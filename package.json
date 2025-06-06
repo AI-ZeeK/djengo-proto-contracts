@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "bin": {
     "djengo-proto-setup": "./scripts/copy-to-project.js",
-    "djengo-proto-command": "./scripts/generate-command.js"
+    "djengo-proto-build": "./scripts/build-all.js"
   },
   "scripts": {
     "build": "npm run build:ts",
@@ -45,7 +45,8 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.0",
-    "@grpc/proto-loader": "^0.7.0"
+    "@grpc/proto-loader": "^0.7.0",
+    "chalk": "^4.1.2"
   },
   "exports": {
     ".": {
