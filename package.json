@@ -4,6 +4,9 @@
   "description": "Shared gRPC proto definitions for DJENGO microservices",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "djengo-proto-setup": "./scripts/copy-to-project.js"
+  },
   "scripts": {
     "build": "npm run build:ts",
     "build:ts": "tsc",
@@ -15,7 +18,9 @@
   "files": [
     "dist/",
     "proto/",
+    "scripts/",
     "README.md",
+    "SETUP.md",
     "*.ts"
   ],
   "keywords": [
