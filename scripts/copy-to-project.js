@@ -73,7 +73,7 @@ function copyProtoFiles() {
     console.log("💡 Tip: Add this to your package.json scripts:");
     console.log('   "proto:setup": "djengo-proto-setup"');
     console.log(
-      '   "proto:generate": "protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=./src/shared/dependencies --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb --ts_proto_opt=outputServices=grpc-js --proto_path=./src/shared/proto ./src/shared/proto/*.proto"'
+      '   "proto:generate": "protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=./src/shared/dependencies --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb --ts_proto_opt=outputServices=grpc-js --ts_proto_opt=useOptionals=messages --ts_proto_opt=snakeToCamel=false --proto_path=./src/shared/proto ./src/shared/proto/*.proto"'
     );
   } catch (error) {
     console.error("❌ Error during setup:", error.message);

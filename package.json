@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "djengo-proto-setup": "./scripts/copy-to-project.js"
+    "djengo-proto-setup": "./scripts/copy-to-project.js",
+    "djengo-proto-command": "./scripts/generate-command.js"
   },
   "scripts": {
     "build": "npm run build:ts",
