@@ -216,7 +216,7 @@ function generateTypeScript(protocPath) {
   // Use the working command format from the gateway service
   const command = [
     `"${protocPath}"`,
-    `--plugin=protoc-gen-ts_proto=${pluginPath}`,
+    `--plugin=protoc-gen-ts_proto="${path.resolve(fullPluginPath)}"`,
     `--ts_proto_out=./src/shared/dependencies`,
     `--ts_proto_opt=nestJs=true`,
     `--ts_proto_opt=fileSuffix=.pb`,
