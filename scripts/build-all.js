@@ -14,13 +14,20 @@ const targetDepsDir = path.join(projectRoot, "src/shared/dependencies");
 
 // NestJS-style logger
 const logger = {
-  log: (message) => console.log(chalk.green(`[DJENGO] ${message}`)),
-  info: (message) => console.log(chalk.blue(`[DJENGO] ${message}`)),
-  warn: (message) => console.log(chalk.yellow(`[DJENGO] ${message}`)),
-  error: (message) => console.log(chalk.red(`[DJENGO] ${message}`)),
-  success: (message) => console.log(chalk.green(`[DJENGO] ✅ ${message}`)),
+  log: (message) =>
+    console.log(chalk.green(`[DJENGO-PROTO-CONTRACTS] ${message}`)),
+  info: (message) =>
+    console.log(chalk.blue(`[DJENGO-PROTO-CONTRACTS] ${message}`)),
+  warn: (message) =>
+    console.log(chalk.yellow(`[DJENGO-PROTO-CONTRACTS] ${message}`)),
+  error: (message) =>
+    console.log(chalk.red(`[DJENGO-PROTO-CONTRACTS] ${message}`)),
+  success: (message) =>
+    console.log(chalk.green(`[DJENGO-PROTO-CONTRACTS] ✅ ${message}`)),
   step: (step, message) =>
-    console.log(chalk.cyan(`[DJENGO] 📋 Step ${step}: ${message}`)),
+    console.log(
+      chalk.cyan(`[DJENGO-PROTO-CONTRACTS] 📋 Step ${step}: ${message}`)
+    ),
   title: (title) => {
     console.log(chalk.magenta.bold(`\n🚀 ${title}`));
     console.log(chalk.magenta("=".repeat(title.length + 3)));
