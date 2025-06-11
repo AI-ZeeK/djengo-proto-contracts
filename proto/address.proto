@@ -6,6 +6,7 @@ package address;
 service AddressService {
 
   rpc VerifyAddress(VerifyAddressRequest) returns (AddressResponse);
+  rpc CreateAddress(CreateAddressRequest) returns (AddressResponse);
 
 }
 
@@ -25,11 +26,33 @@ message Address {
   optional double longitude = 13;
 }
 
+message CreateAddressRequest {
+  string entity_type = 1;
+  string entity_id = 2;
+  string street = 3;
+  string building = 4;
+  string apartment = 5;
+  string district = 6;
+  string city = 7;
+  string state = 8;
+  string postal_code = 9;
+  string country = 10;
+  string landmark = 11;
+  string direction_url = 12;
+  double latitude = 13;
+  double longitude = 14;
+}
+
 // 📝 REQUEST MESSAGES
 
 message VerifyAddressRequest {
   string entity_type = 1;
   string entity_id = 2;
+}
+
+message CreateAddressResponse {
+  Address address = 1;
+  bool status = 2;
 }
 
 message AddressResponse {
