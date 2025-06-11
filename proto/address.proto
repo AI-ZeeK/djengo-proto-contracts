@@ -6,7 +6,7 @@ package address;
 service AddressService {
 
   rpc VerifyAddress(VerifyAddressRequest) returns (AddressResponse);
-  rpc CreateAddress(CreateAddressRequest) returns (AddressResponse);
+  rpc CreateOrUpdateAddress(CreateAddressRequest) returns (AddressResponse);
 
 }
 
