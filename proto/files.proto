@@ -6,6 +6,7 @@ package files;
 service FilesService {
 
   rpc VerifyFile(VerifyFileRequest) returns (VerifyFileResponse);
+  rpc CreateOrUpdateFile(CreateOrUpdateFileRequest) returns (CreateOrUpdateFileResponse);
   // Temporary Upload System (Two-Phase)
   rpc UploadTemporaryFile(UploadTemporaryFileRequest) returns (TempFileResponse);
   rpc ConfirmFile(ConfirmFileRequest) returns (ConfirmFileResponse);
@@ -36,6 +37,16 @@ service FilesService {
 message VerifyFileRequest {
   string entity_type = 1;
   string entity_id = 2;
+}
+
+message CreateOrUpdateFileRequest {
+  string entity_type = 1;
+  string entity_id = 2;
+  string file_url = 3;
+}
+
+message CreateOrUpdateFileResponse {
+  string file_url = 1;
 }
 
 message VerifyFileResponse {
