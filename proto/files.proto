@@ -4,6 +4,8 @@ package files;
 
 // 📁 Files Service - handles file uploads, storage, and management
 service FilesService {
+
+  rpc VerifyFile(VerifyFileRequest) returns (VerifyFileResponse);
   // Temporary Upload System (Two-Phase)
   rpc UploadTemporaryFile(UploadTemporaryFileRequest) returns (TempFileResponse);
   rpc ConfirmFile(ConfirmFileRequest) returns (ConfirmFileResponse);
@@ -30,6 +32,15 @@ service FilesService {
 }
 
 // 📝 REQUEST MESSAGES
+
+message VerifyFileRequest {
+  string entity_type = 1;
+  string entity_id = 2;
+}
+
+message VerifyFileResponse {
+  string file_url = 1;
+}
 
 message UploadTemporaryFileRequest {
   bytes file_data = 1;
