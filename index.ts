@@ -8,6 +8,9 @@ import * as protoLoader from "@grpc/proto-loader";
 // Export all type definitions
 export * from "./types";
 
+// Export TypeScript enums for use across microservices
+export * from "./scripts/enum";
+
 // Import specific types for better intellisense
 import {
   CreateChatRequest,

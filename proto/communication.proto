@@ -28,9 +28,20 @@ service CommunicationService {
   
   // Real-time subscriptions (for WebSocket events)
   rpc GetChatEvents(ChatEventsRequest) returns (stream ChatEventResponse);
+  
+  // Mail Management
+  rpc SendOtpMail(SendOtpMailRequest) returns (SendOtpMailResponse);
+
 }
 
 // 📝 REQUEST MESSAGES
+
+message SendOtpMailRequest {
+  string email = 1;
+  string name = 2;
+  string otp = 3;
+  string type = 4;
+}
 
 message CreateChatRequest {
   string name = 1;
@@ -150,6 +161,11 @@ message DeleteChatResponse {
   bool success = 1;
   optional string error = 2;
   string chat_id = 3;
+}
+
+message SendOtpMailResponse {
+  bool success = 1;
+  optional string error = 2;
 }
 
 message MessageResponse {
