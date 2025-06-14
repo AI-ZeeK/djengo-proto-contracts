@@ -17,8 +17,6 @@ service ProfileService {
   rpc verifyOtp(VerifyOtpRequest) returns (SendOtpResponse);
   rpc logout(LogoutRequest) returns (SendOtpResponse);
   rpc refreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
-  rpc updateUser(UpdateUserRequest) returns (UpdateUserResponse);
-  rpc getUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
 }
 
 // 📝 REQUEST MESSAGES
