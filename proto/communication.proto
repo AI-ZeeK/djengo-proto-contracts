@@ -43,8 +43,13 @@ message SendOtpMailRequest {
   string email = 1;
   string name = 2;
   string otp = 3;
-  string type = 4;
+  SendOtpType type = 4;
 }
+enum SendOtpType {
+  REGISTRATION = 0;
+  SIGNIN = 1;
+}
+
 
 message ClearUserPushSubscriptionsRequest {
   string user_id = 1;
