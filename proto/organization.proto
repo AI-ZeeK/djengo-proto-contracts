@@ -7,129 +7,21 @@ service OrganizationService {
   // Organization Management
   rpc CreateOrganization(CreateOrganizationRequest) returns (OrganizationResponse);
   rpc GetOrganization(GetOrganizationRequest) returns (OrganizationResponse);
-  rpc UpdateOrganization(UpdateOrganizationRequest) returns (OrganizationResponse);
-  rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse);
-  rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse);
-  
-  // Branch Management
-  rpc CreateBranch(CreateBranchRequest) returns (BranchResponse);
-  rpc GetBranch(GetBranchRequest) returns (BranchResponse);
-  rpc UpdateBranch(UpdateBranchRequest) returns (BranchResponse);
-  rpc DeleteBranch(DeleteBranchRequest) returns (DeleteBranchResponse);
-  rpc ListBranches(ListBranchesRequest) returns (ListBranchesResponse);
-  
-  // Staff Management
-  rpc AddStaff(AddStaffRequest) returns (StaffResponse);
-  rpc RemoveStaff(RemoveStaffRequest) returns (StaffResponse);
-  rpc UpdateStaffRole(UpdateStaffRoleRequest) returns (StaffResponse);
-  rpc ListStaff(ListStaffRequest) returns (ListStaffResponse);
-  
-  // Organization Settings
-  rpc UpdateSettings(UpdateSettingsRequest) returns (SettingsResponse);
-  rpc GetSettings(GetSettingsRequest) returns (SettingsResponse);
+
 }
 
 // 📝 REQUEST MESSAGES
 
 message CreateOrganizationRequest {
-  string name = 1;
-  string owner_id = 2;
-  optional string description = 3;
-  optional string logo_url = 4;
-  optional string website = 5;
-  optional string phone = 6;
-  optional string email = 7;
-  optional Address address = 8;
+  string creator_id = 1;
+  string organization_name = 2;
+  string phone_number = 3;
+  string email = 4;
+  string registration_number = 5;
+  string registration_date = 6;
 }
 
 message GetOrganizationRequest {
-  string organization_id = 1;
-}
-
-message UpdateOrganizationRequest {
-  string organization_id = 1;
-  optional string name = 2;
-  optional string description = 3;
-  optional string logo_url = 4;
-  optional string website = 5;
-  optional string phone = 6;
-  optional string email = 7;
-  optional Address address = 8;
-}
-
-message DeleteOrganizationRequest {
-  string organization_id = 1;
-}
-
-message ListOrganizationsRequest {
-  string user_id = 1;
-  optional int32 limit = 2;
-  optional int32 offset = 3;
-}
-
-message CreateBranchRequest {
-  string organization_id = 1;
-  string name = 2;
-  optional string description = 3;
-  optional string manager_id = 4;
-  optional Address address = 5;
-}
-
-message GetBranchRequest {
-  string branch_id = 1;
-}
-
-message UpdateBranchRequest {
-  string branch_id = 1;
-  optional string name = 2;
-  optional string description = 3;
-  optional string manager_id = 4;
-  optional Address address = 5;
-}
-
-message DeleteBranchRequest {
-  string branch_id = 1;
-}
-
-message ListBranchesRequest {
-  string organization_id = 1;
-  optional int32 limit = 2;
-  optional int32 offset = 3;
-}
-
-message AddStaffRequest {
-  string organization_id = 1;
-  string user_id = 2;
-  string role = 3;
-  optional string branch_id = 4;
-  repeated string permissions = 5;
-}
-
-message RemoveStaffRequest {
-  string organization_id = 1;
-  string user_id = 2;
-}
-
-message UpdateStaffRoleRequest {
-  string organization_id = 1;
-  string user_id = 2;
-  string role = 3;
-  repeated string permissions = 4;
-}
-
-message ListStaffRequest {
-  string organization_id = 1;
-  optional string branch_id = 2;
-  optional int32 limit = 3;
-  optional int32 offset = 4;
-}
-
-message UpdateSettingsRequest {
-  string organization_id = 1;
-  map<string, string> settings = 2;
-}
-
-message GetSettingsRequest {
   string organization_id = 1;
 }
 
@@ -141,137 +33,18 @@ message OrganizationResponse {
   optional Organization organization = 3;
 }
 
-message DeleteOrganizationResponse {
-  bool success = 1;
-  optional string error = 2;
-}
-
-message ListOrganizationsResponse {
-  bool success = 1;
-  optional string error = 2;
-  repeated Organization organizations = 3;
-  int32 total_count = 4;
-}
-
-message BranchResponse {
-  bool success = 1;
-  optional string error = 2;
-  optional Branch branch = 3;
-}
-
-message DeleteBranchResponse {
-  bool success = 1;
-  optional string error = 2;
-}
-
-message ListBranchesResponse {
-  bool success = 1;
-  optional string error = 2;
-  repeated Branch branches = 3;
-  int32 total_count = 4;
-}
-
-message StaffResponse {
-  bool success = 1;
-  optional string error = 2;
-  optional Staff staff = 3;
-}
-
-message ListStaffResponse {
-  bool success = 1;
-  optional string error = 2;
-  repeated Staff staff = 3;
-  int32 total_count = 4;
-}
-
-message SettingsResponse {
-  bool success = 1;
-  optional string error = 2;
-  map<string, string> settings = 3;
-}
 
 // 🏗️ DATA MODELS
 
 message Organization {
   string organization_id = 1;
   string name = 2;
-  string owner_id = 3;
-  optional string description = 4;
-  optional string logo_url = 5;
-  optional string website = 6;
-  optional string phone = 7;
-  optional string email = 8;
-  optional Address address = 9;
-  OrganizationStatus status = 10;
-  int32 branch_count = 11;
-  int32 staff_count = 12;
-  string created_at = 13;
-  string updated_at = 14;
-  optional string deleted_at = 15;
+  string phone_number = 3;
+  string email = 4;
+  string registration_number = 5;
+  string registration_date = 6;
+  string creator_id = 7;
+  string created_at = 8;
+  string updated_at = 9;
+  optional string deleted_at = 10;
 }
-
-message Branch {
-  string branch_id = 1;
-  string organization_id = 2;
-  string name = 3;
-  optional string description = 4;
-  optional string manager_id = 5;
-  optional Address address = 6;
-  BranchStatus status = 7;
-  int32 staff_count = 8;
-  string created_at = 9;
-  string updated_at = 10;
-  optional string deleted_at = 11;
-}
-
-message Staff {
-  string staff_id = 1;
-  string organization_id = 2;
-  string user_id = 3;
-  string role = 4;
-  optional string branch_id = 5;
-  repeated string permissions = 6;
-  StaffStatus status = 7;
-  string joined_at = 8;
-  string created_at = 9;
-  string updated_at = 10;
-}
-
-message Address {
-  optional string street = 1;
-  optional string building = 2;
-  optional string apartment = 3;
-  optional string district = 4;
-  optional string city = 5;
-  optional string state = 6;
-  optional string postal_code = 7;
-  optional string country = 8;
-  optional string landmark = 9;
-  optional string direction_url = 10;
-  optional double latitude = 11;
-  optional double longitude = 12;
-}
-
-// 🏷️ ENUMS
-
-enum OrganizationStatus {
-  ORGANIZATION_STATUS_PENDING = 0;
-  ORGANIZATION_STATUS_ACTIVE = 1;
-  ORGANIZATION_STATUS_SUSPENDED = 2;
-  ORGANIZATION_STATUS_DELETED = 3;
-}
-
-enum BranchStatus {
-  BRANCH_STATUS_PENDING = 0;
-  BRANCH_STATUS_ACTIVE = 1;
-  BRANCH_STATUS_SUSPENDED = 2;
-  BRANCH_STATUS_DELETED = 3;
-}
-
-enum StaffStatus {
-  STAFF_STATUS_PENDING = 0;
-  STAFF_STATUS_ACTIVE = 1;
-  STAFF_STATUS_SUSPENDED = 2;
-  STAFF_STATUS_DELETED = 3;
-}
-
