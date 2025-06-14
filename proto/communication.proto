@@ -32,6 +32,9 @@ service CommunicationService {
   // Mail Management
   rpc SendOtpMail(SendOtpMailRequest) returns (SendOtpMailResponse);
 
+  // Push Notifications
+  rpc ClearUserPushSubscriptions(ClearUserPushSubscriptionsRequest) returns (ClearUserPushSubscriptionsResponse);
+
 }
 
 // 📝 REQUEST MESSAGES
@@ -41,6 +44,14 @@ message SendOtpMailRequest {
   string name = 2;
   string otp = 3;
   string type = 4;
+}
+
+message ClearUserPushSubscriptionsRequest {
+  string user_id = 1;
+}
+
+message ClearUserPushSubscriptionsResponse {
+  bool success = 1;
 }
 
 message CreateChatRequest {
