@@ -29,7 +29,7 @@ message LoginRequest {
 }
 
 message SendOtpRequest {
-  string email = 1;
+  string token = 1;
   SendOtpType type = 2;
 }
 
