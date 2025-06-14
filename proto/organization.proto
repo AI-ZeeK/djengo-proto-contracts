@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package organization;
+
+// 💬 Communication Service - handles chats, messages, and real-time communication
+service OrganizationService {
+
+
+}
+
