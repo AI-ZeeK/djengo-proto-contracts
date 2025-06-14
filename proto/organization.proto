@@ -8,9 +8,24 @@ service OrganizationService {
   rpc CreateOrganization(CreateOrganizationRequest) returns (OrganizationResponse);
   rpc GetOrganization(GetOrganizationRequest) returns (OrganizationResponse);
 
+
+  rpc validateCompanyReference(ValidateCompanyReferenceRequest) returns (ValidateCompanyReferenceResponse);
+
+
+
 }
 
 // 📝 REQUEST MESSAGES
+
+message ValidateCompanyReferenceRequest {
+  string company_ref = 1;
+}
+
+message ValidateCompanyReferenceResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string company_ref = 3;
+}
 
 message CreateOrganizationRequest {
   string creator_id = 1;
