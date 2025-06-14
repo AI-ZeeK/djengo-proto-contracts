@@ -24,7 +24,7 @@ message ValidateCompanyReferenceRequest {
 message ValidateCompanyReferenceResponse {
   bool success = 1;
   optional string error = 2;
-  optional string company_ref = 3;
+  optional string company_id = 3;
 }
 
 message CreateOrganizationRequest {
