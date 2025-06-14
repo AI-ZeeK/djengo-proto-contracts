@@ -6,6 +6,7 @@ package profile;
 service ProfileService {
   // User Management
   rpc GetUser(GetUserRequest) returns (UserResponse);
+  rpc GetBusinessUser(GetUserRequest) returns (BusinessUserResponse);
   rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse);
   rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse);
   rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
@@ -96,6 +97,7 @@ message RefreshTokenRequest {
 }
 
 
+
 message GetUserRequest {
   string user_id = 1;
 }
@@ -125,6 +127,24 @@ message UpdateUserRequest {
 }
 
 // 📤 RESPONSE MESSAGES
+
+message BusinessUser {
+  string business_user_id = 1;
+  string user_id = 2;
+  string email = 3;
+  string phone_number = 4;
+  string organization_id = 5;
+  string access_type = 6;
+  int32 access_level = 7;
+  bool is_active = 8;
+  optional string notes = 9;
+}
+
+message BusinessUserResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional BusinessUser business_user = 3;
+}
 
 message UserResponse {
   bool success = 1;
@@ -223,11 +243,7 @@ message UserRole {
   bool is_active = 3;
 }
 
-message BusinessUser {
-  string business_user_id = 1;
-  string business_name = 2;
-  bool is_active = 3;
-} 
+
 
 enum SendOtpType {
   REGISTRATION = 0;
