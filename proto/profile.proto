@@ -26,6 +26,13 @@ service ProfileService {
 
 message EmptyRequest {}
 
+message RegisterResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
+  optional string auth_token = 4;
+}
+
 message Role {
   string role_id = 1;
   string role_name = 2;
