@@ -78,12 +78,7 @@ message RegisterRequest {
   ROLES_ENUM role_name = 2;
   string password = 3;
   string phone_number = 4;
-  string organization_name = 5;
-  string company_ref = 6;
-  string organization_phone_number = 7;
-  string organization_email = 8;
-  string organization_registration_number = 9;
-  string organization_registration_date = 10;
+  string company_ref = 5;
 }
 
 
