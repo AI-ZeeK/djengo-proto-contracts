@@ -13,7 +13,7 @@ service ProfileService {
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
 
   rpc login(LoginRequest) returns (AuthResponse);
-  rpc register(RegisterRequest) returns (AuthResponse);
+  rpc register(RegisterRequest) returns (RegisterResponse);
   rpc sendOtp(SendOtpRequest) returns (SendOtpResponse);
   rpc verifyOtp(VerifyOtpRequest) returns (SendOtpResponse);
   rpc logout(LogoutRequest) returns (SendOtpResponse);
@@ -82,10 +82,10 @@ message AuthResponse {
 
 message RegisterRequest {
   string email = 1;
-  ROLES_ENUM role_name = 2;
-  string password = 3;
-  string phone_number = 4;
-  string company_ref = 5;
+  string password = 2;
+  string phone_number = 3;
+  optional string company_ref = 4;
+  ROLES_ENUM role_name = 5;
 }
 
 
