@@ -82,7 +82,6 @@ message AuthResponse {
 
 message RegisterRequest {
   string email = 1;
-  string passwordless = 2;
   string phone_number = 3;
   string company_ref = 4;
   ROLES_ENUM role_name = 5;
