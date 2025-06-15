@@ -1,8 +1,8 @@
 syntax = "proto3";
 
 package profile;
+import "google/protobuf/struct.proto";
 
-import "google/protobuf/any.proto";
 
 // 👤 Profile Service - handles user profiles and user management
 service ProfileService {
@@ -33,7 +33,6 @@ message RegisterResponse {
   optional string error = 2;
   optional string message = 3;
   optional string auth_token = 4;
-  google.protobuf.Any additional_data = 5;
 }
 
 message Role {
@@ -43,8 +42,8 @@ message Role {
 }
 
 message GetRolesResponse {
-  repeated Role roles = 1;
-  google.protobuf.Any additional_data = 2;
+  // repeated Role roles = 1;
+  google.protobuf.Struct data = 1;
 }
 
 message LoginRequest {
@@ -90,7 +89,6 @@ message RegisterRequest {
   string phone_number = 3;
   string company_ref = 4;
   ROLES_ENUM role_name = 5;
-  google.protobuf.Any additional_data = 6;
 }
 
 
