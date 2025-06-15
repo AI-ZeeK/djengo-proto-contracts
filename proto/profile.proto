@@ -12,14 +12,14 @@ service ProfileService {
   rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
 
-  rpc register(RegisterRequest) returns (RegisterResponse);
-  rpc login(LoginRequest) returns (AuthResponse);
-  rpc sendOtp(SendOtpRequest) returns (SendOtpResponse);
-  rpc verifyOtp(VerifyOtpRequest) returns (SendOtpResponse);
-  rpc logout(LogoutRequest) returns (SendOtpResponse);
-  rpc refreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Login(LoginRequest) returns (AuthResponse);
+  rpc SendOtp(SendOtpRequest) returns (SendOtpResponse);
+  rpc VerifyOtp(VerifyOtpRequest) returns (SendOtpResponse);
+  rpc Logout(LogoutRequest) returns (SendOtpResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
 
-  rpc getRoles(EmptyRequest) returns (GetRolesResponse);
+  rpc GetRoles(EmptyRequest) returns (GetRolesResponse);
 }
 
 // 📝 REQUEST MESSAGES
