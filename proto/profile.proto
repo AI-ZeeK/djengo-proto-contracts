@@ -12,8 +12,7 @@ service ProfileService {
   rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
 
-  rpc UserRegister(UserRegisterRequest) returns (RegisterResponse);
-  rpc Register(EmptyRequest) returns (RegisterResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Login(LoginRequest) returns (AuthResponse);
   rpc SendOtp(SendOtpRequest) returns (SendOtpResponse);
   rpc VerifyOtp(VerifyOtpRequest) returns (SendOtpResponse);
@@ -82,18 +81,12 @@ message AuthResponse {
 }
 
 message RegisterRequest {
-  string email = 1;
-  string password = 2;
+  int32 id = 1;
+  string email = 2;
   string phone_number = 3;
-  string company_ref = 4;
-  ROLES_ENUM role_name = 5;
-}
-message UserRegisterRequest {
-  string email = 1;
-  string password = 2;
-  string phone_number = 3;
-  string company_ref = 4;
-  ROLES_ENUM role_name = 5;
+  string password = 4;
+  optional string company_ref = 5;
+  ROLES_ENUM role_name = 6; 
 }
 
 
