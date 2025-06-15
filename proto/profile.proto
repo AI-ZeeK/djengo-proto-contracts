@@ -43,7 +43,7 @@ message Role {
 
 message GetRolesResponse {
   // repeated Role roles = 1;
-  google.protobuf.Struct data = 1;
+  repeated google.protobuf.Struct data = 1;
 }
 
 message LoginRequest {
