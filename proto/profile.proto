@@ -86,6 +86,8 @@ message RegisterRequest {
   string phone_number = 3;
   string company_ref = 4;
   ROLES_ENUM role_name = 5;
+  int32 role_id = 6;
+  int32 company_id = 7;
 }
 
 
