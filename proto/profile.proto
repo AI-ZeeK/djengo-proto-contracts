@@ -84,7 +84,7 @@ message RegisterRequest {
   string email = 1;
   string password = 2;
   string phone_number = 3;
-  optional string company_ref = 4;
+  string company_ref = 4;
   ROLES_ENUM role_name = 5;
 }
 
