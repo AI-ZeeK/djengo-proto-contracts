@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package profile;
 
-import "google/protobuf/struct.proto";
-
 // 👤 Profile Service - handles user profiles and user management
 service ProfileService {
   // User Management
@@ -14,8 +12,8 @@ service ProfileService {
   rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
 
+  rpc register(RegisterRequest) returns (RegisterResponse);
   rpc login(LoginRequest) returns (AuthResponse);
-  rpc register(google.protobuf.Struct) returns (RegisterResponse);
   rpc sendOtp(SendOtpRequest) returns (SendOtpResponse);
   rpc verifyOtp(VerifyOtpRequest) returns (SendOtpResponse);
   rpc logout(LogoutRequest) returns (SendOtpResponse);
