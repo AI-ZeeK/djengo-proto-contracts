@@ -13,7 +13,7 @@ service ProfileService {
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
 
   rpc UserRegister(UserRegisterRequest) returns (RegisterResponse);
-  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Register(EmptyRequest) returns (RegisterResponse);
   rpc Login(LoginRequest) returns (AuthResponse);
   rpc SendOtp(SendOtpRequest) returns (SendOtpResponse);
   rpc VerifyOtp(VerifyOtpRequest) returns (SendOtpResponse);
