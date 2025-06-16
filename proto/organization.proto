@@ -28,12 +28,12 @@ message ValidateCompanyReferenceResponse {
 }
 
 message CreateOrganizationRequest {
-  string creator_id = 1;
-  string organization_name = 2;
-  string phone_number = 3;
+  string creatorid = 1;
+  string organizationname = 2;
+  string phonenumber = 3;
   string email = 4;
-  string registration_number = 5;
-  string registration_date = 6;
+  string registrationnumber = 5;
+  string registrationdate = 6;
 }
 
 message GetOrganizationRequest {
