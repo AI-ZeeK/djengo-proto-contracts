@@ -31,6 +31,7 @@ message CommonResponseArray {
   string message = 2;
   int32 status = 3;
   repeated google.protobuf.Struct data = 4;
+  repeated Role roles = 5;
 }
 
 
@@ -42,13 +43,15 @@ message RegisterResponse {
   bool success = 1;
   optional string error = 2;
   optional string message = 3;
-  optional string authToken = 4;
+  optional string auth_token = 4;
 }
 
 message Role {
-  string roleId = 1;
-  string roleName = 2;
-  bool isActive = 3;
+  string role_id = 1;
+  string role_name = 2;
+  bool is_active = 3;
+  string roleid = 4;
+  string rolename = 5;
 }
 
 message GetRolesResponse {
@@ -80,7 +83,7 @@ message SendOtpResponse {
 message RefreshTokenResponse {
   bool success = 1;
   User user = 2;
-  string accessToken = 3;
+  string access_token = 3;
 }
 
 
@@ -89,15 +92,15 @@ message AuthResponse {
   bool success = 1;
   optional string error = 2;
   User user = 3;
-  string accessToken = 4;
+  string access_token = 4;
 }
 
 message RegisterRequest {
   string email = 1;
   string password = 2;
-  string phoneNumber = 3;
-  string companyRef = 4;
-  ROLES_ENUM roleName = 5;
+  string phone_number = 3;
+  string company_ref = 4;
+  ROLES_ENUM role_name = 5;
 }
 
 
@@ -108,17 +111,17 @@ enum ROLES_ENUM {
 }
 
 message LogoutRequest {
-  string userId = 1;
+  string user_id = 1;
 }
 
 message RefreshTokenRequest {
-  string userId = 1;
+  string user_id = 1;
 }
 
 
 
 message GetUserRequest {
-  string userId = 1;
+  string user_id = 1;
 }
 
 message GetUserByEmailRequest {
@@ -126,43 +129,43 @@ message GetUserByEmailRequest {
 }
 
 message UpdateUserStatusRequest {
-  string userId = 1;
-  string lastSeen = 2;
+  string user_id = 1;
+  string last_seen = 2;
 }
 
 message GetUserContactsRequest {
-  string userId = 1;
+  string user_id = 1;
   optional string name = 2;
 }
 
 message UpdateUserRequest {
-  string userId = 1;
-  optional string firstName = 2;
-  optional string lastName = 3;
+  string user_id = 1;
+  optional string first_name = 2;
+  optional string last_name = 3;
   optional string email = 4;
-  optional string phoneNumber = 5;
-  optional string avatarUrl = 6;
+  optional string phone_number = 5;
+  optional string avatar_url = 6;
   optional Address address = 7;
 }
 
 // 📤 RESPONSE MESSAGES
 
 message BusinessUser {
-  string businessUserId = 1;
-  string userId = 2;
+  string business_user_id = 1;
+  string user_id = 2;
   string email = 3;
-  string phoneNumber = 4;
-  string organizationId = 5;
-  string accessType = 6;
-  int32 accessLevel = 7;
-  bool isActive = 8;
+  string phone_number = 4;
+  string organization_id = 5;
+  string access_type = 6;
+  int32 access_level = 7;
+  bool is_active = 8;
   optional string notes = 9;
 }
 
 message BusinessUserResponse {
   bool success = 1;
   optional string error = 2;
-  optional BusinessUser businessUser = 3;
+  optional BusinessUser business_user = 3;
 }
 
 message UserResponse {
@@ -188,7 +191,7 @@ message GetUserContactsResponse {
   bool success = 1;
   optional string error = 2;
   repeated Contact contacts = 3;
-  int32 totalCount = 4;
+  int32 total_count = 4;
 }
 
 message UpdateUserResponse {
@@ -200,66 +203,66 @@ message UpdateUserResponse {
 // 🏗️ DATA MODELS
 
 message User {
-  string userId = 1;
+  string user_id = 1;
   string email = 2;
   optional string username = 3;
-  optional string firstName = 4;
-  optional string lastName = 5;
-  optional string phoneNumber = 6;
-  optional string avatarUrl = 7;
-  optional string lastSeen = 8;
-  string createdAt = 9;
-  string updatedAt = 10;
-  bool emailVerified = 11;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  optional string phone_number = 6;
+  optional string avatar_url = 7;
+  optional string last_seen = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  bool email_verified = 11;
   optional Address address = 12;
-  optional UserRole userRole = 13;
-  optional BusinessUser businessUser = 14;
+  optional UserRole user_role = 13;
+  optional BusinessUser business_user = 14;
 }
 
 message BasicUser {
-  string userId = 1;
+  string user_id = 1;
   string email = 2;
   optional string username = 3;
-  optional string firstName = 4;
-  optional string lastName = 5;
-  optional string phoneNumber = 6;
-  optional string lastSeen = 7;
-  string createdAt = 8;
-  string updatedAt = 9;
-  bool emailVerified = 10;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  optional string phone_number = 6;
+  optional string last_seen = 7;
+  string created_at = 8;
+  string updated_at = 9;
+  bool email_verified = 10;
 }
 
 message Contact {
-  string userId = 1;
+  string user_id = 1;
   string email = 2;
   optional string username = 3;
-  optional string firstName = 4;
-  optional string lastName = 5;
-  optional string avatarUrl = 6;
-  optional string lastSeen = 7;
-  bool emailVerified = 8;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  optional string avatar_url = 6;
+  optional string last_seen = 7;
+  bool email_verified = 8;
 }
 
 message Address {
-  optional string addressId = 1;
+  optional string address_id = 1;
   optional string street = 2;
   optional string building = 3;
   optional string apartment = 4;
   optional string district = 5;
   optional string city = 6;
   optional string state = 7;
-  optional string postalCode = 8;
+  optional string postal_code = 8;
   optional string country = 9;
   optional string landmark = 10;
-  optional string directionUrl = 11;
+  optional string direction_url = 11;
   optional double latitude = 12;
   optional double longitude = 13;
 }
 
 message UserRole {
-  string userRoleId = 1;
-  string roleName = 2;
-  bool isActive = 3;
+  string user_role_id = 1;
+  string role_name = 2;
+  bool is_active = 3;
 }
 
 
