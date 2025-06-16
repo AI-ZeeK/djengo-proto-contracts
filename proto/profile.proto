@@ -14,7 +14,7 @@ service ProfileService {
   rpc Logout(LogoutRequest) returns (SendOtpResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
 
-  rpc GetRoles(EmptyRequest) returns (CommonResponseArray);
+  rpc GetRoles(EmptyRequest) returns (GetRolesResponse);
   
   // User Management
   rpc GetUser(GetUserRequest) returns (UserResponse);
@@ -100,7 +100,7 @@ message RegisterRequest {
   string password = 2;
   string phonenumber = 3;
   string companyref = 4;
-  ROLES_ENUM rolename = 5;
+  string rolename = 5;
 }
 
 
