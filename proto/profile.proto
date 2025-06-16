@@ -50,8 +50,6 @@ message Role {
   string role_id = 1;
   string role_name = 2;
   bool is_active = 3;
-  string roleid = 4;
-  string rolename = 5;
 }
 
 message GetRolesResponse {

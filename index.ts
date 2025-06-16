@@ -120,3 +120,29 @@ export function toSnakeCase(obj: any): any {
   }
   return obj;
 }
+
+export function toCamelCase(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(toCamelCase);
+  } else if (obj !== null && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [
+        k.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()),
+        toCamelCase(v),
+      ])
+    );
+  }
+  return obj;
+}
+
+// Utility types
+export type SnakeToCamelCase<S extends string> =
+  S extends `${infer T}_${infer U}`
+    ? `${T}${Capitalize<SnakeToCamelCase<U>>}`
+    : S;
+
+export type KeysToCamelCase<T> = {
+  [K in keyof T as SnakeToCamelCase<Extract<K, string>>]: T[K] extends object
+    ? KeysToCamelCase<T[K]>
+    : T[K];
+};
