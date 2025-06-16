@@ -107,11 +107,16 @@ export const enums: ProtoEnums = {
   },
 };
 
-export function toSnakeCase(obj: any) {
-  return Object.fromEntries(
-    Object.entries(obj).map(([k, v]) => [
-      k.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`),
-      v,
-    ])
-  );
+export function toSnakeCase(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(toSnakeCase);
+  } else if (obj !== null && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [
+        k.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`),
+        toSnakeCase(v),
+      ])
+    );
+  }
+  return obj;
 }
