@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/struct.proto";
 
 package profile;
 
@@ -26,13 +25,6 @@ service ProfileService {
 
 }
 
-message CommonResponseArray {
-  bool success = 1;
-  string message = 2;
-  int32 status = 3;
-  repeated google.protobuf.Struct data = 4;
-  repeated Role roles = 5;
-}
 
 
 // 📝 REQUEST MESSAGES
