@@ -220,6 +220,15 @@ function generateTypeScript(protocPath) {
     process.exit(1);
   }
 
+  // Get the path to google/protobuf files
+  const googleProtoPath = path.join(
+    projectRoot,
+    "node_modules",
+    "google-protobuf",
+    "google",
+    "protobuf"
+  );
+
   // Use the working command format from the gateway service
   const command = [
     `"${protocPath}"`,
@@ -231,6 +240,7 @@ function generateTypeScript(protocPath) {
     `--ts_proto_opt=useOptionals=messages`,
     `--ts_proto_opt=snakeToCamel=false`,
     `--proto_path=./src/shared/proto`,
+    `--proto_path=${googleProtoPath}`,
     `./src/shared/proto/*.proto`,
   ].join(" ");
 

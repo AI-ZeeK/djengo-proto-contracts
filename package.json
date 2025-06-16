@@ -16,6 +16,7 @@
     "prebuild": "npm run clean",
     "prepare": "npm run build",
     "test": "echo \"No tests yet\" && exit 0",
+    "proto:generate": "protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=./dist/dependencies --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb --ts_proto_opt=outputServices=grpc-js --ts_proto_opt=useOptionals=messages --ts_proto_opt=snakeToCamel=false --proto_path=./proto --proto_path=./node_modules/google-protobuf/google/protobuf ./proto/*.proto",
     "dev": "tsc --watch"
   },
   "files": [
