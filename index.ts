@@ -106,3 +106,12 @@ export const enums: ProtoEnums = {
     BLOCKED: 3,
   },
 };
+
+export function toSnakeCase(obj: any) {
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => [
+      k.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`),
+      v,
+    ])
+  );
+}
