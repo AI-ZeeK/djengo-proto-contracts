@@ -10,7 +10,7 @@ service ProfileService {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Login(LoginRequest) returns (AuthResponse);
   rpc SendOtp(SendOtpRequest) returns (SendOtpResponse);
-  rpc VerifyOtp(VerifyOtpRequest) returns (SendOtpResponse);
+  rpc VerifyOtp(VerifyOtpRequest) returns (VerifyOtpResponse);
   rpc Logout(LogoutRequest) returns (SendOtpResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
 
@@ -54,6 +54,13 @@ message Role {
 
 message GetRolesResponse {
   repeated Role roles = 1;
+}
+
+message VerifyOtpResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
+  optional string access_token = 4;
 }
 
 message LoginRequest {
