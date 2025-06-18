@@ -61,6 +61,7 @@ message VerifyOtpResponse {
   optional string error = 2;
   optional string message = 3;
   optional string access_token = 4;
+  optional User user = 5;
 }
 
 message LoginRequest {
