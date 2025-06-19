@@ -156,14 +156,13 @@ export class Helpers {
     if (Array.isArray(obj)) {
       return obj.map(Helpers.toSnakeCase);
     } else if (obj !== null && typeof obj === "object") {
-      // Convert all values recursively, then check if result is empty
       const converted = Object.fromEntries(
         Object.entries(obj).map(([k, v]) => [
           k.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`),
           Helpers.toSnakeCase(v),
         ])
       );
-      return this.isEmptyOrNull(converted);
+      return Helpers.isEmptyOrNull(converted);
     }
     return obj;
   }
@@ -181,7 +180,7 @@ export class Helpers {
           Helpers.toCamelCase(v),
         ])
       );
-      return this.isEmptyOrNull(converted);
+      return Helpers.isEmptyOrNull(converted);
     }
     return obj;
   }
