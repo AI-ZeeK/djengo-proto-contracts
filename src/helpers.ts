@@ -44,7 +44,7 @@ export class Helpers {
    * @param seconds Number of seconds to add to current time
    * @returns Future Date object
    */
-  static getFutureTimestamp(seconds: number): Date {
+  static getFutureTimestamp({ seconds }: { seconds: number }): Date {
     const now = new Date();
     return new Date(now.getTime() + seconds * 1000);
   }
