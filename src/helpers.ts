@@ -184,4 +184,45 @@ export class Helpers {
     }
     return obj;
   }
+
+  /**
+   * Generates a unique company reference ID with hyphens.
+   * Format: XX-CCCCCCss-YY
+   * - XX: first 2 letters of company name (uppercase, sanitized)
+   * - CCCCCC: 6 random uppercase alphanumeric
+   * - ss: 2 random lowercase letters
+   * - YY: last 2 digits of current year
+   */
+  static generateReferenceId({
+    company_name,
+  }: {
+    company_name: string;
+  }): string {
+    const namePart = company_name
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .toUpperCase()
+      .slice(0, 2)
+      .padEnd(2, "X");
+    const now = new Date();
+    const yearPart = now.getFullYear().toString().slice(-2);
+
+    const upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const lowerChars = "abcdefghijklmnopqrstuvwxyz";
+
+    let randomUpper = "";
+    for (let i = 0; i < 6; i++) {
+      randomUpper += upperChars.charAt(
+        Math.floor(Math.random() * upperChars.length)
+      );
+    }
+
+    let randomLower = "";
+    for (let i = 0; i < 2; i++) {
+      randomLower += lowerChars.charAt(
+        Math.floor(Math.random() * lowerChars.length)
+      );
+    }
+
+    return `${namePart}-${randomUpper}${randomLower}-${yearPart}`;
+  }
 }
