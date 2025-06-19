@@ -107,34 +107,6 @@ export const enums: ProtoEnums = {
   },
 };
 
-export function toSnakeCase(obj: any): any {
-  if (Array.isArray(obj)) {
-    return obj.map(toSnakeCase);
-  } else if (obj !== null && typeof obj === "object") {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [
-        k.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`),
-        toSnakeCase(v),
-      ])
-    );
-  }
-  return obj;
-}
-
-export function toCamelCase(obj: any): any {
-  if (Array.isArray(obj)) {
-    return obj.map(toCamelCase);
-  } else if (obj !== null && typeof obj === "object") {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [
-        k.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()),
-        toCamelCase(v),
-      ])
-    );
-  }
-  return obj;
-}
-
 // Utility types
 export type SnakeToCamelCase<S extends string> =
   S extends `${infer T}_${infer U}`
@@ -146,3 +118,5 @@ export type KeysToCamelCase<T> = {
     ? KeysToCamelCase<T[K]>
     : T[K];
 };
+
+export { Helpers } from "./src/helpers";

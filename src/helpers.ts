@@ -133,4 +133,56 @@ export class Helpers {
       .replace(/on\w+=/gi, "") // Remove on* attributes
       .trim();
   }
+
+  /**
+   * Checks if an object is empty. If so, returns null; otherwise, returns the object
+   */
+  static isEmptyOrNull<T extends object>(obj: T): T | null {
+    if (
+      obj &&
+      typeof obj === "object" &&
+      !Array.isArray(obj) &&
+      Object.keys(obj).length === 0
+    ) {
+      return null;
+    }
+    return obj;
+  }
+
+  /**
+   * Converts object keys to snake_case recursively, and converts empty objects to null.
+   */
+  static toSnakeCase(obj: any): any {
+    if (Array.isArray(obj)) {
+      return obj.map(Helpers.toSnakeCase);
+    } else if (obj !== null && typeof obj === "object") {
+      // Convert all values recursively, then check if result is empty
+      const converted = Object.fromEntries(
+        Object.entries(obj).map(([k, v]) => [
+          k.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`),
+          Helpers.toSnakeCase(v),
+        ])
+      );
+      return this.isEmptyOrNull(converted);
+    }
+    return obj;
+  }
+
+  /**
+   * Converts object keys to camelCase recursively, and converts empty objects to null.
+   */
+  static toCamelCase(obj: any): any {
+    if (Array.isArray(obj)) {
+      return obj.map(Helpers.toCamelCase);
+    } else if (obj !== null && typeof obj === "object") {
+      const converted = Object.fromEntries(
+        Object.entries(obj).map(([k, v]) => [
+          k.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()),
+          Helpers.toCamelCase(v),
+        ])
+      );
+      return this.isEmptyOrNull(converted);
+    }
+    return obj;
+  }
 }
