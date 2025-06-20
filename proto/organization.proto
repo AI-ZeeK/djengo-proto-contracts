@@ -8,8 +8,16 @@ service OrganizationService {
   rpc CreateOrganization(CreateOrganizationRequest) returns (OrganizationResponse);
   rpc GetOrganization(GetOrganizationRequest) returns (OrganizationResponse);
 
+  // Validate Company Reference
+  rpc ValidateCompanyReference(ValidateCompanyReferenceRequest) returns (ValidateCompanyReferenceResponse);
 
-  rpc validateCompanyReference(ValidateCompanyReferenceRequest) returns (ValidateCompanyReferenceResponse);
+  // Create Company
+  // rpc CreateCompany(CreateCompanyRequest) returns (CompanyResponse);
+
+  //Delete Utilities
+  rpc DeleteTableLocation(DeleteTableLocationRequest) returns (UtilitiesResponse);
+  rpc DeleteBedSize(DeleteBedSizeRequest) returns (UtilitiesResponse);
+  rpc DeleteRoomLocation(DeleteRoomLocationRequest) returns (UtilitiesResponse);
 
   // CREATE UTILITIES
   rpc CreateTableLocation(CreateTableLocationRequest) returns (UtilitiesResponse);
@@ -17,20 +25,54 @@ service OrganizationService {
   rpc CreateRoomLocation(CreateRoomLocationRequest) returns (UtilitiesResponse);
 
   // Utilities
+  rpc FetchServiceTypes(EmptyRequest) returns (GetServiceTypesResponse);
   rpc GetTableLocations(BranchIdRequest) returns (GetTableLocationsResponse);
   rpc GetBedSizes(BranchIdRequest) returns (GetBedSizesResponse);
   rpc GetRoomLocations(BranchIdRequest) returns (GetRoomLocationsResponse);
 }
 
+
+
 // 📝 REQUEST MESSAGES
+
+message EmptyRequest {
+}
+
+
+message DeleteTableLocationRequest {
+  int32 table_location_id = 1;
+} 
+
+message DeleteBedSizeRequest {
+  int32 bed_size_id = 1;
+}
+
+message DeleteRoomLocationRequest {
+  int32 room_location_id = 1;
+}
+
+
+
+  message GetServiceTypesResponse {
+    bool success = 1;
+    optional string error = 2;
+    repeated ServiceType service_types = 3;
+}
 
 message BranchIdRequest {
   string branch_id = 1;
 }
 
-
+message ServiceType {
+  int32 service_type_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_active = 4;
+}
 
 // � RESPONSE MESSAGES
+
+
 
 message TableLocation {
   int32 table_location_id = 1;
