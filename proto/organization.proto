@@ -17,24 +17,17 @@ service OrganizationService {
   rpc CreateRoomLocation(CreateRoomLocationRequest) returns (UtilitiesResponse);
 
   // Utilities
-  rpc GetTableLocations(GetTableLocationsRequest) returns (GetTableLocationsResponse);
-  rpc GetBedSizes(GetBedSizesRequest) returns (GetBedSizesResponse);
-  rpc GetRoomLocations(GetRoomLocationsRequest) returns (GetRoomLocationsResponse);
+  rpc GetTableLocations(BranchIdRequest) returns (GetTableLocationsResponse);
+  rpc GetBedSizes(BranchIdRequest) returns (GetBedSizesResponse);
+  rpc GetRoomLocations(BranchIdRequest) returns (GetRoomLocationsResponse);
 }
 
 // 📝 REQUEST MESSAGES
 
-message GetTableLocationsRequest {
-  string organization_id = 1;
+message BranchIdRequest {
+  string branch_id = 1;
 }
 
-message GetBedSizesRequest {
-  string organization_id = 1;
-}
-
-message GetRoomLocationsRequest {
-  string organization_id = 1;
-}
 
 
 // � RESPONSE MESSAGES
@@ -101,14 +94,17 @@ message ValidateCompanyReferenceResponse {
 
 message CreateTableLocationRequest {
   string name = 1;
+  string branch_id = 2;
 }
 
 message CreateBedSizeRequest {
   string name = 1;
+  string branch_id = 2;
 }
 
 message CreateRoomLocationRequest {
   string name = 1;
+  string branch_id = 2;
 }
 
 
