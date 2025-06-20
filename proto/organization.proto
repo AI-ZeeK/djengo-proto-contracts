@@ -95,16 +95,19 @@ message ValidateCompanyReferenceResponse {
 message CreateTableLocationRequest {
   string name = 1;
   string branch_id = 2;
+  string creator_id = 3;
 }
 
 message CreateBedSizeRequest {
   string name = 1;
   string branch_id = 2;
+  string creator_id = 3;
 }
 
 message CreateRoomLocationRequest {
   string name = 1;
   string branch_id = 2;
+  string creator_id = 3;
 }
 
 
