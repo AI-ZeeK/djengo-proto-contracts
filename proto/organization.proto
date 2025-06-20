@@ -11,11 +11,83 @@ service OrganizationService {
 
   rpc validateCompanyReference(ValidateCompanyReferenceRequest) returns (ValidateCompanyReferenceResponse);
 
+  // CREATE UTILITIES
+  rpc CreateTableLocation(CreateTableLocationRequest) returns (UtilitiesResponse);
+  rpc CreateBedSize(CreateBedSizeRequest) returns (UtilitiesResponse);
+  rpc CreateRoomLocation(CreateRoomLocationRequest) returns (UtilitiesResponse);
 
-
+  // Utilities
+  rpc GetTableLocations(GetTableLocationsRequest) returns (GetTableLocationsResponse);
+  rpc GetBedSizes(GetBedSizesRequest) returns (GetBedSizesResponse);
+  rpc GetRoomLocations(GetRoomLocationsRequest) returns (GetRoomLocationsResponse);
 }
 
 // 📝 REQUEST MESSAGES
+
+message GetTableLocationsRequest {
+  string organization_id = 1;
+}
+
+message GetBedSizesRequest {
+  string organization_id = 1;
+}
+
+message GetRoomLocationsRequest {
+  string organization_id = 1;
+}
+
+
+// � RESPONSE MESSAGES
+
+message TableLocation {
+  int32 table_location_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_global = 4;
+  bool is_active = 5;
+}
+
+message RoomLocation {
+  int32 room_location_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_global = 4;
+  bool is_active = 5;
+}
+
+message UtilitiesResponse {
+  bool success = 1;
+  optional string error = 2;
+  string message = 3;
+}
+
+message BedSize {
+  int32 bed_size_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_global = 4;
+  bool is_active = 5;
+}
+
+message GetTableLocationsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated TableLocation table_locations = 3;
+}
+
+message GetBedSizesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated BedSize bed_sizes = 3;
+}
+
+
+message GetRoomLocationsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated RoomLocation room_locations = 3;
+}
+
 
 message ValidateCompanyReferenceRequest {
   string company_ref = 1;
@@ -26,6 +98,21 @@ message ValidateCompanyReferenceResponse {
   optional string error = 2;
   string company_id = 3;
 }
+
+message CreateTableLocationRequest {
+  string name = 1;
+}
+
+message CreateBedSizeRequest {
+  string name = 1;
+}
+
+message CreateRoomLocationRequest {
+  string name = 1;
+}
+
+
+
 
 message CreateOrganizationRequest {
   string creator_id = 1;
