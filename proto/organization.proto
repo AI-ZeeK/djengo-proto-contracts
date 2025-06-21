@@ -26,9 +26,9 @@ service OrganizationService {
 
   // Utilities
   rpc FetchServiceTypes(EmptyRequest) returns (GetServiceTypesResponse);
-  rpc GetTableLocations(BranchIdRequest) returns (GetTableLocationsResponse);
-  rpc GetBedSizes(BranchIdRequest) returns (GetBedSizesResponse);
-  rpc GetRoomLocations(BranchIdRequest) returns (GetRoomLocationsResponse);
+  rpc GetTableLocations(OrganizationIdRequest) returns (GetTableLocationsResponse);
+  rpc GetBedSizes(OrganizationIdRequest) returns (GetBedSizesResponse);
+  rpc GetRoomLocations(OrganizationIdRequest) returns (GetRoomLocationsResponse);
 }
 
 
@@ -61,6 +61,10 @@ message DeleteRoomLocationRequest {
 
 message BranchIdRequest {
   string branch_id = 1;
+}
+
+message OrganizationIdRequest {
+  string organization_id = 1;
 }
 
 message ServiceType {
@@ -136,19 +140,19 @@ message ValidateCompanyReferenceResponse {
 
 message CreateTableLocationRequest {
   string name = 1;
-  string branch_id = 2;
+  string organization_id = 2;
   string creator_id = 3;
 }
 
 message CreateBedSizeRequest {
   string name = 1;
-  string branch_id = 2;
+  string organization_id = 2;
   string creator_id = 3;
 }
 
 message CreateRoomLocationRequest {
   string name = 1;
-  string branch_id = 2;
+  string organization_id = 2;
   string creator_id = 3;
 }
 
