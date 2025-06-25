@@ -237,9 +237,10 @@ message AddressRequest {
   optional string district = 4;
   optional string country = 5;
   optional string landmark = 6;
-  optional string latitude = 7;
-  optional string longitude = 8;
+  optional int32 latitude = 7;
+  optional int32 longitude = 8;
   optional string postal_code = 9;
+  optional string direction_url = 10;
 }
   
 
