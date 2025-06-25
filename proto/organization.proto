@@ -180,10 +180,10 @@ message MainBranch {
 }
 
 message BusinessHours {
-  optional string day_of_week = 1;
-  optional string start_time = 2;
-  optional string end_time = 3;
-  optional bool is_active = 4;
+  string day_of_week = 1;
+  string start_time = 2;
+  string end_time = 3;
+  bool is_active = 4;
 }
 
 message BusinessType {
@@ -197,18 +197,18 @@ message BusinessType {
 }
 
 message HotelRoomType {
-  optional string name = 1;
+  string name = 1;
   optional string description = 2;
-  optional int32 price_per_night = 3;
-  optional int32 max_occupancy = 4;
-  optional string bed_type = 5;
+  int32 price_per_night = 3;
+  int32 max_occupancy = 4;
+  int32 bed_type_id = 5;
   repeated HotelRoom hotel_rooms = 6;
 }
 
 message HotelRoom {
-  optional string ref = 1;
+  string ref = 1;
   optional string description = 2;
-  optional int32 location_id = 3;
+  int32 location_id = 3;
   optional bool is_active = 4;
 
 }
