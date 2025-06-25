@@ -176,7 +176,7 @@ message MainBranch {
   optional string name = 1;
   optional string email = 2;
   optional string phone_number = 3;
-  optional AddressRequest address = 4;
+  AddressRequest address = 4;
 }
 
 message BusinessHours {
