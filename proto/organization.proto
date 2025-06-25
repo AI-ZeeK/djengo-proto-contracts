@@ -168,7 +168,7 @@ message CreateCompanyRequest {
   string registration_date = 8;
   string company_logo = 9;
   bool is_multi_branch = 10;
-  optional MainBranch main_branch = 11;
+  MainBranch main_branch = 11;
   repeated BusinessType business_types = 12;
 }
 
