@@ -201,7 +201,7 @@ message HotelRoomType {
   optional string description = 2;
   int32 price_per_night = 3;
   int32 max_occupancy = 4;
-  int32 bed_type_id = 5;
+  int32 bed_size_id = 5;
   repeated HotelRoom hotel_rooms = 6;
 }
 
