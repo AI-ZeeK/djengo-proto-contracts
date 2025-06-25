@@ -12,7 +12,7 @@ service OrganizationService {
   rpc ValidateCompanyReference(ValidateCompanyReferenceRequest) returns (ValidateCompanyReferenceResponse);
 
   // Create Company
-  // rpc CreateCompany(CreateCompanyRequest) returns (CompanyResponse);
+  rpc CreateCompany(CreateCompanyRequest) returns (UtilitiesResponse);
 
   //Delete Utilities
   rpc DeleteTableLocation(DeleteTableLocationRequest) returns (UtilitiesResponse);
@@ -157,6 +157,91 @@ message CreateRoomLocationRequest {
 }
 
 
+message CreateCompanyRequest {
+  string name = 1;
+  string organization_id = 2;
+  string creator_id = 3;
+  string description = 4;
+  string phone_number = 5;
+  string email = 6;
+  string registration_number = 7;
+  string registration_date = 8;
+  string company_logo = 9;
+  bool is_multi_branch = 10;
+  optional MainBranch main_branch = 11;
+  repeated BusinessType business_types = 12;
+}
+
+message MainBranch {
+  optional string name = 1;
+  optional string email = 2;
+  optional string phone_number = 3;
+  optional AddressRequest address = 4;
+}
+
+message BusinessHours {
+  optional string day_of_week = 1;
+  optional string start_time = 2;
+  optional string end_time = 3;
+  optional bool is_active = 4;
+}
+
+message BusinessType {
+  optional string type = 1;
+  optional string description = 2;
+  optional string check_in_time = 3;
+  optional string check_out_time = 4;
+  repeated BusinessHours business_hours = 5;
+  repeated RestaurantTableType restaurant_table_types = 6;
+  repeated HotelRoomType hotel_room_types = 7;
+}
+
+message HotelRoomType {
+  optional string name = 1;
+  optional string description = 2;
+  optional int32 price_per_night = 3;
+  optional int32 max_occupancy = 4;
+  optional string bed_type = 5;
+  repeated HotelRoom hotel_rooms = 6;
+}
+
+message HotelRoom {
+  optional string ref = 1;
+  optional string description = 2;
+  optional int32 location_id = 3;
+  optional bool is_active = 4;
+
+}
+
+
+
+
+
+message RestaurantTableType {
+  optional string name = 1;
+  optional string description = 2;
+  optional int32 seating_capacity = 3;
+  repeated RestaurantTable tables = 4;
+}
+
+message RestaurantTable {
+  optional string name = 1;
+  optional string description = 2;
+  optional int32 location_id = 3;
+}
+
+message AddressRequest {
+  optional string street = 1;
+  optional string building = 2;
+  optional string city = 3;
+  optional string district = 4;
+  optional string country = 5;
+  optional string landmark = 6;
+  optional string latitude = 7;
+  optional string longitude = 8;
+  optional string postal_code = 9;
+}
+  
 
 
 message CreateOrganizationRequest {
