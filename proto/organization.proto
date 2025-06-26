@@ -13,7 +13,7 @@ service OrganizationService {
 
   // Create Company
   rpc CreateCompany(CreateCompanyRequest) returns (UtilitiesResponse);
-
+  rpc FetchOrganizationCompanies(OrganizationIdRequest) returns (FetchCompaniesResponse);   
   //Delete Utilities
   rpc DeleteTableLocation(DeleteTableLocationRequest) returns (UtilitiesResponse);
   rpc DeleteBedSize(DeleteBedSizeRequest) returns (UtilitiesResponse);
@@ -53,10 +53,10 @@ message DeleteRoomLocationRequest {
 
 
 
-  message GetServiceTypesResponse {
-    bool success = 1;
-    optional string error = 2;
-    repeated ServiceType service_types = 3;
+message GetServiceTypesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated ServiceType service_types = 3;
 }
 
 message BranchIdRequest {
@@ -112,6 +112,26 @@ message GetTableLocationsResponse {
   bool success = 1;
   optional string error = 2;
   repeated TableLocation table_locations = 3;
+}
+
+message Company {
+  string company_id = 1;
+  string name = 2;
+  string description = 3;
+  string phone_number = 4;
+  string email = 5; 
+  string registration_number = 6;
+  string registration_date = 7;
+  string company_logo = 8;
+  bool is_multi_branch = 9;
+  MainBranch main_branch = 10;
+  repeated BusinessType business_types = 11;
+}
+
+message FetchCompaniesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated Company companies = 3;
 }
 
 message GetBedSizesResponse {
