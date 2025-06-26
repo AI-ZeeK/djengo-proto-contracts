@@ -29,9 +29,26 @@ service OrganizationService {
   rpc GetTableLocations(OrganizationIdRequest) returns (GetTableLocationsResponse);
   rpc GetBedSizes(OrganizationIdRequest) returns (GetBedSizesResponse);
   rpc GetRoomLocations(OrganizationIdRequest) returns (GetRoomLocationsResponse);
+
+
+  rpc CreateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
+
 }
 
 
+message CreateBusinessUserRoleRequest {
+  string organization_id = 1;
+  string role_name = 2;
+  string description = 3;
+  repeated string business_user_ids = 4;
+  repeated Permission permissions = 5;
+  string creator_id = 6;
+}
+
+message Permission {
+  string permission_name = 1;
+  bool state = 2;
+}
 
 // 📝 REQUEST MESSAGES
 
