@@ -106,7 +106,6 @@ message OrganizationRole {
   string role_id = 1;
   string organization_id = 2;
   string branch_id = 3;
-  string description = 3;
   string name = 4;
   string slug = 5;
   string description = 6;
