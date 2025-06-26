@@ -24,6 +24,8 @@ service ProfileService {
   rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
 
+  // BUSINESS ROLES
+  rpc CreateOrUpdateBusinessUserRole(CreateOrUpdateBusinessUserRoleRequest) returns (CreateOrUpdateBusinessUserRoleResponse);
 }
 
 message CommonResponseArray {
@@ -39,6 +41,18 @@ message CommonResponseArray {
 
 message EmptyRequest {}
 
+message CreateOrUpdateBusinessUserRoleRequest {
+  repeated string business_user_ids = 1;
+  string organization_role_id = 2;
+}
+
+
+
+message CreateOrUpdateBusinessUserRoleResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
+}
 
 message Role {
   string role_id = 1;
