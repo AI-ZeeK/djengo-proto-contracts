@@ -112,6 +112,16 @@ message ServiceType {
 
 // � RESPONSE MESSAGES
 
+message BusinessUserRole {
+  string business_user_role_id = 1;
+  string business_user_id = 2;
+  string organization_role_id = 3;
+  bool is_active = 4;
+  string _count = 5;
+  string created_at = 6;
+  string updated_at = 7;
+  string deleted_at = 8;
+}
 
 
 message OrganizationRole {
@@ -122,6 +132,7 @@ message OrganizationRole {
   string slug = 5;
   string description = 6;
   bool is_active = 7;
+  repeated BusinessUserRole business_user_roles = 8;
 }
 message TableLocation {
   int32 table_location_id = 1;
