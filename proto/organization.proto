@@ -33,6 +33,7 @@ service OrganizationService {
 
   rpc FetchOrgRoles(OrganizationIdRequest) returns (FetchRolesResponse);
   rpc CreateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
+  rpc UpdateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
 
 }
 
