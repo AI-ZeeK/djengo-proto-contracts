@@ -32,6 +32,7 @@ service OrganizationService {
 
 
   rpc FetchOrgRoles(OrganizationIdRequest) returns (FetchRolesResponse);
+  rpc FetchOrgRole(OrganizationIdRequest) returns (FetchRoleResponse);
   rpc CreateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
   rpc UpdateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
 
@@ -42,6 +43,12 @@ message FetchRolesResponse {
   optional string error = 2;
   repeated OrganizationRole organization_roles = 3;
 }
+
+message FetchRoleResponse {
+  bool success = 1;
+  optional string error = 2;
+  OrganizationRole organization_role = 3;
+} 
 
 
 message CreateBusinessUserRoleRequest {
