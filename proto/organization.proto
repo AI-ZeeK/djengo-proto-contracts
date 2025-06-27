@@ -55,6 +55,10 @@ message FetchRoleResponse {
   OrganizationRole organization_role = 3;
 } 
 
+message RoleData {
+  OrganizationRole organization_role = 3;
+}
+
 
 message CreateBusinessUserRoleRequest {
   string organization_id = 1;
@@ -124,6 +128,25 @@ message BusinessUserRole {
   string deleted_at = 8;
 }
 
+message EntityPermission {
+  string entity_id = 1;
+  string entity_type = 2;
+  string permission_id = 3;
+  bool is_granted = 4;
+  string granted_at = 5;
+  string granted_by_user_id = 6;
+  int32 level = 7;
+  PermissionResponse permission = 8;
+}
+
+  message PermissionResponse {
+  string permission_id = 1;
+  string permission_name = 2;
+  string description = 3;
+  int32 level = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
 
 message OrganizationRole {
   string role_id = 1;
@@ -135,6 +158,7 @@ message OrganizationRole {
   bool is_active = 7;
   int32 business_user_roles_count = 8;
   repeated BusinessUserRole business_user_roles = 9;
+  repeated EntityPermission entity_permissions = 10;
 }
 message TableLocation {
   int32 table_location_id = 1;
