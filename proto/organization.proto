@@ -132,7 +132,7 @@ message OrganizationRole {
   string slug = 5;
   string description = 6;
   bool is_active = 7;
-  repeated int32 business_user_roles_count = 8;
+  int32 business_user_roles_count = 8;
   repeated BusinessUserRole business_user_roles = 9;
 }
 message TableLocation {
