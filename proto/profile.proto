@@ -28,6 +28,7 @@ service ProfileService {
   rpc CreateOrUpdateBusinessUserRole(CreateOrUpdateBusinessUserRoleRequest) returns (CreateOrUpdateBusinessUserRoleResponse);
 
   rpc FetchOrganizationRoles(OrganizationRoleIdRequest) returns (FetchOrganizationRolesResponse);
+  rpc FetchOrganizationRolesCount(OrganizationRoleIdRequest) returns (FetchOrganizationRolesCountResponse);
 }
 
 message OrganizationRoleIdRequest {
@@ -36,6 +37,10 @@ message OrganizationRoleIdRequest {
 
 message FetchOrganizationRolesResponse {
   repeated Role roles = 1;
+}
+
+message FetchOrganizationRolesCountResponse {
+  int32 count = 1;
 }
 
 
