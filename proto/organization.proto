@@ -32,10 +32,14 @@ service OrganizationService {
 
 
   rpc FetchOrgRoles(OrganizationIdRequest) returns (FetchRolesResponse);
-  rpc FetchOrgRole(OrganizationIdRequest) returns (FetchRoleResponse);
+  rpc FetchOrgRole(OrganizationRoleIdRequest) returns (FetchRoleResponse);
   rpc CreateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
   rpc UpdateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
 
+}
+
+message OrganizationRoleIdRequest {
+  string organization_role_id = 1;
 }
 
 message FetchRolesResponse {
