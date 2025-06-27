@@ -39,7 +39,8 @@ service OrganizationService {
 }
 
 message OrganizationRoleIdRequest {
-  string organization_role_id = 1;
+  string organization_role_slug = 1;
+  string organization_id = 2;
 }
 
 message FetchRolesResponse {
