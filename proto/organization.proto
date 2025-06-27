@@ -31,7 +31,7 @@ service OrganizationService {
   rpc GetRoomLocations(OrganizationIdRequest) returns (GetRoomLocationsResponse);
 
 
-  rpc FetchOrgRoles( OrganizationIdRequest) returns (FetchRolesResponse);
+  rpc FetchOrgRoles(OrganizationIdRequest) returns (FetchRolesResponse);
   rpc CreateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
 
 }

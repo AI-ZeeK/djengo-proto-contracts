@@ -26,7 +26,18 @@ service ProfileService {
 
   // BUSINESS ROLES
   rpc CreateOrUpdateBusinessUserRole(CreateOrUpdateBusinessUserRoleRequest) returns (CreateOrUpdateBusinessUserRoleResponse);
+
+  rpc FetchOrganizationRoles(OrganizationRoleIdRequest) returns (FetchOrganizationRolesResponse);
 }
+
+message OrganizationRoleIdRequest {
+  string organization_role_id = 1;
+}
+
+message FetchOrganizationRolesResponse {
+  repeated Role roles = 1;
+}
+
 
 message CommonResponseArray {
   bool success = 1;
@@ -58,6 +69,13 @@ message Role {
   string role_id = 1;
   string role_name = 2;
   bool is_active = 3;
+}
+
+message BusinessUserRole {
+  string business_user_role_id = 1;
+  string business_user_id = 2;
+  string organization_role_id = 3;
+  bool is_active = 4;
 }
 
 message GetRolesResponse {
