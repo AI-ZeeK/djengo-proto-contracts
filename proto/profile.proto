@@ -7,16 +7,6 @@ package profile;
 
 // 👤 Profile Service - handles user profiles and user management
 service ProfileService {
-  // admin services
-  rpc AdminRegister(AdminRegisterRequest) returns (AuthInitialResponse);
-  rpc AdminLogin(LoginRequest) returns (AuthInitialResponse);
-  rpc AdminLogout(LogoutRequest) returns (SendOtpResponse);
-  rpc AdminSendOtp(SendOtpRequest) returns (SendOtpResponse);
-  rpc AdminVerifyOtp(VerifyOtpRequest) returns (VerifyOtpResponse);
-  rpc AdminRefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
-  rpc FetchAllAdmin(EmptyRequest) returns (FetchAllAdminResponse);
-  rpc FetchAdminAccount(FetchAdminAccountRequest) returns (FetchAdminAccountResponse);
-
   // user services
   rpc Register(RegisterRequest) returns (AuthInitialResponse);
   rpc Login(LoginRequest) returns (AuthInitialResponse);
@@ -42,20 +32,8 @@ service ProfileService {
   rpc FetchOrganizationRolesCount(OrganizationRoleIdRequest) returns (FetchOrganizationRolesCountResponse);
 }
 
-message FetchAllAdminResponse {
-  repeated User users = 1;
-}
-  
-message FetchAdminAccountRequest {
-  string user_id = 1;
-}
 
-message FetchAdminAccountResponse {
-  User user = 1;
-}
-
-
-  message OrganizationRoleIdRequest {
+message OrganizationRoleIdRequest {
   string organization_role_id = 1;
 }
 
@@ -162,12 +140,7 @@ message AuthInitialResponse {
   optional string auth_token = 4;
 }
   
-message AdminRegisterRequest {
-  string email = 1;
-  string password = 2;
-  string platform_ref = 3;
 
-}
 
 message RegisterRequest {
   string email = 1;
