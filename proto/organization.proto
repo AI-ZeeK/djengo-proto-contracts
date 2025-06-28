@@ -29,6 +29,7 @@ service OrganizationService {
   rpc GetTableLocations(OrganizationIdRequest) returns (GetTableLocationsResponse);
   rpc GetBedSizes(OrganizationIdRequest) returns (GetBedSizesResponse);
   rpc GetRoomLocations(OrganizationIdRequest) returns (GetRoomLocationsResponse);
+  rpc GetCountries(EmptyRequest) returns (GetCountriesResponse);
 
 
   rpc FetchOrgRoles(OrganizationIdRequest) returns (FetchRolesResponse);
@@ -41,6 +42,24 @@ service OrganizationService {
 message OrganizationRoleIdRequest {
   string organization_role_slug = 1;
   string organization_id = 2;
+}
+
+message Country {
+  string country_id = 1;
+  string country_name = 2;
+  string country_code = 3;
+  string currency_code = 4;
+  bool is_active = 5;
+  string created_at = 6;
+  string updated_at = 7;
+  string deleted_at = 8;
+}
+
+
+message GetCountriesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated Country countries = 3;
 }
 
 message FetchRolesResponse {

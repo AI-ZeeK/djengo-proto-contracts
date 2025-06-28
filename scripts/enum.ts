@@ -66,6 +66,8 @@ export enum ROLES_ENUM {
   BRANCH = "BRANCH",
   STAFF = "STAFF",
   AGENCY = "AGENCY",
+  SUPER_ADMIN = "SUPER_ADMIN",
+  ADMIN = "ADMIN",
 }
 
 export enum BASE_ORGANIZATION_ROLE_ENUM {
