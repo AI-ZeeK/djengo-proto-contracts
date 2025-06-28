@@ -7,8 +7,15 @@ package profile;
 
 // 👤 Profile Service - handles user profiles and user management
 service ProfileService {
+  // admin services
   rpc AdminRegister(AdminRegisterRequest) returns (AuthInitialResponse);
   rpc AdminSignin(RegisterRequest) returns (AuthInitialResponse);
+  rpc AdminLogout(LogoutRequest) returns (SendOtpResponse);
+  rpc AdminSendOtp(SendOtpRequest) returns (SendOtpResponse);
+  rpc AdminVerifyOtp(VerifyOtpRequest) returns (VerifyOtpResponse);
+  rpc AdminRefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+
+  // user services
   rpc Register(RegisterRequest) returns (AuthInitialResponse);
   rpc Login(LoginRequest) returns (AuthInitialResponse);
   rpc SendOtp(SendOtpRequest) returns (SendOtpResponse);
