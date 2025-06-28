@@ -9,7 +9,7 @@ package profile;
 service ProfileService {
   // admin services
   rpc AdminRegister(AdminRegisterRequest) returns (AuthInitialResponse);
-  rpc AdminSignin(RegisterRequest) returns (AuthInitialResponse);
+  rpc AdminLogin(LoginRequest) returns (AuthInitialResponse);
   rpc AdminLogout(LogoutRequest) returns (SendOtpResponse);
   rpc AdminSendOtp(SendOtpRequest) returns (SendOtpResponse);
   rpc AdminVerifyOtp(VerifyOtpRequest) returns (VerifyOtpResponse);
