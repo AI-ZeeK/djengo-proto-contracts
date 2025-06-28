@@ -14,6 +14,8 @@ service ProfileService {
   rpc AdminSendOtp(SendOtpRequest) returns (SendOtpResponse);
   rpc AdminVerifyOtp(VerifyOtpRequest) returns (VerifyOtpResponse);
   rpc AdminRefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc FetchAllAdmin(EmptyRequest) returns (FetchAllAdminResponse);
+  rpc FetchAdminAccount(FetchAdminAccountRequest) returns (FetchAdminAccountResponse);
 
   // user services
   rpc Register(RegisterRequest) returns (AuthInitialResponse);
@@ -40,7 +42,20 @@ service ProfileService {
   rpc FetchOrganizationRolesCount(OrganizationRoleIdRequest) returns (FetchOrganizationRolesCountResponse);
 }
 
-message OrganizationRoleIdRequest {
+message FetchAllAdminResponse {
+  repeated User users = 1;
+}
+  
+message FetchAdminAccountRequest {
+  string user_id = 1;
+}
+
+message FetchAdminAccountResponse {
+  User user = 1;
+}
+
+
+  message OrganizationRoleIdRequest {
   string organization_role_id = 1;
 }
 
