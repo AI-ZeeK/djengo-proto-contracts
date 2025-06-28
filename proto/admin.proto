@@ -1,11 +1,11 @@
 syntax = "proto3";
 
 
-package profile;
+package admin;
 
 
 // 👤 Profile Service - handles user profiles and user management
-service ProfileService {
+service AdminService {
   // admin services
   rpc AdminRegister(AdminRegisterRequest) returns (AuthInitialResponse);
   rpc AdminLogin(LoginRequest) returns (AuthInitialResponse);
