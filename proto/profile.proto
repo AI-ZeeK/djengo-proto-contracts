@@ -7,6 +7,8 @@ package profile;
 
 // 👤 Profile Service - handles user profiles and user management
 service ProfileService {
+  rpc AdminRegister(AdminRegisterRequest) returns (AuthInitialResponse);
+  rpc AdminSignin(RegisterRequest) returns (AuthInitialResponse);
   rpc Register(RegisterRequest) returns (AuthInitialResponse);
   rpc Login(LoginRequest) returns (AuthInitialResponse);
   rpc SendOtp(SendOtpRequest) returns (SendOtpResponse);
@@ -136,6 +138,13 @@ message AuthInitialResponse {
   optional string error = 2;
   optional string message = 3;
   optional string auth_token = 4;
+}
+  
+message AdminRegisterRequest {
+  string email = 1;
+  string password = 2;
+  string platform_ref = 3;
+
 }
 
 message RegisterRequest {
@@ -327,4 +336,7 @@ message UserRole {
 enum SendOtpType {
   REGISTRATION = 0;
   SIGNIN = 1;
+  ADMIN_REGISTRATION = 2;
+  ADMIN_SIGNIN = 3;
+  FORGOT_PASSWORD = 4;
 }
