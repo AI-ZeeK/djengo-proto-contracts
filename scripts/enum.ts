@@ -97,6 +97,7 @@ export enum FILE_ENTITY_TYPE_ENUM {
   USER_AVATAR = "user_avatar",
   ORGANIZATION_LOGO = "organization_logo",
   BUSINESS_LOGO = "business_logo",
+  PLATFORM_USER_AVATAR = "platform_user_avatar",
 }
 
 export enum PermissionName {
