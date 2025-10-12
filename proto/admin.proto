@@ -24,6 +24,8 @@ service AdminService {
 
 message FetchAllAdminResponse {
   repeated User users = 1;
+  bool success = 2 ;
+  string message = 3;
 }
   
 message FetchAdminAccountRequest {
