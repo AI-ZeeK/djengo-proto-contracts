@@ -138,3 +138,8 @@ export enum PermissionRestriction {
   RESTRICT_FUND_MANAGEMENT = "RESTRICT_FUND_MANAGEMENT",
   RESTRICT_FUND_APPROVAL = "RESTRICT_FUND_APPROVAL",
 }
+
+export enum ORGANIZATION_QUEUES {
+  BASE = "organization_queue",
+  CREATE_ACCOUNT = "create_organization_account_queue",
+}
