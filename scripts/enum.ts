@@ -193,3 +193,8 @@ export enum PermissionName {
   RESTRICT_DISBURSEMENT_ACCESS = "RESTRICT_DISBURSEMENT_ACCESS",
   RESTRICT_DISBURSEMENT_APPROVAL = "RESTRICT_DISBURSEMENT_APPROVAL",
 }
+
+export enum ORGANIZATION_QUEUES {
+  BASE = "organization_queue",
+  CREATE_ACCOUNT = "create_organization_account_queue",
+}
