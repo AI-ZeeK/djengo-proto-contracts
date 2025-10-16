@@ -14,7 +14,7 @@ service FinancialsService {
 
 message CreateWalletRequest {
   string entity_id = 1;
-  string entity_type = 2;
+  WALLET_ENTITY_TYPE_ENUM entity_type = 2;
   string currency_code = 3;
 }
 
@@ -58,3 +58,12 @@ message Wallet {
   string created_at = 7;
   string updated_at = 8;
 }
+
+enum WALLET_ENTITY_TYPE_ENUM
+    {
+        ORGANIZATION = 0;
+        COMPANY = 1;
+        BRANCH = 2;
+        ADMIN = 3;
+        USER = 4;
+    } 
