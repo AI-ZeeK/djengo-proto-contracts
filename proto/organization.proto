@@ -19,7 +19,7 @@ service OrganizationService {
   // Create Branch
   // rpc CreateBranch(CreateBranchRequest) returns (UtilitiesResponse);
   rpc FetchBranch(BranchIdRequest) returns (FetchBranchResponse);
-  rpc FetchCompanyBranch(FetchCompanyRequest) returns (FetchBranchesResponse);
+  rpc FetchCompanyBranches(FetchCompanyRequest) returns (FetchBranchesResponse);
   // rpc UpdateBranch(UpdateBranchRequest) returns (UtilitiesResponse);
   // rpc DeleteBranch(BranchIdRequest) returns (UtilitiesResponse);
 
