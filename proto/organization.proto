@@ -13,7 +13,8 @@ service OrganizationService {
 
   // Create Company
   rpc CreateCompany(CreateCompanyRequest) returns (UtilitiesResponse);
-  rpc FetchOrganizationCompanies(OrganizationIdRequest) returns (FetchCompaniesResponse);   
+  rpc FetchOrganizationCompanies(OrganizationIdRequest) returns (FetchCompaniesResponse);
+  rpc FetchCompany(FetchCompanyRequest) returns (FetchCompanyResponse);
   //Delete Utilities
   rpc DeleteTableLocation(DeleteTableLocationRequest) returns (UtilitiesResponse);
   rpc DeleteBedSize(DeleteBedSizeRequest) returns (UtilitiesResponse);
@@ -55,6 +56,17 @@ message Country {
   string deleted_at = 8;
 }
 
+message FetchCompanyRequest {
+  string company_id = 1;
+}
+
+
+message FetchCompanyResponse {    
+  bool success = 1;
+  optional string error = 2;
+  Company company = 3;
+  string message = 4;
+}
 
 message GetCountriesResponse {
   bool success = 1;
