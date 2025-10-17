@@ -15,6 +15,14 @@ service OrganizationService {
   rpc CreateCompany(CreateCompanyRequest) returns (UtilitiesResponse);
   rpc FetchOrganizationCompanies(OrganizationIdRequest) returns (FetchCompaniesResponse);
   rpc FetchCompany(FetchCompanyRequest) returns (FetchCompanyResponse);
+
+  // Create Branch
+  // rpc CreateBranch(CreateBranchRequest) returns (UtilitiesResponse);
+  rpc FetchBranch(BranchIdRequest) returns (FetchBranchResponse);
+  rpc FetchCompanyBranch(FetchCompanyRequest) returns (FetchBranchesResponse);
+  // rpc UpdateBranch(UpdateBranchRequest) returns (UtilitiesResponse);
+  // rpc DeleteBranch(BranchIdRequest) returns (UtilitiesResponse);
+
   //Delete Utilities
   rpc DeleteTableLocation(DeleteTableLocationRequest) returns (UtilitiesResponse);
   rpc DeleteBedSize(DeleteBedSizeRequest) returns (UtilitiesResponse);
@@ -65,6 +73,18 @@ message FetchCompanyResponse {
   bool success = 1;
   optional string error = 2;
   Company company = 3;
+  string message = 4;
+}
+message FetchBranchResponse {    
+  bool success = 1;
+  optional string error = 2;
+  Branch branch = 3;
+  string message = 4;
+}
+message FetchBranchesResponse {      
+  bool success = 1;
+  optional string error = 2;
+  repeated Branch branches = 3;
   string message = 4;
 }
 
