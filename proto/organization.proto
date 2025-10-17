@@ -15,6 +15,7 @@ service OrganizationService {
   rpc CreateCompany(CreateCompanyRequest) returns (UtilitiesResponse);
   rpc FetchOrganizationCompanies(OrganizationIdRequest) returns (FetchCompaniesResponse);
   rpc FetchCompany(FetchCompanyRequest) returns (FetchCompanyResponse);
+  rpc HandleMultiBranchCompanySetup(FetchCompanyRequest) returns (UtilitiesResponse);
 
   // Create Branch
   // rpc CreateBranch(CreateBranchRequest) returns (UtilitiesResponse);
