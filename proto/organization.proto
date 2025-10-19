@@ -285,13 +285,18 @@ message Company {
   string email = 4;
   string name = 5;
   string registration_date = 6;
-  bool is_active = 7;
+  bool   is_active = 7;
   string registration_number = 8;
-  string created_at = 9;
-  string updated_at = 10;
-  optional string deleted_at = 11;  
-  CompanyMetaData company_meta_data = 12;
-  repeated Branch branches = 13;
+  string company_logo = 9;
+  string base_currency = 10;
+  string country_code = 11;
+  string phone_number = 12;
+  string created_at = 13;
+  string updated_at = 14;
+  optional string deleted_at = 15;
+  CompanyMetaData company_meta_data = 16;
+  Branch main_branch = 17;
+  repeated Branch branches = 18;
 }
 
 
