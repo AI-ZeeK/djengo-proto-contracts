@@ -24,22 +24,10 @@ service OrganizationService {
   // rpc UpdateBranch(UpdateBranchRequest) returns (UtilitiesResponse);
   // rpc DeleteBranch(BranchIdRequest) returns (UtilitiesResponse);
 
-  //Delete Utilities
-  rpc DeleteTableLocation(DeleteTableLocationRequest) returns (UtilitiesResponse);
-  rpc DeleteBedSize(DeleteBedSizeRequest) returns (UtilitiesResponse);
-  rpc DeleteRoomLocation(DeleteRoomLocationRequest) returns (UtilitiesResponse);
 
-  // CREATE UTILITIES
-  rpc CreateTableLocation(CreateTableLocationRequest) returns (UtilitiesResponse);
-  rpc CreateBedSize(CreateBedSizeRequest) returns (UtilitiesResponse);
-  rpc CreateRoomLocation(CreateRoomLocationRequest) returns (UtilitiesResponse);
 
   // Utilities
-  rpc FetchServiceTypes(EmptyRequest) returns (GetServiceTypesResponse);
-  rpc GetTableLocations(OrganizationIdRequest) returns (GetTableLocationsResponse);
-  rpc GetBedSizes(OrganizationIdRequest) returns (GetBedSizesResponse);
-  rpc GetRoomLocations(OrganizationIdRequest) returns (GetRoomLocationsResponse);
-  rpc GetCountries(EmptyRequest) returns (GetCountriesResponse);
+
 
 
   rpc FetchOrgRoles(OrganizationIdRequest) returns (FetchRolesResponse);
@@ -56,7 +44,7 @@ message UpdateCompanyDetailsRequest {
   string email = 4; 
   string registration_number = 5;
   string registration_date = 6;
-  int32 country_id = 7;
+  int32  country_code = 7;
   string base_currency = 8;
   optional AddressRequest address = 9;
 }
@@ -66,16 +54,7 @@ message OrganizationRoleIdRequest {
   string organization_id = 2;
 }
 
-message Country {
-  string country_id = 1;
-  string country_name = 2;
-  string country_code = 3;
-  string currency_code = 4;
-  bool is_active = 5;
-  string created_at = 6;
-  string updated_at = 7;
-  string deleted_at = 8;
-}
+
 
 message FetchCompanyRequest {
   string company_id = 1;
@@ -101,11 +80,6 @@ message FetchBranchesResponse {
   string message = 4;
 }
 
-message GetCountriesResponse {
-  bool success = 1;
-  optional string error = 2;
-  repeated Country countries = 3;
-}
 
 message FetchRolesResponse {
   bool success = 1;
@@ -144,26 +118,6 @@ message EmptyRequest {
 }
 
 
-message DeleteTableLocationRequest {
-  int32 table_location_id = 1;
-} 
-
-message DeleteBedSizeRequest {
-  int32 bed_size_id = 1;
-}
-
-message DeleteRoomLocationRequest {
-  int32 room_location_id = 1;
-}
-
-
-
-message GetServiceTypesResponse {
-  bool success = 1;
-  optional string error = 2;
-  repeated ServiceType service_types = 3;
-}
-
 message BranchIdRequest {
   string branch_id = 1;
 }
@@ -178,9 +132,7 @@ message ServiceType {
   string description = 3;
   bool is_active = 4;
 }
-
 // � RESPONSE MESSAGES
-
 message BusinessUserRole {
   string business_user_role_id = 1;
   string business_user_id = 2;
@@ -224,21 +176,7 @@ message OrganizationRole {
   repeated BusinessUserRole business_user_roles = 9;
   repeated EntityPermission entity_permissions = 10;
 }
-message TableLocation {
-  int32 table_location_id = 1;
-  string name = 2;
-  string description = 3;
-  bool is_global = 4;
-  bool is_active = 5;
-}
 
-message RoomLocation {
-  int32 room_location_id = 1;
-  string name = 2;
-  string description = 3;
-  bool is_global = 4;
-  bool is_active = 5;
-}
 
 message UtilitiesResponse {
   bool success = 1;
@@ -246,41 +184,11 @@ message UtilitiesResponse {
   string message = 3;
 }
 
-message BedSize {
-  int32 bed_size_id = 1;
-  string name = 2;
-  string description = 3;
-  bool is_global = 4;
-  bool is_active = 5;
-}
-
-message GetTableLocationsResponse {
-  bool success = 1;
-  optional string error = 2;
-  repeated TableLocation table_locations = 3;
-}
-
-
-
 message FetchCompaniesResponse {
   bool success = 1;
   optional string error = 2;
   repeated Company companies = 3;
 }
-
-message GetBedSizesResponse {
-  bool success = 1;
-  optional string error = 2;
-  repeated BedSize bed_sizes = 3;
-}
-
-
-message GetRoomLocationsResponse {
-  bool success = 1;
-  optional string error = 2;
-  repeated RoomLocation room_locations = 3;
-}
-
 
 message ValidateCompanyReferenceRequest {
   string company_ref = 1;
@@ -291,25 +199,6 @@ message ValidateCompanyReferenceResponse {
   optional string error = 2;
   string company_id = 3;
 }
-
-message CreateTableLocationRequest {
-  string name = 1;
-  string organization_id = 2;
-  string creator_id = 3;
-}
-
-message CreateBedSizeRequest {
-  string name = 1;
-  string organization_id = 2;
-  string creator_id = 3;
-}
-
-message CreateRoomLocationRequest {
-  string name = 1;
-  string organization_id = 2;
-  string creator_id = 3;
-}
-
 
 message CreateCompanyRequest {
   string name = 1;
@@ -323,7 +212,7 @@ message CreateCompanyRequest {
   string company_logo = 9;
   bool is_multi_branch = 10;
   MainBranch main_branch = 11;
-  repeated BusinessType business_types = 12;
+  // repeated BusinessType business_types = 12;
 }
 
 message MainBranch {
@@ -331,57 +220,6 @@ message MainBranch {
   optional string email = 2;
   optional string phone_number = 3;
   AddressRequest address = 4;
-}
-
-message BusinessHours {
-  string day_of_week = 1;
-  string start_time = 2;
-  string end_time = 3;
-  bool is_active = 4;
-}
-
-message BusinessType {
-  optional string type = 1;
-  optional string description = 2;
-  optional string check_in_time = 3;
-  optional string check_out_time = 4;
-  repeated BusinessHours business_hours = 5;
-  repeated RestaurantTableType restaurant_table_types = 6;
-  repeated HotelRoomType hotel_room_types = 7;
-}
-
-message HotelRoomType {
-  string name = 1;
-  optional string description = 2;
-  int32 price_per_night = 3;
-  int32 max_occupancy = 4;
-  int32 bed_size_id = 5;
-  repeated HotelRoom hotel_rooms = 6;
-}
-
-message HotelRoom {
-  string ref = 1;
-  optional string description = 2;
-  int32 location_id = 3;
-  optional bool is_active = 4;
-
-}
-
-
-
-
-
-message RestaurantTableType {
-  optional string name = 1;
-  optional string description = 2;
-  optional int32 seating_capacity = 3;
-  repeated RestaurantTable tables = 4;
-}
-
-message RestaurantTable {
-  optional string name = 1;
-  optional string description = 2;
-  optional int32 location_id = 3;
 }
 
 message AddressRequest {
@@ -399,8 +237,6 @@ message AddressRequest {
   optional double latitude = 12;
   optional double longitude = 13;
 }
-  
-
 
 message CreateOrganizationRequest {
   string creator_id = 1;
@@ -425,10 +261,7 @@ message OrganizationResponse {
   string organization_id = 5;
   string message = 6;  
 }
-
-
 // 🏗️ DATA MODELS
-
 message Organization {
   string organization_id = 1;
   string name = 2;
