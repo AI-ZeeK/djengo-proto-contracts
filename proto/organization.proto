@@ -56,7 +56,7 @@ message UpdateCompanyDetailsRequest {
   string email = 4; 
   string registration_number = 5;
   string registration_date = 6;
-  string country_of_operation = 7;
+  int32 country_id = 7;
   string base_currency = 8;
   optional AddressRequest address = 9;
 }
