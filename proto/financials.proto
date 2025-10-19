@@ -26,7 +26,7 @@ message CreateWalletRequest {
 
 
 message GetCountryRequest {
-  string country_code = 1;
+  int32 country_code = 1;
 }
 
 message UpdateWalletRequest {
