@@ -16,7 +16,7 @@ service OrganizationService {
   rpc FetchOrganizationCompanies(OrganizationIdRequest) returns (FetchCompaniesResponse);
   rpc FetchCompany(FetchCompanyRequest) returns (FetchCompanyResponse);
   rpc HandleMultiBranchCompanySetup(FetchCompanyRequest) returns (UtilitiesResponse);
-
+  rpc UpdateCompanyDetails(UpdateCompanyDetailsRequest) returns (UtilitiesResponse);
   // Create Branch
   // rpc CreateBranch(CreateBranchRequest) returns (UtilitiesResponse);
   rpc FetchBranch(BranchIdRequest) returns (FetchBranchResponse);
@@ -47,6 +47,18 @@ service OrganizationService {
   rpc CreateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
   rpc UpdateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
 
+}
+
+message UpdateCompanyDetailsRequest {
+  string company_id = 1;
+  string name = 2;
+  string phone_number = 3;
+  string email = 4; 
+  string registration_number = 5;
+  string registration_date = 6;
+  string country_of_operation = 7;
+  string base_currency = 8;
+  optional AddressRequest address = 9;
 }
 
 message OrganizationRoleIdRequest {
