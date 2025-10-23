@@ -22,6 +22,12 @@ service OperationService {
   rpc CreateServiceType(CreateServiceTypeRequest) returns (CreateServiceTypeResponse);
   rpc UpdateServiceType(UpdateServiceTypeRequest) returns (CreateServiceTypeResponse);
 
+    // Business Types Management
+  rpc GetAdminBusinessTypes(EmptyRequest) returns (GetBusinessTypesResponse);
+  rpc GetBusinessTypes(EmptyRequest) returns (GetBusinessTypesResponse);
+  rpc CreateBusinessType(CreateBusinessTypeRequest) returns (CreateBusinessTypeResponse);
+  rpc UpdateBusinessTypeActiveStatus(UpdateBusinessTypeActiveStatusRequest) returns (UpdateBusinessTypeActiveStatusResponse);
+
 
   rpc FetchServiceTypes(EmptyRequest) returns (GetServiceTypesResponse);
   rpc GetTableLocations(OrganizationIdRequest) returns (GetTableLocationsResponse);
@@ -189,6 +195,44 @@ message GetServiceTypesResponse {
   bool success = 1;
   optional string error = 2;
   repeated ServiceType service_types = 3;
+}
+
+// Business Types Messages
+message CreateBusinessTypeRequest {
+  string name = 1;
+  string description = 2;
+  bool is_active = 3;
+}
+
+message CreateBusinessTypeResponse {
+  bool success = 1;
+  string message = 2;
+  optional BusinessTypeData data = 3;
+}
+
+message UpdateBusinessTypeActiveStatusRequest {
+  int32 business_type_id = 1;
+}
+
+message UpdateBusinessTypeActiveStatusResponse {
+  bool success = 1;
+  string message = 2;
+  optional BusinessTypeData data = 3;
+}
+
+message GetBusinessTypesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated BusinessTypeData business_types = 3;
+}
+
+message BusinessTypeData {
+  int32 business_type_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_active = 4;
+  string created_at = 5;
+  string updated_at = 6;
 }
 
 message GetBedSizesResponse {
