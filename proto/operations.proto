@@ -12,6 +12,11 @@ service OperationService {
 
   // Company Services Management
   rpc CreateCompanyServices(CreateCompanyServicesRequest) returns (CreateCompanyServicesResponse);
+  rpc UpdateCompanyServiceStatus(UpdateCompanyServiceStatusRequest) returns (UpdateCompanyServiceResponse);
+  rpc UpdateCompanyService(UpdateCompanyServiceRequest) returns (UpdateCompanyServiceResponse);
+  rpc DeleteCompanyService(DeleteCompanyServiceRequest) returns (DeleteCompanyServiceResponse);
+  rpc GetCompanyServices(GetCompanyServicesRequest) returns (GetCompanyServicesResponse);
+  rpc SearchCompanyServices(SearchCompanyServicesRequest) returns (GetCompanyServicesResponse);
   rpc CreateServiceBranch(CreateServiceBranchRequest) returns (CreateServiceBranchResponse);
   rpc UpsertBusinessHours(UpsertBusinessHoursRequest) returns (UpsertBusinessHoursResponse);
 
@@ -84,13 +89,86 @@ message HealthCheckResponse {
 // --- Company Services Creation ---
 message CreateCompanyServicesRequest {
   string company_id = 1;
-  string branch_id = 2;
-  repeated BusinessTypeRequest business_types = 3;
+  string business_type_id = 2;
+  int32 service_type_id = 3;
+  string base_price = 4;
+  string description = 5;
+  bool is_active = 6;
+  optional string branch_id = 7;
+  repeated BusinessTypeRequest business_types = 8;
 }
 
 message CreateCompanyServicesResponse {
   string message = 1;
   bool success = 2;
+  optional CompanyServiceData data = 3;
+}
+
+// --- Update Company Service ---
+message UpdateCompanyServiceStatusRequest {
+  string company_service_id = 1;
+  optional bool is_active = 2;
+}
+message UpdateCompanyServiceRequest {
+  string company_service_id = 1;
+  optional string business_type_id = 2;
+  optional string base_price = 3;
+  optional string description = 4;
+  optional bool is_active = 5;
+}
+
+message UpdateCompanyServiceResponse {
+  bool success = 1;
+  string message = 2;
+  optional CompanyServiceData data = 3;
+}
+
+// --- Delete Company Service (Soft Delete) ---
+message DeleteCompanyServiceRequest {
+  string company_service_id = 1;
+}
+
+message DeleteCompanyServiceResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// --- Get Company Services ---
+message GetCompanyServicesRequest {
+  string company_id = 1;
+  optional string branch_id = 2;
+  optional bool include_inactive = 3;
+}
+
+// --- Search Company Services with Filters ---
+message SearchCompanyServicesRequest {
+  optional string company_id = 1; // Optional - filter by company, if not provided returns all companies
+  optional string service_name = 2; // Filter by service/business type name
+  optional string business_type_id = 3; // Filter by business type ID
+  optional bool include_inactive = 4; // Include inactive services
+  optional string branch_id = 5; // Filter by branch
+  optional bool include_deleted = 6; // Include soft-deleted services (default: false)
+}
+
+message GetCompanyServicesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated CompanyServiceData company_services = 3;
+}
+
+message CompanyServiceData {
+  string company_service_id = 1;
+  string company_id = 2;
+  string business_type_id = 3;
+  int32 service_type_id = 4;
+  string base_price = 5;
+  string description = 6;
+  bool is_active = 7;
+  optional string branch_id = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  optional string business_type_name = 11;
+  optional string service_type_name = 12;
 }
 
 message BusinessTypeRequest {
