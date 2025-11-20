@@ -89,7 +89,7 @@ message HealthCheckResponse {
 // --- Company Services Creation ---
 message CreateCompanyServicesRequest {
   string company_id = 1;
-  int32 service_type_id = 2;
+  string business_type_id = 2;
   string base_price = 3;
   string description = 4;
   bool is_active = 5;
