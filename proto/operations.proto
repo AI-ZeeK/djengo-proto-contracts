@@ -89,13 +89,12 @@ message HealthCheckResponse {
 // --- Company Services Creation ---
 message CreateCompanyServicesRequest {
   string company_id = 1;
-  string business_type_id = 2;
-  int32 service_type_id = 3;
-  string base_price = 4;
-  string description = 5;
-  bool is_active = 6;
-  optional string branch_id = 7;
-  repeated BusinessTypeRequest business_types = 8;
+  int32 service_type_id = 2;
+  string base_price = 3;
+  string description = 4;
+  bool is_active = 5;
+  optional string branch_id = 6;
+  repeated BusinessTypeRequest business_types = 7;
 }
 
 message CreateCompanyServicesResponse {
@@ -153,7 +152,8 @@ message SearchCompanyServicesRequest {
 message GetCompanyServicesResponse {
   bool success = 1;
   optional string error = 2;
-  repeated CompanyServiceData company_services = 3;
+    string message = 3;
+  repeated CompanyServiceData company_services = 4;
 }
 
 message CompanyServiceData {
