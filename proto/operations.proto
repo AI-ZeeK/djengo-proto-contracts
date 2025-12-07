@@ -90,11 +90,12 @@ message HealthCheckResponse {
 message CreateCompanyServicesRequest {
   string company_id = 1;
   int32 business_type_id = 2;
-  string base_price = 3;
-  string description = 4;
-  bool is_active = 5;
-  optional string branch_id = 6;
-  repeated BusinessTypeRequest business_types = 7;
+  string name = 3;
+  string base_price = 4;
+  string description = 5;
+  bool is_active = 6;
+  optional string branch_id = 7;
+  repeated BusinessTypeRequest business_types = 8;
 }
 
 message CreateCompanyServicesResponse {
