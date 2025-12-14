@@ -108,10 +108,18 @@ message VerifyOtpResponse {
   optional User user = 5;
 }
 
+enum SessionSource {
+  WEB = 0;
+  MOBILE = 1;
+  TABLET = 2;
+  OTHER = 3;
+}
+
 message LoginRequest {
   string email = 1;
   string password = 2;
-  string source = 3;
+  string device_info = 3;
+  SessionSource source = 4;
 }
 
 message SendOtpRequest {
@@ -160,7 +168,8 @@ message RegisterRequest {
   string phone_number = 3;
   string company_ref = 4;
   string role_name = 5;
-  string source = 6;
+  string device_info = 6;
+  SessionSource source = 7;
 }
 
 
