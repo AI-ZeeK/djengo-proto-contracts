@@ -181,6 +181,7 @@ enum ROLES_ENUM {
 
 message LogoutRequest {
   string user_id = 1;
+  SessionSource source = 2;
 }
 
 message RefreshTokenRequest {
