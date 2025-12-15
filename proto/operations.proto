@@ -16,6 +16,7 @@ service OperationService {
   rpc UpdateCompanyService(UpdateCompanyServiceRequest) returns (UpdateCompanyServiceResponse);
   rpc DeleteCompanyService(DeleteCompanyServiceRequest) returns (DeleteCompanyServiceResponse);
   rpc GetCompanyServices(GetCompanyServicesRequest) returns (GetCompanyServicesResponse);
+  rpc GetCompanyService(GetCompanyServiceRequest) returns (GetCompanyServiceResponse);
   rpc SearchCompanyServices(SearchCompanyServicesRequest) returns (GetCompanyServicesResponse);
   rpc CreateServiceBranch(CreateServiceBranchRequest) returns (CreateServiceBranchResponse);
   rpc UpsertBusinessHours(UpsertBusinessHoursRequest) returns (UpsertBusinessHoursResponse);
@@ -112,9 +113,10 @@ message UpdateCompanyServiceStatusRequest {
 message UpdateCompanyServiceRequest {
   string company_service_id = 1;
   optional int32 business_type_id = 2;
-  optional string base_price = 3;
-  optional string description = 4;
-  optional bool is_active = 5;
+  optional string name = 3;
+  optional string base_price = 4;
+  optional string description = 5;
+  optional bool is_active = 6;
 }
 
 message UpdateCompanyServiceResponse {
@@ -139,6 +141,10 @@ message GetCompanyServicesRequest {
   optional string branch_id = 2;
   optional bool include_inactive = 3;
 }
+// --- Get Company Services ---
+message GetCompanyServiceRequest {
+  string company_service_id = 1;
+}
 
 // --- Search Company Services with Filters ---
 message SearchCompanyServicesRequest {
@@ -150,10 +156,16 @@ message SearchCompanyServicesRequest {
   optional bool include_deleted = 6; // Include soft-deleted services (default: false)
 }
 
+message GetCompanyServiceResponse  {
+  bool success = 1;
+  optional string error = 2;
+  string message = 3;
+  CompanyServiceData company_service = 4;
+}
 message GetCompanyServicesResponse {
   bool success = 1;
   optional string error = 2;
-    string message = 3;
+  string message = 3;
   repeated CompanyServiceData company_services = 4;
 }
 
