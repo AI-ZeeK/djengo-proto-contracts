@@ -173,8 +173,8 @@ message CompanyServiceData {
   string company_service_id = 1;
   string company_id = 2;
   int32 business_type_id = 3;
-  int32 service_type_id = 4;
-  string base_price = 5;
+  int32 name = 4;
+  string price = 5;
   string description = 6;
   bool is_active = 7;
   optional string branch_id = 8;
