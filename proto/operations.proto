@@ -169,6 +169,10 @@ message GetCompanyServicesResponse {
   repeated CompanyServiceData company_services = 4;
 }
 
+
+
+
+
 message CompanyServiceData {
   string company_service_id = 1;
   string company_id = 2;
@@ -180,8 +184,8 @@ message CompanyServiceData {
   optional string branch_id = 8;
   string created_at = 9;
   string updated_at = 10;
-  optional string business_type_name = 11;
-  optional string service_type_name = 12;
+  optional BusinessType business_type = 11;
+  repeated ServiceBranch service_branches = 12;
 }
 
 message BusinessTypeRequest {
@@ -406,17 +410,26 @@ message BedSize {
   bool is_global = 4;
   bool is_active = 5;
 }
-
-
 message BusinessType {
-  optional string type = 1;
-  optional string description = 2;
-  optional string check_in_time = 3;
-  optional string check_out_time = 4;
-  repeated BusinessHours business_hours = 5;
-  repeated RestaurantTableType restaurant_table_types = 6;
-  repeated HotelRoomType hotel_room_types = 7;
+  int32 business_type_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_active = 4;
 }
+message ServiceBranch{
+  string service_branch_id = 1;
+  string branch_id = 2;
+  string service_id = 3;
+  string service_type_name = 4;
+  string description = 5;
+  string check_in_time = 6;
+  string check_out_time = 7;
+  repeated BusinessHours business_hours = 8;
+  repeated RestaurantTableType restaurant_table_types = 9;
+  repeated HotelRoomType hotel_room_types = 10;
+
+}
+
 
 message BusinessHours {
   string day_of_week = 1;
