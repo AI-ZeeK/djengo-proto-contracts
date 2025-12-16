@@ -118,6 +118,7 @@ message CreateStaffRoleRequest {
   repeated string staff_ids = 4;
   repeated Permission permissions = 5;
   string creator_id = 6;
+  optional string branch_id = 7;
 }
 message UpdateStaffRoleRequest {
   string role_id = 1;
@@ -127,6 +128,7 @@ message UpdateStaffRoleRequest {
   repeated string staff_ids = 5;
   repeated Permission permissions = 6;
   string creator_id = 7;
+  optional string branch_id = 8;
 }
 
 message Permission {
