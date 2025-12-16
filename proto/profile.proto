@@ -53,7 +53,7 @@ message AdminUsersAnalyticsRequest {
   optional Timeline timeline = 1;
   optional string start_date = 2;
   optional string end_date = 3;
-  optional string role_slug = 4;
+  optional string role_id = 4;
 }
 
 message Analytic {
