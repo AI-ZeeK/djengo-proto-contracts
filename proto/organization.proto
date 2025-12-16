@@ -35,6 +35,9 @@ service OrganizationService {
   rpc CreateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
   rpc UpdateBusinessUserRole(CreateBusinessUserRoleRequest) returns (UtilitiesResponse);
 
+  rpc CreateStaffRole(CreateStaffRoleRequest) returns (UtilitiesResponse);
+  rpc UpdateStaffRole(UpdateStaffRoleRequest) returns (UtilitiesResponse);
+
 }
 
 message UpdateCompanyDetailsRequest {
@@ -115,6 +118,15 @@ message CreateStaffRoleRequest {
   repeated string staff_ids = 4;
   repeated Permission permissions = 5;
   string creator_id = 6;
+}
+message UpdateStaffRoleRequest {
+  string role_id = 1;
+  string company_id = 2;
+  string role_name = 3;
+  string description = 4;
+  repeated string staff_ids = 5;
+  repeated Permission permissions = 6;
+  string creator_id = 7;
 }
 
 message Permission {
