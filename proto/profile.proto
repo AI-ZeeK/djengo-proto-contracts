@@ -34,6 +34,34 @@ service ProfileService {
 
   rpc getStaffDetails(StaffDetailsRequest) returns (StaffDetailsResponse);
   rpc getManyStaffDetails(ManyStaffDetailsRequest) returns (ManyStaffDetailsResponse);
+  
+  
+  rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
+}
+
+message GetUsersRequest {
+  optional string search = 1;
+  optional int32 page = 2;
+  optional int32 per_page = 3;
+  optional string sort_by = 4;
+  optional string sort_order = 5;
+}
+
+message TableMeta {
+  int32 total = 1;
+  int32 current_page = 2;
+  int32 per_page = 3;
+  int32 total_pages = 4;
+  int32 next_page = 5;
+  int32 prev_page = 6;
+
+}
+
+message GetUsersResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated User users = 3;
+  TableMeta meta = 4;
 }
 
 
