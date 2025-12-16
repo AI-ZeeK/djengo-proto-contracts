@@ -42,7 +42,7 @@ service ProfileService {
 message GetUsersRequest {
   string search = 1;
   int32 page = 2;
-  int32 per_page = 3;
+  int32 page_size = 3;
   string sort_by = 4;
   string sort_order = 5;
 }
@@ -50,7 +50,7 @@ message GetUsersRequest {
 message TableMeta {
   int32 total = 1;
   int32 current_page = 2;
-  int32 per_page = 3;
+  int32 page_size = 3;
   int32 total_pages = 4;
   int32 next_page = 5;
   int32 prev_page = 6;
