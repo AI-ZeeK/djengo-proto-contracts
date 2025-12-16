@@ -39,9 +39,11 @@ service ProfileService {
 
 message StaffDetailsRequest {
   string staff_id = 1;  
+  string company_id = 2;
 }
 message ManyStaffDetailsRequest {
   repeated string staff_ids = 1;  
+  string company_id = 2;
 }
 
 message Staff {
