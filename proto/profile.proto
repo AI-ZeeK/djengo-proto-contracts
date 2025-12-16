@@ -31,6 +31,40 @@ service ProfileService {
 
   rpc FetchOrganizationRoles(OrganizationRoleIdRequest) returns (FetchOrganizationRolesResponse);
   rpc FetchOrganizationRolesCount(OrganizationRoleIdRequest) returns (FetchOrganizationRolesCountResponse);
+
+  rpc getStaffDetails(StaffDetailsRequest) returns (StaffDetailsResponse);
+  rpc getManyStaffDetails(ManyStaffDetailsRequest) returns (ManyStaffDetailsResponse);
+}
+
+
+message StaffDetailsRequest {
+  string staff_id = 1;  
+}
+message ManyStaffDetailsRequest {
+  repeated string staff_ids = 1;  
+}
+
+message Staff {
+  string staff_id = 1;
+  string company_id = 2;
+  string user_id = 3;
+  optional string branch_id = 4;
+  string email = 5;
+  optional string designation = 6;
+  bool is_active = 7;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+message StaffDetailsResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional Staff staff = 3;
+}
+message ManyStaffDetailsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated Staff staffs = 3;
 }
 
 message ValidateAccountRequest {
