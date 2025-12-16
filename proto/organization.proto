@@ -49,6 +49,7 @@ message CompanyRoleRequest {
 message CompanyRolesRequest {
   string company_id = 1;
   optional string branch_id = 2;
+  RoleType role_type = 3;
 }
 
 message UpdateCompanyDetailsRequest {
