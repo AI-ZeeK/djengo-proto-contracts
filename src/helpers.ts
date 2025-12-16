@@ -253,7 +253,7 @@ export class Helpers {
     if (!user) return user;
 
     const sensitiveFields = ["password", "refresh_token", ...extraFields];
-    const sanitized = { ...user };
+    const sanitized: Record<string, any> = { ...user };
 
     for (const field of sensitiveFields) {
       if (field in sanitized) {
@@ -261,6 +261,16 @@ export class Helpers {
       }
     }
 
-    return sanitized;
+    // Always stringify date fields if present
+    const dateFields = ["created_at", "last_login", "updated_at"];
+    for (const field of dateFields) {
+      if (field in sanitized && sanitized[field] != null) {
+        if (typeof sanitized[field] !== "string") {
+          sanitized[field] = String(sanitized[field]);
+        }
+      }
+    }
+
+    return sanitized as Partial<T>;
   }
 }
