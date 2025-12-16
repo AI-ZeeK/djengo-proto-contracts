@@ -37,6 +37,41 @@ service ProfileService {
   
   
   rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
+  rpc AdminUsersAnalytics(AdminUsersAnalyticsRequest) returns (AdminUsersAnalyticsResponse);
+}
+
+enum TIMELINE_ENUM {
+  _1m = 0;
+  _3m = 1;
+  _6m = 2;
+  _1y = 3;
+
+}
+
+
+message AdminUsersAnalyticsRequest {
+  optional TIMELINE_ENUM timeline = 1;
+  optional string start_date = 2;
+  optional string end_date = 3;
+  optional string role_slug = 4;
+}
+
+message Analytic {
+  int32 value = 1;
+  string trend = 2;
+  string percentage = 3;
+  
+}
+
+message AdminUsersAnalyticsResponse {
+  Analytic total_users = 1;
+  Analytic new_users = 2;
+  Analytic active_users = 3;
+  Analytic business_users = 4;
+  Analytic pending_users = 5;
+  Analytic deactivated_users = 6;
+  Analytic high_value_users = 7;
+  Analytic at_risk_users = 8;
 }
 
 message GetUsersRequest {
