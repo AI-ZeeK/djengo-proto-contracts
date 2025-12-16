@@ -246,4 +246,32 @@ export class Helpers {
 
     return `${letters}-${digits}-${datestamp}`;
   }
+  static sanitizeUser<T extends object>(
+    user: T,
+    extraFields: string[] = []
+  ): Partial<T> {
+    if (!user) return user;
+
+    const sensitiveFields = ["password", "refresh_token", ...extraFields];
+    const sanitized = { ...user };
+
+    for (const field of sensitiveFields) {
+      if (field in sanitized) {
+        sanitized[field] = undefined;
+      }
+    }
+
+    // Always stringify date fields if present
+    const dateFields = ["created_at", "last_login", "updated_at"];
+    for (const field of dateFields) {
+      if (field in sanitized && sanitized[field] != null) {
+        // If already a string, leave as is; else stringify
+        if (typeof sanitized[field] !== "string") {
+          sanitized[field] = String(sanitized[field]);
+        }
+      }
+    }
+
+    return sanitized;
+  }
 }

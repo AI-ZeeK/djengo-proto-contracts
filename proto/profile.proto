@@ -321,7 +321,7 @@ message GetUserByEmailResponse {
 message UpdateUserStatusResponse {
   bool success = 1;
   optional string error = 2;
-  optional BasicUser user = 3;
+  optional User user = 3;
 }
 
 message GetUserContactsResponse {
@@ -334,7 +334,7 @@ message GetUserContactsResponse {
 message UpdateUserResponse {
   bool success = 1;
   optional string error = 2;
-  optional BasicUser user = 3;
+  optional User user = 3;
 }
 
 // 🏗️ DATA MODELS
@@ -358,18 +358,18 @@ message User {
   optional BusinessUser business_user = 16;
 }
 
-message BasicUser {
-  string user_id = 1;
-  string email = 2;
-  optional string username = 3;
-  optional string first_name = 4;
-  optional string last_name = 5;
-  optional string phone_number = 6;
-  optional string last_seen = 7;
-  string created_at = 8;
-  string updated_at = 9;
-  bool email_verified = 10;
-}
+// message BasicUser {
+//   string user_id = 1;
+//   string email = 2;
+//   optional string username = 3;
+//   optional string first_name = 4;
+//   optional string last_name = 5;
+//   optional string phone_number = 6;
+//   optional string last_seen = 7;
+//   string created_at = 8;
+//   string updated_at = 9;
+//   bool email_verified = 10;
+// }
 
 message Contact {
   string user_id = 1;
