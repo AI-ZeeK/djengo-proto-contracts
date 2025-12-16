@@ -261,17 +261,6 @@ export class Helpers {
       }
     }
 
-    // Always stringify date fields if present
-    const dateFields = ["created_at", "last_login", "updated_at"];
-    for (const field of dateFields) {
-      if (field in sanitized && sanitized[field] != null) {
-        // If already a string, leave as is; else stringify
-        if (typeof sanitized[field] !== "string") {
-          sanitized[field] = String(sanitized[field]);
-        }
-      }
-    }
-
     return sanitized;
   }
 }
