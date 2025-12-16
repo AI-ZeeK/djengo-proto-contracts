@@ -40,7 +40,7 @@ service ProfileService {
   rpc AdminUsersAnalytics(AdminUsersAnalyticsRequest) returns (AdminUsersAnalyticsResponse);
 }
 
-enum TIMELINE_ENUM {
+enum Timeline {
   _1m = 0;
   _3m = 1;
   _6m = 2;
