@@ -238,7 +238,6 @@ function generateTypeScript(protocPath) {
     `--ts_proto_opt=fileSuffix=.pb`,
     `--ts_proto_opt=outputServices=grpc-js`,
     `--ts_proto_opt=useOptionals=messages`,
-    `--ts_proto_opt=snakeToCamel=false`,
     `--proto_path=./src/shared/proto`,
     `--proto_path=${googleProtoPath}`,
     `./src/shared/proto/*.proto`,
