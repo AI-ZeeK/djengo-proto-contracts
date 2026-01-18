@@ -301,7 +301,16 @@ export class Helpers {
     return { percentage: Math.round(pct * 10) / 10, trend };
   }
 
-  static getDateRanges(timeline: string) {
+  static getDateRanges(
+    timeline?: string,
+    startDate?: string,
+    endDate?: string,
+  ): {
+    dateFrom?: Date;
+    dateTo?: Date;
+    prevDateFrom?: Date;
+    prevDateTo?: Date;
+  } {
     const now = new Date();
     let dateFrom: Date | undefined;
     let dateTo: Date | undefined;
@@ -380,6 +389,14 @@ export class Helpers {
           break;
       }
       dateTo = now;
+    }
+
+    if (startDate) dateFrom = new Date(startDate);
+    if (endDate) dateTo = new Date(endDate);
+    if (startDate && endDate) {
+      const diff = new Date(endDate).getTime() - new Date(startDate).getTime();
+      prevDateTo = new Date(new Date(startDate).getTime());
+      prevDateFrom = new Date(new Date(startDate).getTime() - diff);
     }
 
     return { dateFrom, dateTo, prevDateFrom, prevDateTo };
