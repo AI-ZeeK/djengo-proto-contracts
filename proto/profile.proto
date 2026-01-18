@@ -25,7 +25,7 @@ service ProfileService {
   rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse);
   rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
-  rpc GetUserCountForOrganization(OrganizationIdRequest) returns (GetUserCountForOrganizationResponse);
+  rpc GetUserCountForOrganization(GetUserCountForOrganizationRequest) returns (GetUserCountForOrganizationResponse);
 
   // BUSINESS ROLES
   rpc CreateOrUpdateBusinessUserRole(CreateOrUpdateBusinessUserRoleRequest) returns (CreateOrUpdateBusinessUserRoleResponse);
@@ -52,8 +52,9 @@ enum Timeline {
   all = 4;
 }
 
-message OrganizationIdRequest {
+message GetUserCountForOrganizationRequest {
   string organization_id = 1;
+  bool is_active = 2;
 }
 
 message GetUserCountForOrganizationResponse {
