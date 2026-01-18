@@ -247,6 +247,7 @@ enum SendOtpType {
 // Analytics Messages
 message TotalOrganizationsData {
   int32 count = 1;
+  repeated TrendData trend_data = 2;
 }
 
 message OrganizationWithCounts {
@@ -310,10 +311,16 @@ message DailyActiveUsersAnalytics {
   DailyActiveUsersSummary summary = 4;
 }
 
+message TrendData {
+  string name = 1;
+  int32 value = 2;
+}
+
 message ActiveUsersCountData {
   int32 count = 1;
   double percentage = 2;
   string trend = 3;
+  repeated TrendData trend_data = 4;
 }
 
 message OverviewAnalyticsResponse {

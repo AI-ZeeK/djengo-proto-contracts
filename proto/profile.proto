@@ -88,10 +88,16 @@ message DailyActiveUsersAnalyticsResponse {
   DailyActiveUsersSummary summary = 4;
 }
 
+message TrendData {
+  string name = 1;
+  int32 value = 2;
+}
+
 message ActiveUsersCountResponse {
   int32 count = 1;
   double percentage = 2;
   string trend = 3;
+  repeated TrendData trend_data = 4;
 }
 
 
