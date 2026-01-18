@@ -1,3 +1,10 @@
+enum Timeline {
+  _1m = "1m",
+  _3m = "3m",
+  _6m = "6m",
+  _1y = "1y",
+  all = "all",
+}
 export class Helpers {
   /**
    * Generates a random OTP (One-Time Password)
@@ -160,7 +167,7 @@ export class Helpers {
         Object.entries(obj).map(([k, v]) => [
           k.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`),
           Helpers.toSnakeCase(v),
-        ])
+        ]),
       );
       return Helpers.isEmptyOrNull(converted);
     }
@@ -178,7 +185,7 @@ export class Helpers {
         Object.entries(obj).map(([k, v]) => [
           k.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()),
           Helpers.toCamelCase(v),
-        ])
+        ]),
       );
       return Helpers.isEmptyOrNull(converted);
     }
@@ -212,14 +219,14 @@ export class Helpers {
     let randomUpper = "";
     for (let i = 0; i < 6; i++) {
       randomUpper += upperChars.charAt(
-        Math.floor(Math.random() * upperChars.length)
+        Math.floor(Math.random() * upperChars.length),
       );
     }
 
     let randomLower = "";
     for (let i = 0; i < 2; i++) {
       randomLower += lowerChars.charAt(
-        Math.floor(Math.random() * lowerChars.length)
+        Math.floor(Math.random() * lowerChars.length),
       );
     }
 
@@ -229,7 +236,7 @@ export class Helpers {
   static generateUserSlug(): string {
     // Generate 3 random uppercase letters
     const letters = Array.from({ length: 3 }, () =>
-      String.fromCharCode(65 + Math.floor(Math.random() * 26))
+      String.fromCharCode(65 + Math.floor(Math.random() * 26)),
     ).join("");
 
     // Generate 4 random digits
@@ -248,7 +255,7 @@ export class Helpers {
   }
   static sanitizeUser<T extends object>(
     user: T,
-    extraFields: string[] = []
+    extraFields: string[] = [],
   ): Partial<T> {
     if (!user) return user;
 
@@ -272,5 +279,109 @@ export class Helpers {
     }
 
     return sanitized as Partial<T>;
+  }
+
+  static computeTrend(
+    current: number,
+    previous: number,
+  ): {
+    percentage: number;
+    trend: "increase" | "decrease" | "neutral";
+  } {
+    if (previous === 0 && current > 0)
+      return { percentage: 100, trend: "neutral" };
+    if (previous === 0 && current === 0)
+      return { percentage: 0, trend: "neutral" };
+    const diff = current - previous;
+    const pct = previous !== 0 ? (diff / previous) * 100 : 0;
+    let trend: "increase" | "decrease" | "neutral" = "neutral";
+    if (pct > 0) trend = "increase";
+    else if (pct < 0) trend = "decrease";
+    else if (pct === 0) trend = "neutral";
+    return { percentage: Math.round(pct * 10) / 10, trend };
+  }
+
+  static getDateRanges(timeline: string) {
+    const now = new Date();
+    let dateFrom: Date | undefined;
+    let dateTo: Date | undefined;
+    let prevDateFrom: Date | undefined;
+    let prevDateTo: Date | undefined;
+
+    if (timeline) {
+      switch (timeline as Timeline) {
+        case Timeline._1m:
+          dateFrom = new Date(
+            now.getFullYear(),
+            now.getMonth() - 1,
+            now.getDate(),
+          );
+          prevDateFrom = new Date(
+            now.getFullYear(),
+            now.getMonth() - 2,
+            now.getDate(),
+          );
+          prevDateTo = new Date(
+            now.getFullYear(),
+            now.getMonth() - 1,
+            now.getDate(),
+          );
+          break;
+        case Timeline._3m:
+          dateFrom = new Date(
+            now.getFullYear(),
+            now.getMonth() - 3,
+            now.getDate(),
+          );
+          prevDateFrom = new Date(
+            now.getFullYear(),
+            now.getMonth() - 6,
+            now.getDate(),
+          );
+          prevDateTo = new Date(
+            now.getFullYear(),
+            now.getMonth() - 3,
+            now.getDate(),
+          );
+          break;
+        case Timeline._6m:
+          dateFrom = new Date(
+            now.getFullYear(),
+            now.getMonth() - 6,
+            now.getDate(),
+          );
+          prevDateFrom = new Date(
+            now.getFullYear(),
+            now.getMonth() - 12,
+            now.getDate(),
+          );
+          prevDateTo = new Date(
+            now.getFullYear(),
+            now.getMonth() - 6,
+            now.getDate(),
+          );
+          break;
+        case Timeline._1y:
+          dateFrom = new Date(
+            now.getFullYear() - 1,
+            now.getMonth(),
+            now.getDate(),
+          );
+          prevDateFrom = new Date(
+            now.getFullYear() - 2,
+            now.getMonth(),
+            now.getDate(),
+          );
+          prevDateTo = new Date(
+            now.getFullYear() - 1,
+            now.getMonth(),
+            now.getDate(),
+          );
+          break;
+      }
+      dateTo = now;
+    }
+
+    return { dateFrom, dateTo, prevDateFrom, prevDateTo };
   }
 }

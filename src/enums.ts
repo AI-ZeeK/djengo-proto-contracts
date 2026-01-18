@@ -11,6 +11,13 @@ export enum UserRole {
   AGENCY = "AGENCY",
 }
 
+export enum Timeline {
+  _1m = "1m",
+  _3m = "3m",
+  _6m = "6m",
+  _1y = "1y",
+  all = "all",
+}
 /**
  * Base organization roles
  */
