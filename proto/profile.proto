@@ -48,6 +48,7 @@ enum Timeline {
   _3m = 1;
   _6m = 2;
   _1y = 3;
+  all = 4;
 }
 
 message YAxis {
