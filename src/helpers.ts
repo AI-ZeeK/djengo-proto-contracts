@@ -1,4 +1,4 @@
-import { Timeline } from "../scripts/enum";
+import { Timeline } from "..";
 
 export class Helpers {
   /**
