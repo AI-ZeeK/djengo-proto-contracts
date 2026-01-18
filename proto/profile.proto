@@ -38,6 +38,9 @@ service ProfileService {
   
   rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
   rpc AdminUsersAnalytics(AdminUsersAnalyticsRequest) returns (AdminUsersAnalyticsResponse);
+
+  rpc ActiveUsersCount(EmptyRequest) returns (ActiveUsersCountResponse);
+  rpc DailyActiveUsersAnalytics(EmptyRequest) returns (DailyActiveUsersAnalyticsResponse);
 }
 
 enum Timeline {
@@ -45,7 +48,50 @@ enum Timeline {
   _3m = 1;
   _6m = 2;
   _1y = 3;
+}
 
+message YAxis {
+  int32 max = 1;
+  repeated int32 sections = 2;
+  string label = 3;
+}
+
+message XAxis {
+  repeated string sections = 1;
+  string label = 2;
+}
+
+message DailyActiveUsersData {
+  string day = 1;
+  string date = 2;
+  int32 active_users = 3;
+  bool is_today = 4;
+}
+
+message PeakDay {
+  string day = 1;
+  string date = 2;
+  int32 active_users = 3;
+  bool is_today = 4;
+}
+
+message DailyActiveUsersSummary {
+  int32 total_users = 1;
+  double avg_daily_active = 2;
+  PeakDay peak_day = 3;
+}
+
+message DailyActiveUsersAnalyticsResponse {
+  YAxis y_axis = 1;
+  XAxis x_axis = 2;
+  repeated DailyActiveUsersData data = 3;
+  DailyActiveUsersSummary summary = 4;
+}
+
+message ActiveUsersCountResponse {
+  int32 count = 1;
+  double percentage = 2;
+  string trend = 3;
 }
 
 
