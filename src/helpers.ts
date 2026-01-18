@@ -301,112 +301,118 @@ export class Helpers {
     return { percentage: Math.round(pct * 10) / 10, trend };
   }
 
-  static getDateRanges(
-    timeline?: string,
-    startDate?: string,
-    endDate?: string,
-  ): {
-    dateFrom?: Date;
-    dateTo?: Date;
-    prevDateFrom?: Date;
-    prevDateTo?: Date;
+  static getDateRanges({
+    timeline,
+    start_date,
+    end_date,
+  }: {
+    timeline: string;
+    start_date?: string;
+    end_date?: string;
+  }): {
+    date_from?: Date;
+    date_to?: Date;
+    prev_date_from?: Date;
+    prev_date_to?: Date;
   } {
     const now = new Date();
-    let dateFrom: Date | undefined;
-    let dateTo: Date | undefined;
-    let prevDateFrom: Date | undefined;
-    let prevDateTo: Date | undefined;
+    let date_from: Date | undefined;
+    let date_to: Date | undefined;
+    let prev_date_from: Date | undefined;
+    let prev_date_to: Date | undefined;
 
     if (timeline) {
       switch (timeline as Timeline) {
         case Timeline._1m:
-          dateFrom = new Date(
+          date_from = new Date(
             now.getFullYear(),
             now.getMonth() - 1,
             now.getDate(),
           );
-          prevDateFrom = new Date(
+          prev_date_from = new Date(
             now.getFullYear(),
             now.getMonth() - 2,
             now.getDate(),
           );
-          prevDateTo = new Date(
+          prev_date_to = new Date(
             now.getFullYear(),
             now.getMonth() - 1,
             now.getDate(),
           );
           break;
         case Timeline._3m:
-          dateFrom = new Date(
+          date_from = new Date(
             now.getFullYear(),
             now.getMonth() - 3,
             now.getDate(),
           );
-          prevDateFrom = new Date(
+          prev_date_from = new Date(
             now.getFullYear(),
             now.getMonth() - 6,
             now.getDate(),
           );
-          prevDateTo = new Date(
+          prev_date_to = new Date(
             now.getFullYear(),
             now.getMonth() - 3,
             now.getDate(),
           );
           break;
         case Timeline._6m:
-          dateFrom = new Date(
+          date_from = new Date(
             now.getFullYear(),
             now.getMonth() - 6,
             now.getDate(),
           );
-          prevDateFrom = new Date(
+          prev_date_from = new Date(
             now.getFullYear(),
             now.getMonth() - 12,
             now.getDate(),
           );
-          prevDateTo = new Date(
+          prev_date_to = new Date(
             now.getFullYear(),
             now.getMonth() - 6,
             now.getDate(),
           );
           break;
         case Timeline._1y:
-          dateFrom = new Date(
+          date_from = new Date(
             now.getFullYear() - 1,
             now.getMonth(),
             now.getDate(),
           );
-          prevDateFrom = new Date(
+          prev_date_from = new Date(
             now.getFullYear() - 2,
             now.getMonth(),
             now.getDate(),
           );
-          prevDateTo = new Date(
+          prev_date_to = new Date(
             now.getFullYear() - 1,
             now.getMonth(),
             now.getDate(),
           );
           break;
       }
-      dateTo = now;
+      date_to = now;
     }
 
-    if (startDate) dateFrom = new Date(startDate);
-    if (endDate) dateTo = new Date(endDate);
-    if (startDate && endDate) {
-      const diff = new Date(endDate).getTime() - new Date(startDate).getTime();
-      prevDateTo = new Date(new Date(startDate).getTime());
-      prevDateFrom = new Date(new Date(startDate).getTime() - diff);
+    if (start_date) date_from = new Date(start_date);
+    if (end_date) date_to = new Date(end_date);
+    if (start_date && end_date) {
+      const diff =
+        new Date(end_date).getTime() - new Date(start_date).getTime();
+      prev_date_to = new Date(new Date(start_date).getTime());
+      prev_date_from = new Date(new Date(start_date).getTime() - diff);
     }
 
-    return { dateFrom, dateTo, prevDateFrom, prevDateTo };
+    return { date_from, date_to, prev_date_from, prev_date_to };
   }
 
   static buildWhere(extra: any = {}, dateRange: any) {
     const where: any = { ...extra };
-    const { dateFrom, dateTo, prevDateFrom, prevDateTo, usePrev } = dateRange;
-    const from = usePrev ? prevDateFrom : dateFrom;
-    const to = usePrev ? prevDateTo : dateTo;
+    const { date_from, date_to, prev_date_from, prev_date_to, usePrev } =
+      dateRange;
+    const from = usePrev ? prev_date_from : date_from;
+    const to = usePrev ? prev_date_to : date_to;
 
     if (from || to) {
       where.created_at = {};
