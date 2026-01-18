@@ -74,6 +74,14 @@ export enum BASE_ORGANIZATION_ROLE_ENUM {
   CREATOR = "CREATOR",
 }
 
+export enum TIMELINE_ENUM {
+  _1m = "1m",
+  _3m = "3m",
+  _6m = "6m",
+  _1y = "1y",
+  all = "all",
+}
+
 export enum ADDRESS_TYPE_ENUM {
   USER_HOME = "user_home",
   USER_WORK = "user_work",
