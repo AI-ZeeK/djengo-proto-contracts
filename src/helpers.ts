@@ -384,4 +384,18 @@ export class Helpers {
 
     return { dateFrom, dateTo, prevDateFrom, prevDateTo };
   }
+
+  static buildWhere(extra: any = {}, dateRange: any) {
+    const where: any = { ...extra };
+    const { dateFrom, dateTo, prevDateFrom, prevDateTo, usePrev } = dateRange;
+    const from = usePrev ? prevDateFrom : dateFrom;
+    const to = usePrev ? prevDateTo : dateTo;
+
+    if (from || to) {
+      where.created_at = {};
+      if (from) where.created_at.gte = from;
+      if (to) where.created_at.lte = to;
+    }
+    return where;
+  }
 }
