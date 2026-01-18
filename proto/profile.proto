@@ -25,6 +25,7 @@ service ProfileService {
   rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse);
   rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc GetUserCountForOrganization(OrganizationIdRequest) returns (GetUserCountForOrganizationResponse);
 
   // BUSINESS ROLES
   rpc CreateOrUpdateBusinessUserRole(CreateOrUpdateBusinessUserRoleRequest) returns (CreateOrUpdateBusinessUserRoleResponse);
@@ -49,6 +50,14 @@ enum Timeline {
   _6m = 2;
   _1y = 3;
   all = 4;
+}
+
+message OrganizationIdRequest {
+  string organization_id = 1;
+}
+
+message GetUserCountForOrganizationResponse {
+  int32 count = 1;
 }
 
 message YAxis {
