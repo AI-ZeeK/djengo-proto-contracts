@@ -27,6 +27,8 @@ service ProfileService {
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc GetUserCountForOrganization(GetUserCountForOrganizationRequest) returns (GetUserCountForOrganizationResponse);
 
+  rpc GetLoginHistory(GetLoginHistoryRequest) returns (LoginHistoryResponse);
+
   // BUSINESS ROLES
   rpc CreateOrUpdateBusinessUserRole(CreateOrUpdateBusinessUserRoleRequest) returns (CreateOrUpdateBusinessUserRoleResponse);
 
@@ -39,9 +41,29 @@ service ProfileService {
   
   rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
   rpc AdminUsersAnalytics(AdminUsersAnalyticsRequest) returns (AdminUsersAnalyticsResponse);
-
+// ANALYTICS
   rpc ActiveUsersCount(EmptyRequest) returns (ActiveUsersCountResponse);
   rpc DailyActiveUsersAnalytics(EmptyRequest) returns (DailyActiveUsersAnalyticsResponse);
+}
+
+message LoginHistoryResponse {
+  repeated LoginHistory login_history = 1;
+}
+
+message LoginHistory {
+  string session_id = 1;
+  string user_id = 2;
+  string device_info = 3;
+  bool is_active = 4;
+  string login_at = 5;
+  SessionSource source = 9;
+}
+
+
+message GetLoginHistoryRequest {
+  string user_id = 1;
+  optional int32 page = 2;
+  optional int32 page_size = 3;
 }
 
 enum Timeline {
