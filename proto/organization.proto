@@ -10,6 +10,11 @@ service OrganizationService {
 
   // Validate Company Reference
   rpc ValidateCompanyReference(ValidateCompanyReferenceRequest) returns (ValidateCompanyReferenceResponse);
+  
+  // Verify IDs
+  rpc VerifyCompanyId(VerifyCompanyIdRequest) returns (UtilitiesResponse);
+  rpc VerifyBranchId(VerifyBranchIdRequest) returns (UtilitiesResponse);
+  rpc VerifyDepartmentId(VerifyDepartmentIdRequest) returns (UtilitiesResponse);
 
   // Create Company
   rpc CreateCompany(CreateCompanyRequest) returns (UtilitiesResponse);
@@ -260,6 +265,18 @@ message ValidateCompanyReferenceResponse {
   bool success = 1;
   optional string error = 2;
   string company_id = 3;
+}
+
+message VerifyCompanyIdRequest {
+  string company_id = 1;
+}
+
+message VerifyBranchIdRequest {
+  string branch_id = 1;
+}
+
+message VerifyDepartmentIdRequest {
+  string department_id = 1;
 }
 
 message CreateCompanyRequest {
