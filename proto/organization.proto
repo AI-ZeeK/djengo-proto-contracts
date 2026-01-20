@@ -12,9 +12,9 @@ service OrganizationService {
   rpc ValidateCompanyReference(ValidateCompanyReferenceRequest) returns (ValidateCompanyReferenceResponse);
   
   // Verify IDs
-  rpc VerifyCompanyId(VerifyCompanyIdRequest) returns (UtilitiesResponse);
-  rpc VerifyBranchId(VerifyBranchIdRequest) returns (UtilitiesResponse);
-  rpc VerifyDepartmentId(VerifyDepartmentIdRequest) returns (UtilitiesResponse);
+  rpc VerifyCompanyId(VerifyCompanyIdRequest) returns (VerifyCompanyIdResponse);
+  rpc VerifyBranchId(VerifyBranchIdRequest) returns (VerifyBranchIdResponse);
+  rpc VerifyDepartmentId(VerifyDepartmentIdRequest) returns (VerifyDepartmentIdResponse);
 
   // Create Company
   rpc CreateCompany(CreateCompanyRequest) returns (UtilitiesResponse);
@@ -271,12 +271,33 @@ message VerifyCompanyIdRequest {
   string company_id = 1;
 }
 
+message VerifyCompanyIdResponse {
+  bool success = 1;
+  optional string error = 2;
+  string message = 3;
+  optional Company company = 4;
+}
+
 message VerifyBranchIdRequest {
   string branch_id = 1;
 }
 
+message VerifyBranchIdResponse {
+  bool success = 1;
+  optional string error = 2;
+  string message = 3;
+  optional Branch branch = 4;
+}
+
 message VerifyDepartmentIdRequest {
   string department_id = 1;
+}
+
+message VerifyDepartmentIdResponse {
+  bool success = 1;
+  optional string error = 2;
+  string message = 3;
+  optional Department department = 4;
 }
 
 message CreateCompanyRequest {
@@ -399,6 +420,18 @@ message Branch {
   string updated_at = 10;
   optional string deleted_at = 11;
   optional string creator_id = 12;
+}
+
+message Department {
+  string department_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  string name = 4;
+  optional string description = 5;
+  bool is_active = 6;
+  string created_at = 7;
+  string updated_at = 8;
+  optional string deleted_at = 9;
 }
 
 // message Company {
