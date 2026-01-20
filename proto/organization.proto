@@ -15,6 +15,7 @@ service OrganizationService {
   rpc VerifyCompanyId(VerifyCompanyIdRequest) returns (VerifyCompanyIdResponse);
   rpc VerifyBranchId(VerifyBranchIdRequest) returns (VerifyBranchIdResponse);
   rpc VerifyDepartmentId(VerifyDepartmentIdRequest) returns (VerifyDepartmentIdResponse);
+  rpc VerifyRoleId(VerifyRoleIdRequest) returns (VerifyRoleIdResponse);
 
   // Create Company
   rpc CreateCompany(CreateCompanyRequest) returns (UtilitiesResponse);
@@ -298,6 +299,18 @@ message VerifyDepartmentIdResponse {
   optional string error = 2;
   string message = 3;
   optional Department department = 4;
+}
+
+message VerifyRoleIdRequest {
+  string company_id = 1;
+  string role_id = 2;
+}
+
+message VerifyRoleIdResponse {
+  bool success = 1;
+  optional string error = 2;
+  string message = 3;
+  optional OrganizationRole role = 4;
 }
 
 message CreateCompanyRequest {
