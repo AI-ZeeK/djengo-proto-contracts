@@ -270,6 +270,7 @@ message ValidateCompanyReferenceResponse {
 
 message VerifyCompanyIdRequest {
   string company_id = 1;
+  string organization_id = 2;
 }
 
 message VerifyCompanyIdResponse {
@@ -281,6 +282,8 @@ message VerifyCompanyIdResponse {
 
 message VerifyBranchIdRequest {
   string branch_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
 }
 
 message VerifyBranchIdResponse {
@@ -291,7 +294,9 @@ message VerifyBranchIdResponse {
 }
 
 message VerifyDepartmentIdRequest {
-  string department_id = 1;
+  string company_id = 1;
+  string organization_id = 2;
+  string department_id = 3;
 }
 
 message VerifyDepartmentIdResponse {
