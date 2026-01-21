@@ -234,8 +234,9 @@ message StaffInvitationItem {
 }
 
 message SendStaffInvitationsRequest {
-  string company_id = 1;
-  string invited_by = 2;
+  string organization_id = 1;
+  string company_id = 2;
+  string invited_by = 3;
   repeated StaffInvitationItem invitations = 5;
 }
 
