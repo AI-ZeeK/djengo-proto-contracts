@@ -44,6 +44,7 @@ service ProfileService {
   rpc MarkInvitationViewed(MarkInvitationViewedRequest) returns (InvitationStatusResponse);
   rpc AcceptInvitation(AcceptInvitationRequest) returns (AcceptInvitationResponse);
   rpc DeclineInvitation(DeclineInvitationRequest) returns (InvitationStatusResponse);
+  rpc GetInvitationsByCompany(CompanyIdRequest) returns (GetInvitationsByCompanyResponse);
   
   
   rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
@@ -64,6 +65,16 @@ message LoginHistory {
   bool is_active = 4;
   string login_at = 5;
   SessionSource source = 9;
+}
+
+message GetInvitationsByCompanyResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated StaffInvitation invitations = 3;
+}
+
+message CompanyIdRequest {
+  string company_id = 1;
 }
 
 
