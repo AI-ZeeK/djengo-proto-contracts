@@ -302,12 +302,12 @@ message StaffInvitation {
   string email = 7;
   string invitation_code = 8;
   InvitationStatus status = 9;
-  string invited_by = 9;
-  string expires_at = 10;
-  optional string viewed_at = 11;
-  optional string accepted_at = 12;
-  optional string declined_at = 13;
-  string created_at = 14;
+  string invited_by =10;
+  string expires_at = 11;
+  optional string viewed_at = 12;
+  optional string accepted_at = 13;
+  optional string declined_at = 14;
+  string created_at = 15;
 }
 
 message GetInvitationByCodeResponse {
