@@ -276,15 +276,32 @@ enum InvitationStatus {
   INVITATION_EXPIRED = 4;
 }
 
+message OrganizationRole {
+  string role_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string branch_id = 4;
+  string name = 5;
+  string slug = 6;
+  string description = 7;
+  bool is_active = 8;
+  bool is_org_level = 10;
+  string created_at = 11;
+  string updated_at = 12;
+  string deleted_at = 13;
+}
+
+
 message StaffInvitation {
   string invitation_id = 1;
   string company_id = 2;
   optional string branch_id = 3;
   optional string department_id = 4;
   optional string role_id = 5;
-  string email = 6;
-  string invitation_code = 7;
-  InvitationStatus status = 8;
+  optional OrganizationRole role = 6;
+  string email = 7;
+  string invitation_code = 8;
+  InvitationStatus status = 9;
   string invited_by = 9;
   string expires_at = 10;
   optional string viewed_at = 11;
