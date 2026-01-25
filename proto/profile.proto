@@ -269,11 +269,11 @@ message GetInvitationByCodeRequest {
 }
 
 enum InvitationStatus {
-  INVITATION_PENDING = 0;
-  INVITATION_VIEWED = 1;
-  INVITATION_ACCEPTED = 2;
-  INVITATION_DECLINED = 3;
-  INVITATION_EXPIRED = 4;
+  PENDING = 0;
+  VIEWED = 1;
+  ACCEPTED = 2;
+  DECLINED = 3;
+  EXPIRED = 4;
 }
 
 message OrganizationRole {
@@ -301,7 +301,7 @@ message StaffInvitation {
   optional OrganizationRole role = 6;
   string email = 7;
   string invitation_code = 8;
-  InvitationStatus status = 9;
+  // InvitationStatus status = 9;
   string invited_by =10;
   string expires_at = 11;
   optional string responsed_at = 12;
