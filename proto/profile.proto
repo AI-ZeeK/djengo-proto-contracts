@@ -67,6 +67,12 @@ message LoginHistory {
   SessionSource source = 9;
 }
 
+enum RequestFilter {
+  ALL = 0;
+  ACTIVE = 1;
+  INACTIVE = 2; 
+}
+
 message PaginatedCompanyRequest {
   // Company identification
   string company_id = 1;
@@ -78,6 +84,9 @@ message PaginatedCompanyRequest {
   optional int32 page_size = 5;
   optional string sort_by = 6;
   optional string sort_order = 7;
+  optional RequestFilter filter = 8;
+
+
 }
 
 message GetInvitationsByCompanyResponse {
