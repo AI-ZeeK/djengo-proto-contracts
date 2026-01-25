@@ -84,6 +84,7 @@ message GetInvitationsByCompanyResponse {
   bool success = 1;
   optional string error = 2;
   repeated StaffInvitation invitations = 3;
+  TableMeta meta = 4;
 }
 
 message CompanyIdRequest {
