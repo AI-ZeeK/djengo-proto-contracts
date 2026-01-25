@@ -37,7 +37,8 @@ service ProfileService {
 
   rpc getStaffDetails(StaffDetailsRequest) returns (StaffDetailsResponse);
   rpc getManyStaffDetails(ManyStaffDetailsRequest) returns (ManyStaffDetailsResponse);
-  
+  rpc getCompanyStaffs(PaginatedCompanyRequest) returns (ManyStaffDetailsResponse);
+
   // Staff Invitations
   rpc SendStaffInvitations(SendStaffInvitationsRequest) returns (SendStaffInvitationsResponse);
   rpc GetInvitationByCode(GetInvitationByCodeRequest) returns (GetInvitationByCodeResponse);
@@ -246,6 +247,9 @@ message Staff {
   bool is_active = 7;
   string created_at = 10;
   string updated_at = 11;
+  optional User user = 12;
+  string role_id = 13;
+  optional OrganizationRole role = 14;
 }
 
 message StaffDetailsResponse {
