@@ -261,6 +261,8 @@ message ManyStaffDetailsResponse {
   bool success = 1;
   optional string error = 2;
   repeated Staff staffs = 3;
+  optional  TableMeta meta = 4;
+
 }
 
 // Staff Invitation Messages
