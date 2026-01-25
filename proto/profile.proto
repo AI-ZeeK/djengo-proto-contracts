@@ -306,7 +306,7 @@ message StaffInvitation {
   string expires_at = 11;
   optional string responsed_at = 12;
   string created_at = 15;
-  string status = 16
+  string status = 16;
 }
 
 message GetInvitationByCodeResponse {
