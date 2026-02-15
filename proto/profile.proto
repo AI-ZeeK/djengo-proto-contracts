@@ -336,6 +336,8 @@ message StaffInvitation {
   optional string responsed_at = 12;
   string created_at = 15;
   string status = 16;
+ optional Company company = 17;
+
 }
 
 message GetInvitationByCodeResponse {
