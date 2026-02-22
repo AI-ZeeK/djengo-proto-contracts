@@ -45,6 +45,7 @@ service ProfileService {
   rpc GetInvitationByCode(GetInvitationByCodeRequest) returns (GetInvitationByCodeResponse);
   rpc AcceptInvitation(AcceptInvitationRequest) returns (AcceptInvitationResponse);
   rpc DeclineInvitation(DeclineInvitationRequest) returns (InvitationStatusResponse);
+  rpc DeleteStaffInvitation(GetInvitationByCodeRequest) returns (InvitationStatusResponse);
   rpc ResendStaffInvitation(ResendStaffInvitationRequest) returns (ResendStaffInvitationResponse);
   rpc GetInvitationsByCompany(PaginatedCompanyRequest) returns (GetInvitationsByCompanyResponse);
   
