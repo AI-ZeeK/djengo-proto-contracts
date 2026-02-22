@@ -348,10 +348,9 @@ message GetInvitationByCodeResponse {
 
 message AcceptInvitationRequest {
   string invitation_code = 1;
-  string user_id = 2;
-  string first_name = 3;
-  string last_name = 4;
-  AddressRequest address = 5;
+  string first_name = 2;
+  string last_name = 3;
+  AddressRequest address = 4;
 }
 
 message AcceptInvitationResponse {
