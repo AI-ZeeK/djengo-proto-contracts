@@ -364,7 +364,9 @@ message AcceptInvitationRequest {
   string invitation_code = 1;
   string first_name = 2;
   string last_name = 3;
-  AddressRequest address = 4;
+  optional string phone_number = 4;
+  optional string country_code = 5;
+  AddressRequest address = 6;
 }
 
 message AcceptInvitationResponse {
