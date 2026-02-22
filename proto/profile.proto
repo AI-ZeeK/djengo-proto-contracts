@@ -42,7 +42,6 @@ service ProfileService {
   // Staff Invitations
   rpc SendStaffInvitations(SendStaffInvitationsRequest) returns (SendStaffInvitationsResponse);
   rpc GetInvitationByCode(GetInvitationByCodeRequest) returns (GetInvitationByCodeResponse);
-  rpc MarkInvitationViewed(MarkInvitationViewedRequest) returns (InvitationStatusResponse);
   rpc AcceptInvitation(AcceptInvitationRequest) returns (AcceptInvitationResponse);
   rpc DeclineInvitation(DeclineInvitationRequest) returns (InvitationStatusResponse);
   rpc GetInvitationsByCompany(PaginatedCompanyRequest) returns (GetInvitationsByCompanyResponse);
@@ -346,13 +345,13 @@ message GetInvitationByCodeResponse {
   optional StaffInvitation invitation = 3;
 }
 
-message MarkInvitationViewedRequest {
-  string invitation_code = 1;
-}
 
 message AcceptInvitationRequest {
   string invitation_code = 1;
   string user_id = 2;
+  string first_name = 3;
+  string last_name = 4;
+  AddressRequest address = 5;
 }
 
 message AcceptInvitationResponse {
