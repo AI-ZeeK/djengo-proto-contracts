@@ -386,11 +386,12 @@ message CreateDepartmentTypeRequest {
 
 message UpdateDepartmentTypeRequest {
   string organization_id = 1;
-  string company_id = 2;
-  optional string branch_id = 3;
-  string name = 4;
-  optional string description = 5;
-  DepartmentTypeEnum type = 6;
+  string department_type_id = 2;
+  string company_id = 3;
+  optional string branch_id = 4;
+  string name = 5;
+  optional string description = 6;
+  DepartmentTypeEnum type = 7;
 }
 
 message GetDepartmentTypesRequest {
