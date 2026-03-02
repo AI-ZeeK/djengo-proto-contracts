@@ -55,6 +55,7 @@ service OrganizationService {
   rpc UpdateDepartmentType(UpdateDepartmentTypeRequest) returns (DepartmentTypeResponse);
   rpc GetDepartmentTypes(GetDepartmentTypesRequest) returns (GetDepartmentTypesResponse);
   rpc GetDepartmentType(GetDepartmentTypeRequest) returns (DepartmentTypeResponse);
+  rpc DeleteDepartmentType(DeleteDepartmentTypeRequest) returns (UtilitiesResponse);
 
   // Departments
   rpc CreateDepartment(CreateDepartmentRequest) returns (DepartmentResponse);
@@ -406,6 +407,12 @@ message GetDepartmentTypeRequest {
 
   string department_type_id = 2;
   string company_id = 3;
+}
+
+message DeleteDepartmentTypeRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string department_type_id = 3;
 }
 
 message GetDepartmentsRequest {
