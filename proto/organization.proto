@@ -51,7 +51,7 @@ service OrganizationService {
   rpc TotalOrganizations(EmptyRequest) returns (TotalOrganizationsResponse);
   rpc TopPerformingOrganizations(TopPerformingOrganizationsRequest) returns (TopPerformingOrganizationsResponse);
 
-    rpc CreateDepartmentType(CreateDepartmentTypeRequest) returns (DepartmentTypeResponse);
+  rpc CreateDepartmentType(CreateDepartmentTypeRequest) returns (DepartmentTypeResponse);
   rpc UpdateDepartmentType(UpdateDepartmentTypeRequest) returns (DepartmentTypeResponse);
   rpc GetDepartmentTypes(GetDepartmentTypesRequest) returns (GetDepartmentTypesResponse);
   rpc GetDepartmentType(GetDepartmentTypeRequest) returns (DepartmentTypeResponse);
@@ -818,6 +818,14 @@ message DepartmentWithType {
   string updated_at = 9;
   optional string deleted_at = 10;
   optional DepartmentType department_type = 11;
+  repeated DepartmentRoleData department_roles = 12;
+  optional Branch branch = 13;
+}
+
+message StaffDepartmentRoleData {
+  string staff_id = 1;
+  string department_role_id = 2;
+  bool is_active = 3;
 }
 
 message DepartmentRoleData {
@@ -832,4 +840,10 @@ message DepartmentRoleData {
   int32 level_number = 9;
   optional string reports_to = 10;
   repeated EntityPermission entity_permissions = 11;
+  repeated StaffDepartmentRoleData staff_department_roles = 12;
+  optional DepartmentRoleData superior = 13;
+  repeated DepartmentRoleData subordinates = 14;
+  optional DepartmentWithType department = 15;
+  string created_at = 16;
+  string updated_at = 17;
 }
