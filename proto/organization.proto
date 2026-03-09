@@ -822,10 +822,29 @@ message DepartmentWithType {
   optional Branch branch = 13;
 }
 
+// Slim user info embedded in staff department role assignments
+message StaffUserInfo {
+  string user_id = 1;
+  string email = 2;
+  optional string first_name = 3;
+  optional string last_name = 4;
+  optional string avatar_url = 5;
+  optional string phone_number = 6;
+  optional string username = 7;
+}
+
+// Enriched staff record embedded in department role assignments
+// Populated by the department service via a getManyStaffDetails call to profile-service
 message StaffDepartmentRoleData {
   string staff_id = 1;
   string department_role_id = 2;
   bool is_active = 3;
+  optional string company_id = 4;
+  optional string email = 5;
+  optional string designation = 6;
+  optional string created_at = 7;
+  optional string updated_at = 8;
+  optional StaffUserInfo user = 9;
 }
 
 message DepartmentRoleData {

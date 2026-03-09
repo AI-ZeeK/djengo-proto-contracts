@@ -36,7 +36,7 @@ service ProfileService {
   rpc FetchOrganizationRoles(OrganizationRoleIdRequest) returns (FetchOrganizationRolesResponse);
   rpc FetchOrganizationRolesCount(OrganizationRoleIdRequest) returns (FetchOrganizationRolesCountResponse);
   
-  rpc getStaffDetails(StaffDetailsRequest) returns (Staff);
+  rpc getStaffDetails(StaffDetailsRequest) returns (StaffDetailsResponse);
   rpc getManyStaffDetails(ManyStaffDetailsRequest) returns (ManyStaffDetailsResponse);
   rpc getCompanyStaffs(PaginatedCompanyRequest) returns (ManyStaffDetailsResponse);
   
@@ -263,7 +263,6 @@ message Staff {
   optional User user = 12;
   string role_id = 13;
   optional OrganizationRole role = 14;
-  optional string deleted_at = 15;
 }
 
 message StaffDetailsResponse {
