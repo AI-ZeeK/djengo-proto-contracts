@@ -833,6 +833,22 @@ message StaffUserInfo {
   optional string username = 7;
 }
 
+// Full staff record mirroring profile-service Staff type
+// Self-contained so organization.proto does not need to import profile.proto
+message StaffData {
+  string staff_id = 1;
+  string company_id = 2;
+  string user_id = 3;
+  optional string branch_id = 4;
+  string email = 5;
+  optional string designation = 6;
+  bool is_active = 7;
+  string created_at = 8;
+  string updated_at = 9;
+  optional StaffUserInfo user = 10;
+  optional string role_id = 11;
+}
+
 // Enriched staff record embedded in department role assignments
 // Populated by the department service via a getManyStaffDetails call to profile-service
 message StaffDepartmentRoleData {
@@ -845,6 +861,7 @@ message StaffDepartmentRoleData {
   optional string created_at = 7;
   optional string updated_at = 8;
   optional StaffUserInfo user = 9;
+  optional StaffData staff = 10;
 }
 
 message DepartmentRoleData {
