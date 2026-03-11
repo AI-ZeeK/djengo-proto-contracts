@@ -574,6 +574,7 @@ message PermissionGroupData {
   int32 level = 4;
   string category = 5;
   repeated PermissionDetail permissions = 6;
+  string group_type = 7;
 }
 
 message GetPermissionGroupsResponse {
