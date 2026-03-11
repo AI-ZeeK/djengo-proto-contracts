@@ -70,6 +70,11 @@ service OrganizationService {
   rpc GetDepartmentRole(GetDepartmentRoleRequest) returns (DepartmentRoleResponse);
   rpc GetDepartmentRoleStaff(GetDepartmentRoleRequest) returns (GetDepartmentRoleStaffResponse);
   rpc AssignStaffDepartmentRole(AssignStaffDepartmentRoleRequest) returns (UtilitiesResponse);
+
+  // Entity Permissions
+  rpc GetDepartmentRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
+  rpc GetStaffCompanyRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
+  rpc GetBusinessUserRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
   
   // Tables
   rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse);
@@ -522,6 +527,38 @@ message AssignStaffDepartmentRoleRequest {
   string role_id = 2;
   repeated string staff_ids = 3;
   string company_id = 4;
+}
+
+// ── Permission entity requests / responses ──────────────────────────────────
+
+/// Fetch all entity permissions for a specific role (department role, company role, etc.)
+/// The RPC name determines which entity_type is queried internally.
+message GetEntityPermissionsRequest {
+  string role_id = 1;     // UUID of the role whose permissions to fetch
+  string company_id = 2;  // Scoping guard
+}
+
+message EntityPermissionDetail {
+  string entity_permission_id = 1;
+  string entity_type = 2;
+  bool is_granted = 3;
+  int32 level = 4;
+  string granted_at = 5;
+  PermissionDetail permission = 6;
+}
+
+message PermissionDetail {
+  int32 permission_id = 1;
+  string permission_name = 2;
+  string description = 3;
+  int32 level = 4;
+  string category = 5;
+}
+
+message GetEntityPermissionsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated EntityPermissionDetail permissions = 3;
 }
 
 message GetOrganizationRequest {
