@@ -68,6 +68,7 @@ service OrganizationService {
   rpc UpdateDepartmentRole(UpdateDepartmentRoleRequest) returns (DepartmentRoleResponse);
   rpc GetDepartmentRoles(GetDepartmentRolesRequest) returns (GetDepartmentRolesResponse);
   rpc GetDepartmentRole(GetDepartmentRoleRequest) returns (DepartmentRoleResponse);
+  rpc GetDepartmentRoleStaff(GetDepartmentRoleRequest) returns (GetDepartmentRoleStaffResponse);
   rpc AssignStaffDepartmentRole(AssignStaffDepartmentRoleRequest) returns (UtilitiesResponse);
   
   // Tables
@@ -563,6 +564,14 @@ message GetDepartmentRolesResponse {
   bool success = 1;
   optional string error = 2;
   repeated DepartmentRoleData department_roles = 3;
+}
+
+message GetDepartmentRoleStaffResponse {
+  bool success = 1;
+  optional string error = 2;
+  string role_id = 3;
+  string role_name = 4;
+  repeated StaffDepartmentRoleData staff_department_roles = 5;
 }
 
 // 🏗️ DATA MODELS
