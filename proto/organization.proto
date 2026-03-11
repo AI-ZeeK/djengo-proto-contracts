@@ -75,6 +75,11 @@ service OrganizationService {
   rpc GetDepartmentRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
   rpc GetStaffCompanyRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
   rpc GetBusinessUserRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
+
+  // Permission Group Catalogs
+  rpc GetDepartmentPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
+  rpc GetStaffPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
+  rpc GetBusinessUserPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
   
   // Tables
   rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse);
@@ -559,6 +564,22 @@ message GetEntityPermissionsResponse {
   bool success = 1;
   optional string error = 2;
   repeated EntityPermissionDetail permissions = 3;
+}
+
+/// A seeded permission group with all its member permissions expanded.
+message PermissionGroupData {
+  int32 group_id = 1;
+  string group_name = 2;
+  string description = 3;
+  int32 level = 4;
+  string category = 5;
+  repeated PermissionDetail permissions = 6;
+}
+
+message GetPermissionGroupsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated PermissionGroupData groups = 3;
 }
 
 message GetOrganizationRequest {
