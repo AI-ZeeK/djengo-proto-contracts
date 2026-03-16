@@ -11,9 +11,8 @@ export enum UserRole {
   AGENCY = "AGENCY",
 }
 
-
- * Base organization roles
- */
+//  * Base organization roles
+//  */
 export enum OrganizationRole {
   CREATOR = "CREATOR",
   ADMIN = "ADMIN",

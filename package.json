@@ -16,7 +16,7 @@
     "prebuild": "npm run clean",
     "prepare": "npm run build",
     "test": "echo \"No tests yet\" && exit 0",
-    "proto:generate": "protoc --plugin=protoc-gen-ts_proto=C:\\Users\\user\\OneDrive\\Documents\\Code\\Zeavak\\gateway-service\\node_modules\\.bin\\protoc-gen-ts_proto.cmd -I=proto --ts_proto_out=dist/dependencies proto/*.proto --ts_proto_opt=nestJs=true,fileSuffix=.pb,snakeToCamel=false",
+    "proto:generate": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto -I=src/shared/proto --ts_proto_out=src/shared/dependencies src/shared/proto/*.proto --ts_proto_opt=nestJs=true,fileSuffix=.pb",
     "dev": "tsc --watch"
   },
   "files": [

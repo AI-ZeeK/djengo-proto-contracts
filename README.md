@@ -39,26 +39,40 @@ npm link @djengo/proto-contracts
 
 ## 🛠️ Usage
 
-### TypeScript Import (Recommended)
+### As an npm dependency
 
-```typescript
-import {
-  loadCommunicationProto,
-  createClient,
-  enums,
-  CommunicationServiceClient,
-  ProfileServiceClient,
-} from "@djengo/proto-contracts";
+- Add to your project:
+  ```sh
+  npm install @djengo/proto-contracts
+  ```
+- On install, protos will be generated into `node_modules/@djengo/proto-contracts` (if you add a postinstall script).
 
-// Load proto definitions
-const proto = loadCommunicationProto();
+### Manual build
 
-// Create gRPC client with full type safety
-const communicationClient = createClient(
-  "communication",
-  "localhost:50051"
-) as CommunicationServiceClient;
-```
+- Clone this repo and run:
+  ```sh
+  npm install
+  npm run build:proto
+  # or
+  node build.js dist
+  ```
+- Generated files will be in the `dist/` directory by default.
+- To change output location, pass an argument or set the `PROTO_OUT` env variable:
+  ```sh
+  node build.js node_modules/@djengo/proto-contracts
+  # or
+  PROTO_OUT=node_modules/@djengo/proto-contracts node build.js
+  ```
+
+## Adding/Updating Protos
+
+- Place `.proto` files in the `proto/` directory.
+- Update and rebuild as needed.
+
+## Requirements
+
+- Node.js
+- `grpc-tools` (installed automatically)
 
 ### CommonJS Import
 
@@ -85,7 +99,7 @@ import {
 // Create client with type safety
 const commClient = createClient(
   "communication",
-  "localhost:50051"
+  "localhost:50051",
 ) as CommunicationServiceClient;
 
 // Send a message with full type checking
@@ -132,7 +146,7 @@ import {
 // Create client with type safety
 const profileClient = createClient(
   "profile",
-  "localhost:50052"
+  "localhost:50052",
 ) as ProfileServiceClient;
 
 // Get user profile
@@ -309,7 +323,7 @@ export class ChatService {
 
   onModuleInit() {
     this.communicationService = this.client.getService<CommunicationService>(
-      "CommunicationService"
+      "CommunicationService",
     );
   }
 
@@ -324,7 +338,7 @@ export class ChatService {
 
   async getMessages(
     chatId: string,
-    userId: string
+    userId: string,
   ): Promise<GetMessagesResponse> {
     return this.communicationService
       .getMessages({
@@ -400,11 +414,11 @@ const app = express();
 const clients = {
   communication: createClient(
     "communication",
-    process.env.COMM_SERVICE_URL || "localhost:50051"
+    process.env.COMM_SERVICE_URL || "localhost:50051",
   ) as CommunicationServiceClient,
   profile: createClient(
     "profile",
-    process.env.PROFILE_SERVICE_URL || "localhost:50052"
+    process.env.PROFILE_SERVICE_URL || "localhost:50052",
   ) as ProfileServiceClient,
 };
 
@@ -422,7 +436,7 @@ app.post("/api/chats/:chatId/messages", async (req, res) => {
         (error, response) => {
           if (error) reject(error);
           else resolve(response);
-        }
+        },
       );
     });
     res.json(result);
@@ -482,7 +496,7 @@ server.bindAsync(
   () => {
     console.log("Communication service running on port 50051");
     server.start();
-  }
+  },
 );
 ```
 

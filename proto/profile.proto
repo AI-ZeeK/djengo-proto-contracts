@@ -178,7 +178,7 @@ message DailyActiveUsersAnalyticsResponse {
   DailyActiveUsersSummary summary = 4;
 }
 
-message TrendData {
+message ChartData {
   string name = 1;
   int32 value = 2;
 }

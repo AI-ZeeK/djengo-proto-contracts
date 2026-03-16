@@ -748,7 +748,7 @@ message Department {
 // }
 
 // Analytics Messages
-message TrendData {
+message ChartData {
   string name = 1;
   int32 value = 2;
 }

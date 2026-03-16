@@ -14,6 +14,28 @@ service FinancialsService {
   rpc GetCountries(EmptyRequest) returns (GetCountriesResponse);
   rpc GetCountry(GetCountryRequest) returns (GetCountryResponse);
 
+  // Analytics endpoint for company financials
+  rpc GetCompanyFinancialAnalytics (CompanyFinancialAnalyticsRequest) returns (CompanyFinancialAnalyticsResponse);
+}
+
+message CompanyFinancialAnalyticsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string timeline = 3; // e.g. "1m", "3m", "6m", "1y", "all"
+  string start_date = 4; // optional
+  string end_date = 5;   // optional
+}
+
+message CompanyFinancialAnalyticsResponse {
+  double amount = 1;
+  string trend = 2;
+  double percentaae = 3;
+  repeated ChartData chart_data = 4;
+}
+
+message ChartData {
+  string name = 1; // e.g. "W1", "Jan", "2024-03-01"
+  double value = 2;
 }
 
 message EmptyRequest {}
