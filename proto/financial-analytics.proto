@@ -20,7 +20,7 @@ message CompanyFinancialAnalyticsRequest {
 message CompanyFinancialAnalyticsResponse {
   double amount = 1;
   string trend = 2;
-  double percentaae = 3;
+  double percentage = 3;
   repeated ChartData chartData = 4;
 }
 
