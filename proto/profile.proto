@@ -9,6 +9,8 @@ package profile;
 
 // 👤 Profile Service - handles user profiles and user management
 service ProfileService {
+
+  rpc GetOverviewAnalytics(OverviewAnalyticsRequest) returns (OverviewAnalyticsResponse);
   rpc GetStaffAnalytics(StaffAnalyticsRequest) returns (StaffAnalyticsResponse);
   // user services
   rpc ValidateAccount(ValidateAccountRequest) returns (ValidateAccountResponse);
@@ -62,6 +64,26 @@ service ProfileService {
 
 message LoginHistoryResponse {
   repeated LoginHistory login_history = 1;
+}
+
+message OverviewAnalyticsRequest {
+  string user_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  Timeline timeline = 4;
+  string start_date = 5;
+  string end_date = 6;
+}
+
+message OverviewAnalyticsResponse {
+  int32 total_users = 1;
+  int32 active_users = 2;
+  int32 new_users = 3;
+  int32 business_users = 4;
+  int32 pending_users = 5;
+  int32 deactivated_users = 6;
+  int32 high_value_users = 7;
+  int32 at_risk_users = 8;  
 }
 
 // Staff Analytics
