@@ -11,10 +11,10 @@ service AnalyticsService {
 message CompanyFinancialAnalyticsRequest {
   string companyId = 1;
   string organizationId = 2;
-  string timeline = 3;
+  Timeline timeline = 3;
   string startDate = 4;
   string endDate = 5;
-  string category = 6;
+  TransactionCategory category = 6;
 }
 
 message CompanyFinancialAnalyticsResponse {
@@ -27,4 +27,22 @@ message CompanyFinancialAnalyticsResponse {
 message ChartData {
   string name = 1;
   double value = 2;
+}
+
+enum Timeline {
+  _1m = 0;
+  _3m = 1;
+  _6m = 2;
+  _1y = 3;
+  all = 4;
+}
+  
+ enum TransactionCategory {
+    Salary = 0;
+    Budget = 1;
+    Order = 2;
+    Expense = 3;
+    Deposit = 4;
+    Withdrawal = 5;
+    Transfer = 6;
 }
