@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package Financials.Grpc;
+
+service AnalyticsService {
+  rpc GetCompanyFinancialAnalytics (CompanyFinancialAnalyticsRequest) returns (CompanyFinancialAnalyticsResponse);
+}
+
+message CompanyFinancialAnalyticsRequest {
+  string companyId = 1;
+  string organizationId = 2;
+  string timeline = 3;
+  string startDate = 4;
+  string endDate = 5;
+  string category = 6;
+}
+
+message CompanyFinancialAnalyticsResponse {
+  double amount = 1;
+  string trend = 2;
+  double percentaae = 3;
+  repeated ChartData chartData = 4;
+}
+
+message ChartData {
+  string name = 1;
+  double value = 2;
+}
