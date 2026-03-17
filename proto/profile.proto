@@ -1,4 +1,5 @@
 
+
 syntax = "proto3";
 
 import "google/protobuf/struct.proto";
@@ -8,6 +9,7 @@ package profile;
 
 // 👤 Profile Service - handles user profiles and user management
 service ProfileService {
+  rpc GetStaffAnalytics(StaffAnalyticsRequest) returns (StaffAnalyticsResponse);
   // user services
   rpc ValidateAccount(ValidateAccountRequest) returns (ValidateAccountResponse);
   rpc Register(RegisterRequest) returns (AuthInitialResponse);
@@ -36,9 +38,9 @@ service ProfileService {
   rpc FetchOrganizationRoles(OrganizationRoleIdRequest) returns (FetchOrganizationRolesResponse);
   rpc FetchOrganizationRolesCount(OrganizationRoleIdRequest) returns (FetchOrganizationRolesCountResponse);
   
-  rpc getStaffDetails(StaffDetailsRequest) returns (StaffDetailsResponse);
-  rpc getManyStaffDetails(ManyStaffDetailsRequest) returns (ManyStaffDetailsResponse);
-  rpc getCompanyStaffs(PaginatedCompanyRequest) returns (ManyStaffDetailsResponse);
+  rpc GetStaffDetails(StaffDetailsRequest) returns (StaffDetailsResponse);
+  rpc GetManyStaffDetails(ManyStaffDetailsRequest) returns (ManyStaffDetailsResponse);
+  rpc GetCompanyStaffs(PaginatedCompanyRequest) returns (ManyStaffDetailsResponse);
   
   // Staff Invitations
   rpc SendStaffInvitations(SendStaffInvitationsRequest) returns (SendStaffInvitationsResponse);
@@ -60,6 +62,22 @@ service ProfileService {
 
 message LoginHistoryResponse {
   repeated LoginHistory login_history = 1;
+}
+
+// Staff Analytics
+message StaffAnalyticsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  Timeline timeline = 3;
+  string start_date = 4;
+  string end_date = 5;
+}
+
+message StaffAnalyticsResponse {
+  int32 amount = 1;
+  string trend = 2;
+  double percentage = 3;
+  repeated TrendData chart_data = 4;
 }
 
 message LoginHistory {
