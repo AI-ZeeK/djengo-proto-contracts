@@ -6,6 +6,22 @@ package financials;
 
 service AnalyticsService {
   rpc GetCompanyFinancialAnalytics (CompanyFinancialAnalyticsRequest) returns (CompanyFinancialAnalyticsResponse);
+
+  // Returns only the flexible periodical growth trend data for a company (for charting)
+  rpc GetCompanyGrowthTrend (CompanyGrowthTrendRequest) returns (CompanyGrowthTrendResponse);
+
+// Request for company growth trend data
+}
+message CompanyGrowthTrendRequest {
+  string companyId = 1;
+  Timeline timeline = 2;
+  string startDate = 3;
+  string endDate = 4;
+}
+
+// Response for company growth trend data
+message CompanyGrowthTrendResponse {
+  repeated ChartData chart_data = 1;
 }
 
 message CompanyFinancialAnalyticsRequest {
@@ -21,7 +37,7 @@ message CompanyFinancialAnalyticsResponse {
   double amount = 1;
   string trend = 2;
   double percentage = 3;
-  repeated ChartData chartData = 4;
+  repeated ChartData chart_data = 4;
 }
 
 message ChartData {
