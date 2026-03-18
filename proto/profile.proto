@@ -75,15 +75,30 @@ message OverviewAnalyticsRequest {
   string end_date = 6;
 }
 
+// Analytics block for cards
+message AnalyticsBlock {
+  string title = 1;
+  string description = 2;
+  double amount = 3;
+  string trend = 4;
+  double percentage = 5;
+  repeated TrendData chart_data = 6;
+  string slug = 7; // Optional, for unique identification (e.g., branch_analytics)
+}
+
+// Chart block for charts array
+message ChartBlock {
+  string slug = 1;
+  string type = 2; // e.g., "line"
+  string title = 3;
+  string dataKey = 4;
+  repeated TrendData data = 5;
+}
+
+// Updated response for overview analytics
 message OverviewAnalyticsResponse {
-  int32 total_users = 1;
-  int32 active_users = 2;
-  int32 new_users = 3;
-  int32 business_users = 4;
-  int32 pending_users = 5;
-  int32 deactivated_users = 6;
-  int32 high_value_users = 7;
-  int32 at_risk_users = 8;  
+  repeated AnalyticsBlock cards = 1;
+  repeated ChartBlock charts = 2;
 }
 
 // Staff Analytics
