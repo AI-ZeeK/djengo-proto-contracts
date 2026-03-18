@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option csharp_namespace = "Financials.Grpc";
 
-package financials;
+package financial_analytics;
 
 service AnalyticsService {
   rpc GetCompanyFinancialAnalytics (CompanyFinancialAnalyticsRequest) returns (CompanyFinancialAnalyticsResponse);
