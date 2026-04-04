@@ -60,6 +60,85 @@ service ProfileService {
   rpc ActiveUsersCount(EmptyRequest) returns (ActiveUsersCountResponse);
   rpc DailyActiveUsersAnalytics(EmptyRequest) returns (DailyActiveUsersAnalyticsResponse);
   rpc GetOrganizationBusinessUsers(GetOrganizationBusinessUsersRequest) returns (GetOrganizationBusinessUsersResponse);
+  
+  // Staff Management
+  rpc OnboardStaff(OnboardStaffRequest) returns (OnboardStaffResponse);
+  rpc AddStaffPaymentAdjustment(AddStaffPaymentAdjustmentRequest) returns (AddStaffPaymentAdjustmentResponse);
+  rpc StaffProbationHistory(StaffProbationHistoryRequest) returns (StaffProbationHistoryResponse);
+}
+// --- Staff Management Messages ---
+
+message OnboardStaffRequest {
+  string staff_id = 1;
+  double base_salary = 2;
+  string company_id = 3;
+  string organization_id = 4;
+  string authorized_by = 5;
+  repeated StaffDocument documents = 6;
+  optional string probation_end = 7; // ISO date string
+}
+
+message StaffDocument {
+  string type = 1;
+  string url = 2;
+  optional string uploaded_at = 3; // ISO date string
+}
+
+message OnboardStaffResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional StaffMeta staff_meta = 3;
+}
+
+message StaffMeta {
+  string staff_meta_id = 1;
+  string staff_id = 2;
+  double base_salary = 3;
+  bool is_onboarded = 4;
+  optional string probation_end = 5;
+  string currency_code = 6;
+  // Add other fields as needed
+}
+
+message AddStaffPaymentAdjustmentRequest {
+  string staff_id = 1;
+  double amount = 2;
+  string type = 3; // "BONUS" or "FINE"
+  optional string reason = 4;
+  optional string effective_at = 5; // ISO date string
+  optional string expire_at = 6; // ISO date string
+  optional Timeline period = 7; // "1M", "3M", "6M"
+}
+
+message AddStaffPaymentAdjustmentResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional StaffPaymentAdjustment adjustment = 3;
+}
+
+message StaffPaymentAdjustment {
+  string adjustment_id = 1;
+  string meta_id = 2;
+  double amount = 3;
+  string type = 4;
+  optional string reason = 5;
+  string effective_at = 6;
+  optional string expire_at = 7;
+}
+
+message StaffProbationHistoryRequest {
+  string staff_id = 1;
+  optional ProbationPeriod new_probation = 2;
+}
+
+message ProbationPeriod {
+  string start = 1; // ISO date string
+  string end = 2;   // ISO date string
+}
+
+message StaffProbationHistoryResponse {
+  repeated ProbationPeriod history = 1;
+  optional string error = 2;
 }
 
 message LoginHistoryResponse {
