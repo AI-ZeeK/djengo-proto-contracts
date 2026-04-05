@@ -4,6 +4,9 @@ option csharp_namespace = "Financials.Grpc";
 
 package financials;
 
+// --- Bank List ---
+
+
 service FinancialsService {
   rpc CreateWallet (CreateWalletRequest) returns (WalletReply);
   rpc UpdateWallet (UpdateWalletRequest) returns (WalletReply);
@@ -13,6 +16,8 @@ service FinancialsService {
 
   rpc GetCountries(EmptyRequest) returns (GetCountriesResponse);
   rpc GetCountry(GetCountryRequest) returns (GetCountryResponse);
+
+  rpc GetBanks (GetBanksRequest) returns (GetBanksResponse);
 
   // Additional RPC methods for financial analytics can be added here
   rpc GetCompanyFinancialAnalytics (CompanyFinancialAnalyticsRequest) returns (CompanyFinancialAnalyticsResponse);
@@ -37,6 +42,19 @@ service FinancialsService {
   rpc ValidateBankDetails (ValidateBankDetailsRequest) returns (ValidateBankDetailsResponse);
 }
 
+
+message GetBanksRequest {
+  string country_code = 1;
+}
+
+message Bank {
+  string name = 1;
+  string code = 2;
+}
+
+message GetBanksResponse {
+  repeated Bank banks = 1;
+}
 // --- Bank Validation ---
 message ValidateBankDetailsRequest {
   string bank_name = 1;
