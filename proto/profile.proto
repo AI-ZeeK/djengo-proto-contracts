@@ -90,15 +90,6 @@ message OnboardStaffResponse {
   optional StaffMeta staff_meta = 3;
 }
 
-message StaffMeta {
-  string staff_meta_id = 1;
-  string staff_id = 2;
-  double base_salary = 3;
-  bool is_onboarded = 4;
-  optional string probation_end = 5;
-  string currency_code = 6;
-  // Add other fields as needed
-}
 
 message AddStaffPaymentAdjustmentRequest {
   string staff_id = 1;
