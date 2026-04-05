@@ -385,6 +385,24 @@ message ManyStaffDetailsRequest {
   string company_id = 2;
 }
 
+message StaffMeta {
+  string staff_meta_id = 1;
+  string staff_id = 2;
+  double base_salary = 3;
+  bool is_onboarded = 4;
+  optional string probation_end = 5;
+  string currency_code = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+message StaffProbationHistory {
+  string probation_history_id = 1;
+  string start_date = 3;
+  string end_date = 4;
+  string created_at = 5;
+}
+
 message Staff {
   string staff_id = 1;
   string company_id = 2;
@@ -398,6 +416,9 @@ message Staff {
   optional User user = 12;
   string role_id = 13;
   optional OrganizationRole role = 14;
+  optional StaffMeta meta_data = 15;
+  repeated StaffProbationHistory probation_history = 16;
+
 }
 
 message StaffDetailsResponse {
