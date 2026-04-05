@@ -43,6 +43,8 @@ service ProfileService {
   rpc GetStaffDetails(StaffDetailsRequest) returns (StaffDetailsResponse);
   rpc GetManyStaffDetails(ManyStaffDetailsRequest) returns (ManyStaffDetailsResponse);
   rpc GetCompanyStaffs(PaginatedCompanyRequest) returns (ManyStaffDetailsResponse);
+  rpc GetCompanyStaff(GetCompanyStaffRequest) returns (GetCompanyStaffResponse);
+
   
   // Staff Invitations
   rpc SendStaffInvitations(SendStaffInvitationsRequest) returns (SendStaffInvitationsResponse);
@@ -90,6 +92,19 @@ message OnboardStaffResponse {
   optional StaffMeta staff_meta = 3;
 }
 
+
+// 
+message GetCompanyStaffRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string staff_id = 3;
+}
+
+message GetCompanyStaffResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional Staff staff = 3;
+}
 
 message AddStaffPaymentAdjustmentRequest {
   string staff_id = 1;
