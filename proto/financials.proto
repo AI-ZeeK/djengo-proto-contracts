@@ -20,7 +20,36 @@ service FinancialsService {
   // Returns only the flexible periodical growth trend data for a company (for charting)
   rpc GetCompanyGrowthTrend (CompanyGrowthTrendRequest) returns (CompanyGrowthTrendResponse);
 
+  // Budget
+  rpc CreateMonthlyBudget(CreateMonthlyBudgetRequest) returns (MonthlyBudget);
+  rpc GetMonthlyBudget(GetMonthlyBudgetRequest) returns (MonthlyBudget);
+  rpc UpdateMonthlyBudget(UpdateMonthlyBudgetRequest) returns (MonthlyBudget);
+  rpc ListMonthlyBudgets(ListMonthlyBudgetsRequest) returns (ListMonthlyBudgetsResponse);
+  rpc CreateBudgetAllocation(CreateBudgetAllocationRequest) returns (BudgetAllocation);
+  rpc ListBudgetAllocations(ListBudgetAllocationsRequest) returns (ListBudgetAllocationsResponse);
+  // Payroll
+  rpc CreatePayroll(CreatePayrollRequest) returns (Payroll);
+  rpc RunPayroll(RunPayrollRequest) returns (Payroll);
+  rpc GetPayroll(GetPayrollRequest) returns (Payroll);
+  rpc ListPayrolls(ListPayrollsRequest) returns (ListPayrollsResponse);
+
+  // Bank validation
+  rpc ValidateBankDetails (ValidateBankDetailsRequest) returns (ValidateBankDetailsResponse);
 }
+
+// --- Bank Validation ---
+message ValidateBankDetailsRequest {
+  string bank_name = 1;
+  string account_number = 2;
+  string country_code = 3; // e.g. "NG" for Nigeria, "US" for United States
+}
+
+message ValidateBankDetailsResponse {
+  bool is_valid = 1;
+  string account_name = 2; // If available from provider
+  string message = 3;
+}
+
 message CompanyGrowthTrendRequest {
   string companyId = 1;
   Timeline timeline = 2;
@@ -135,12 +164,15 @@ message Country {
 message Wallet {
   string wallet_id = 1;
   string entity_id = 2;
-  string entity_type = 3;
-  string currency_code = 4;
-  double balance = 5;
-  string status = 6;
-  string created_at = 7;
-  string updated_at = 8;
+  WALLET_ENTITY_TYPE_ENUM entity_type = 3;
+  string organization_id = 4; // Always set
+  string branch_id = 5; // Optional
+  string company_id = 6; // Optional
+  string currency_code = 7;
+  double balance = 8;
+  string status = 9;
+  string created_at = 10;
+  string updated_at = 11;
 }
 
 enum WALLET_ENTITY_TYPE_ENUM {
@@ -150,3 +182,179 @@ enum WALLET_ENTITY_TYPE_ENUM {
   ADMIN = 3;
   USER = 4;
 } 
+
+
+// Budget allocation details
+message BudgetAllocation {
+  string allocation_id = 1;
+  string budget_id = 2;
+  string organization_id = 3; // Required
+  optional string branch_id = 4; // Optional
+  string company_id = 5; // Optional
+  BUDGET_ENTITY_TYPE_ENUM entity_type = 6;
+  string entity_id = 7;
+  string name = 8;
+  string description = 9;
+  double allocated_amount = 10;
+  string allocated_by = 11;
+}
+
+// Monthly budget resource
+message MonthlyBudget {
+  string budget_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  int32 month = 4;
+  int32 year = 5;
+  double total_amount = 6;
+  double allocated_amount = 7;
+  repeated BudgetAllocation allocations = 8;
+  BudgetState budget_state = 9;
+}
+
+// Payroll resource
+message Payroll {
+  string payroll_id = 1;
+  string parent = 2;
+  int32 month = 3;
+  int32 year = 4;
+  string entity_id = 5;
+  BUDGET_ENTITY_TYPE_ENUM entity_type = 6;
+  double total_amount = 7;
+  PayrollState payroll_state = 8;
+  repeated PayrollStaff staff = 9;
+}
+
+// Payroll staff resource
+message PayrollStaff {
+  string payroll_staff_id = 1;
+  string staff_id = 2;
+  string payroll_id = 3;
+  double amount = 4;
+  PayrollState payroll_state = 5;
+}
+
+// --- Requests/Responses ---
+message CreateMonthlyBudgetRequest {
+  string budget_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string branch_id = 4;
+  int32 month = 5;
+  int32 year = 6;
+  double total_amount = 7;
+  double allocated_amount = 8;
+  repeated BudgetAllocation allocations = 9;
+  BudgetState budget_state = 10;
+  string budget_type = 11; // "organization", "company", or "branch"
+}
+
+// Get by ID
+message GetMonthlyBudgetRequest {
+  string budget_id = 1;
+    string organization_id = 2;
+  string company_id = 3;
+  string budget_type = 4; // "organization", "company", or "branch"
+}
+
+// Update
+message UpdateMonthlyBudgetRequest {
+  string budget_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  optional double total_amount = 4;
+  optional double allocated_amount = 5;
+  optional BudgetState budget_state = 6;
+  string budget_type = 7; // "organization", "company", or "branch"
+}
+
+// Pagination, filtering, sorting
+message ListMonthlyBudgetsRequest {
+  optional string search = 1;
+  optional int32 page = 2;
+  optional int32 page_size = 3;
+  optional string sort_by = 4;
+  optional string sort_order = 5;
+  optional BudgetFilter filter = 6;
+}
+
+message BudgetFilter {
+  optional string organization_id = 1;
+  optional string company_id = 2;
+  optional int32 year = 3;
+  optional int32 month = 4;
+}
+
+message ListMonthlyBudgetsResponse {
+  repeated MonthlyBudget budgets = 1;
+  TableMeta meta = 2;
+}
+
+message TableMeta {
+  int32 total = 1;
+  int32 current_page = 2;
+  int32 page_size = 3;
+  int32 total_pages = 4;
+  int32 next_page = 5;
+  int32 prev_page = 6;
+}
+message CreateBudgetAllocationRequest {
+  string parent = 1;
+  BudgetAllocation budget_allocation = 2;
+}
+message ListBudgetAllocationsRequest {
+  string parent = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+message ListBudgetAllocationsResponse {
+  repeated BudgetAllocation allocations = 1;
+  string next_page_token = 2;
+}
+message CreatePayrollRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  Payroll payroll = 3;
+}
+message RunPayrollRequest {
+  string name = 1;
+}
+message GetPayrollRequest {
+  string name = 1;
+}
+message ListPayrollsRequest {
+  string parent = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+message ListPayrollsResponse {
+  repeated Payroll payrolls = 1;
+  string next_page_token = 2;
+}
+
+// --- Enums ---
+enum BUDGET_ENTITY_TYPE_ENUM {
+  BUDGET_ENTITY_ORGANIZATION = 0;
+  BUDGET_ENTITY_COMPANY = 1;
+  BUDGET_ENTITY_BRANCH = 2;
+}
+
+enum BUDGET_TYPE_ENUM {
+  SALARY = 0;
+  INVENTORY = 1;
+  BASE = 2;
+}
+
+enum BudgetState {
+  BUDGET_STATE_UNSPECIFIED = 0;
+  BUDGET_PENDING = 1;
+  BUDGET_APPROVED = 2;
+  BUDGET_REJECTED = 3;
+}
+enum PayrollState {
+  PAYROLL_STATE_UNSPECIFIED = 0;
+  PAYROLL_PENDING = 1;
+  PAYROLL_RUNNING = 2;
+  PAYROLL_COMPLETED = 3;
+  PAYROLL_FAILED = 4;
+}
