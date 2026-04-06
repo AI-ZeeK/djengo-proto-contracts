@@ -970,8 +970,8 @@ message AddressRequest {
 message GetStaffForPayrollRequest {
   string company_id = 1;
   string organization_id = 2;
-  int32 month = 3; // 1-12
-  int32 year = 4;  // 4-digit year
+  int32 month = 3; 
+  int32 year = 4;  
 }
 
 message GetStaffForPayrollResponse {
@@ -986,7 +986,8 @@ message PayrollStaff {
   User user = 3;
   double base_salary = 4;
   double total_adjustment = 5;
-  repeated PayrollAdjustment adjustments = 6;
+  double expected_payroll_amount = 6;
+  repeated PayrollAdjustment adjustments = 7;
 }
 
 message PayrollAdjustment {
@@ -995,4 +996,5 @@ message PayrollAdjustment {
   optional string reason = 3;
   string effective_at = 4;
   optional string expire_at = 5;
+
 }
