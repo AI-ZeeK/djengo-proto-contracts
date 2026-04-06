@@ -972,6 +972,9 @@ message GetStaffForPayrollRequest {
   string organization_id = 2;
   int32 month = 3; 
   int32 year = 4;  
+  string search = 5;
+  string sort_by = 8;
+  string sort_order = 9;
 }
 
 message GetStaffForPayrollResponse {
@@ -987,7 +990,8 @@ message PayrollStaff {
   double base_salary = 4;
   double total_adjustment = 5;
   double expected_payroll_amount = 6;
-  repeated PayrollAdjustment adjustments = 7;
+  double adjustments_counts = 7;
+
 }
 
 message PayrollAdjustment {

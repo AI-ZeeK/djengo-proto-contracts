@@ -472,10 +472,8 @@ message ListStaffPayrollForPeriodRequest {
   string period = 4;
   StaffPayrollInclusionFilter filter = 5;
   string search = 6;
-  int32 page = 7;
-  int32 page_size = 8;
-  string sort_by = 9;
-  string sort_order = 10;
+  string sort_by = 7;
+  string sort_order = 8;
 }
 
 message StaffPayrollRow {
