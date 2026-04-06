@@ -19,6 +19,10 @@ service FinancialsService {
   rpc GetCountries(EmptyRequest) returns (GetCountriesResponse);
   rpc GetCountry(GetCountryRequest) returns (GetCountryResponse);
 
+  // Staff Payroll Table for a Payroll Period
+  rpc ListStaffPayrollForPeriod(ListStaffPayrollForPeriodRequest) returns (ListStaffPayrollForPeriodResponse);
+
+
   rpc GetBanks (GetBanksRequest) returns (GetBanksResponse);
 
   // Additional RPC methods for financial analytics can be added here
@@ -417,8 +421,7 @@ message PayrollAnalyticsChartData {
 message GetPayrollAnalyticsResponse {
   repeated PayrollAnalyticsCard cards = 1;
   repeated PayrollAnalyticsChart charts = 2;
-    optional string alert = 3;
-
+      optional string alert = 3;
 }
 
 
@@ -453,3 +456,42 @@ message GetPayrollAnalyticsResponse {
     repeated PayrollScheduleTableRow schedules = 1;
     TableMeta meta = 2;
   }
+
+  // --- Staff Payroll Table for Payroll Period ---
+enum StaffPayrollInclusionFilter {
+  STAFF_PAYROLL_ALL = 0;
+  STAFF_PAYROLL_INCLUDED = 1;
+  STAFF_PAYROLL_NOT_INCLUDED = 2;
+}
+
+message ListStaffPayrollForPeriodRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string payroll_id = 3; // optional, if searching by payroll id
+  // period: "current" or a stringified integer month (e.g., "4" for April)
+  string period = 4;
+  StaffPayrollInclusionFilter filter = 5;
+  string search = 6;
+  int32 page = 7;
+  int32 page_size = 8;
+  string sort_by = 9;
+  string sort_order = 10;
+}
+
+message StaffPayrollRow {
+  string staff_id = 1;
+  string staff_email = 2;
+  // Optionally add more user fields as needed
+  bool included_in_payroll = 3;
+  double payroll_amount = 4;
+  double base_salary = 5;
+  double total_adjustment = 6;
+  // Optionally: repeated PayrollAdjustment adjustments = 7;
+}
+
+message ListStaffPayrollForPeriodResponse {
+  bool success = 1;
+  repeated StaffPayrollRow staff = 2;
+  TableMeta meta = 3;
+  string error = 4;
+}
