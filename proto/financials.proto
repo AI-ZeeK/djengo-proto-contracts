@@ -8,6 +8,8 @@ package financials;
 
 
 service FinancialsService {
+
+  rpc ListPayrollSchedules (ListPayrollSchedulesRequest) returns (ListPayrollSchedulesResponse);
   rpc CreateWallet (CreateWalletRequest) returns (WalletReply);
   rpc UpdateWallet (UpdateWalletRequest) returns (WalletReply);
   rpc Credit (WalletTransactionRequest) returns (WalletReply);
@@ -402,14 +404,49 @@ message PayrollAnalyticsChart {
   repeated PayrollAnalyticsChartData data = 3;
   string data_key = 4;
   string color = 5;
+
 }
 
 message PayrollAnalyticsChartData {
   string name = 1;
   double value = 2;
+  
 }
 
 message GetPayrollAnalyticsResponse {
   repeated PayrollAnalyticsCard cards = 1;
   repeated PayrollAnalyticsChart charts = 2;
 }
+
+
+  // --- Payroll Schedules Table ---
+  message ListPayrollSchedulesRequest {
+    string organization_id = 1;
+    string company_id = 2;
+    string search = 3;         // Search by name or other fields
+    int32 page = 4;            // 1-based page number
+    int32 page_size = 5;       // Items per page
+    string sort_by = 6;        // Field to sort by (e.g. "name", "scheduled_at")
+    string sort_order = 7;     // "asc" or "desc"
+  }
+
+  message PayrollScheduleTableRow {
+    string schedule_id = 1;
+    string name = 2;
+    string organization_id = 3;
+    string company_id = 4;
+    string branch_id = 5;
+    string scheduled_at = 6;
+    int32 month = 7;
+    int32 year = 8;
+    string schedule_status = 9; // e.g. "active", "cancelled"
+    string payroll_status = 10; // e.g. "pending", "completed"
+    int32 staff_count = 11;
+    string created_at = 12;
+    string updated_at = 13;
+  }
+
+  message ListPayrollSchedulesResponse {
+    repeated PayrollScheduleTableRow schedules = 1;
+    TableMeta meta = 2;
+  }
