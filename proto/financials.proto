@@ -479,12 +479,13 @@ message ListStaffPayrollForPeriodRequest {
 message StaffPayrollRow {
   string staff_id = 1;
   string staff_email = 2;
+    User user = 3;
   // Optionally add more user fields as needed
-  bool included_in_payroll = 3;
-  double payroll_amount = 4;
-  double base_salary = 5;
-  double total_adjustment = 6;
-  // Optionally: repeated PayrollAdjustment adjustments = 7;
+  bool included_in_payroll = 4;
+  double payroll_amount = 5;
+  double base_salary = 6;
+  double total_adjustment = 7;
+  // Optionally: repeated PayrollAdjustment adjustments = 8;
 }
 
 message ListStaffPayrollForPeriodResponse {
@@ -492,4 +493,20 @@ message ListStaffPayrollForPeriodResponse {
   repeated StaffPayrollRow staff = 2;
   TableMeta meta = 3;
   string error = 4;
+
+
+}message User {
+  string user_id = 1;
+  string email = 2;
+  optional string username = 3;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  optional string phone_number = 6;
+  optional string avatar_url = 7;
+  optional string last_seen = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  string last_login = 11;
+  bool email_verified = 12;
+
 }
