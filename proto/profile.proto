@@ -9,6 +9,9 @@ package profile;
 
 // 👤 Profile Service - handles user profiles and user management
 service ProfileService {
+  // Payroll: Get staff for payroll with base salary and adjustments
+  rpc GetStaffForPayroll(GetStaffForPayrollRequest) returns (GetStaffForPayrollResponse);
+
 
   rpc GetOverviewAnalytics(OverviewAnalyticsRequest) returns (OverviewAnalyticsResponse);
   rpc GetStaffAnalytics(StaffAnalyticsRequest) returns (StaffAnalyticsResponse);
@@ -963,3 +966,33 @@ message AddressRequest {
   optional double longitude = 13;
 }
   
+// --- Payroll Staff For Payroll ---
+message GetStaffForPayrollRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  int32 month = 3; // 1-12
+  int32 year = 4;  // 4-digit year
+}
+
+message GetStaffForPayrollResponse {
+  bool success = 1;
+  repeated PayrollStaff payroll = 2;
+  optional string error = 3;
+}
+
+message PayrollStaff {
+  string staff_id = 1;
+  string staff_email = 2;
+  User user = 3;
+  double base_salary = 4;
+  double total_adjustment = 5;
+  repeated PayrollAdjustment adjustments = 6;
+}
+
+message PayrollAdjustment {
+  string type = 1; // 'BONUS' or 'FINE'
+  double amount = 2;
+  optional string reason = 3;
+  string effective_at = 4;
+  optional string expire_at = 5;
+}
