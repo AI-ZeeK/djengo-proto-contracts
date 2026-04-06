@@ -59,7 +59,8 @@ message GetBanksResponse {
 message ValidateBankDetailsRequest {
   string bank_name = 1;
   string account_number = 2;
-  string country_code = 3; // e.g. "NG" for Nigeria, "US" for United States
+  string bank_code = 3;
+  string country_code = 4; // e.g. "NG" for Nigeria, "US" for United States
 }
 
 message ValidateBankDetailsResponse {
