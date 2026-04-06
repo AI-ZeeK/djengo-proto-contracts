@@ -384,6 +384,7 @@ enum PayrollState {
 // --- Payroll Analytics ---
 message GetPayrollAnalyticsRequest {
   string company_id = 1;
+  string organization_id = 2;
 }
 
 message PayrollAnalyticsCard {
