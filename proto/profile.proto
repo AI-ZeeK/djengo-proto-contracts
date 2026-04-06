@@ -78,6 +78,13 @@ message OnboardStaffRequest {
   string authorized_by = 5;
   repeated StaffDocument documents = 6;
   optional string probation_end = 7; // ISO date string
+  optional string probation_period = 8; 
+  string account_name = 9;
+  string account_number = 10;
+  string bank_code = 11;
+  string bank_name = 12;
+
+
 }
 
 message StaffDocument {
