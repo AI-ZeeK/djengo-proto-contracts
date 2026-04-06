@@ -393,9 +393,10 @@ message PayrollAnalyticsCard {
   string title = 1;
   double total = 2;
   string status = 3;
-  string due_date = 4;
+  optional string info = 4;
   double growth = 5;
   int32 count = 6;
+  string description = 7;
 }
 
 message PayrollAnalyticsChart {
