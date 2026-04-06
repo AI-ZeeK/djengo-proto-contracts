@@ -417,6 +417,8 @@ message PayrollAnalyticsChartData {
 message GetPayrollAnalyticsResponse {
   repeated PayrollAnalyticsCard cards = 1;
   repeated PayrollAnalyticsChart charts = 2;
+    optional string alert = 3;
+
 }
 
 
