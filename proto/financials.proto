@@ -52,9 +52,34 @@ service FinancialsService {
 
   // Bank validation
   rpc ValidatePaymentDetails (ValidatePaymentDetailsRequest) returns (ValidatePaymentDetailsResponse);
+
+  rpc CreatePaymentDetails (CreatePaymentDetailsRequest) returns (CreatePaymentDetailsResponse);
 }
 
+enum PAYMENT_FREQUENCY_ENUM {
+  MONTHLY = 0;
+  BIWEEKLY = 1;
+  WEEKLY = 2;
 
+}
+
+message CreatePaymentDetailsRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string bank_name = 4;
+  string account_number = 5;
+  string bank_code = 6;
+  string country_code = 7; // e.g. "NG" for Nigeria, "US" for United States
+  PAYMENT_FREQUENCY_ENUM payment_frequency = 8;
+  string base_salary = 9;
+  string account_name = 10;
+}
+
+message CreatePaymentDetailsResponse {
+  bool success = 1;
+  string message = 2;
+}
 message GetBanksRequest {
   string country_code = 1;
 }
