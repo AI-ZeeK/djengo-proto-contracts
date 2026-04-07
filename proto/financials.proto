@@ -9,6 +9,12 @@ package financials;
 
 service FinancialsService {
 
+
+  // ...existing rpcs...
+  rpc GetStaffPaymentDetails (GetStaffPaymentDetailsRequest) returns (GetStaffPaymentDetailsResponse);
+
+
+
   rpc ListPayrollSchedules (ListPayrollSchedulesRequest) returns (ListPayrollSchedulesResponse);
   rpc CreateWallet (CreateWalletRequest) returns (WalletReply);
   rpc UpdateWallet (UpdateWalletRequest) returns (WalletReply);
@@ -54,6 +60,32 @@ service FinancialsService {
   rpc ValidatePaymentDetails (ValidatePaymentDetailsRequest) returns (ValidatePaymentDetailsResponse);
 
   rpc CreatePaymentDetails (CreatePaymentDetailsRequest) returns (CreatePaymentDetailsResponse);
+}
+
+// --- Get Staff Payment Details ---
+message GetStaffPaymentDetailsRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+}
+
+message GetStaffPaymentDetailsResponse {
+  bool success = 1;
+  string error = 2;
+  StaffPaymentDetails details = 3;
+}
+
+message StaffPaymentDetails {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string bank_name = 4;
+  string account_number = 5;
+  string account_name = 6;
+  PAYMENT_FREQUENCY_ENUM payment_frequency = 7;
+  string base_salary = 8;
+  string sort_code = 9;
+  string created_at = 10;
 }
 
 enum PAYMENT_FREQUENCY_ENUM {
