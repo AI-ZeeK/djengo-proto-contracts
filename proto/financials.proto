@@ -8,6 +8,9 @@ package financials;
 
 
 service FinancialsService {
+  // Get paginated payment history for a staff member
+  rpc GetStaffPaymentHistory (GetStaffPaymentHistoryRequest) returns (GetStaffPaymentHistoryResponse);
+
 
 
   // ...existing rpcs...
@@ -60,6 +63,37 @@ service FinancialsService {
   rpc ValidatePaymentDetails (ValidatePaymentDetailsRequest) returns (ValidatePaymentDetailsResponse);
 
   rpc CreatePaymentDetails (CreatePaymentDetailsRequest) returns (CreatePaymentDetailsResponse);
+}
+
+
+// --- Staff Payment History ---
+message GetStaffPaymentHistoryRequest {
+  string user_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+  string sort_by = 6;        // Field to sort by (e.g. "name", "scheduled_at")
+  string sort_order = 7;     // Sort order (e.g. "asc", "desc")
+}
+
+message GetStaffPaymentHistoryResponse {
+  bool success = 1;
+  repeated PaymentHistoryRow history = 2;
+  TableMeta meta = 3;
+  string error = 4;
+}
+
+message PaymentHistoryRow {
+  string transaction_id = 1;
+  double amount = 2;
+  string currency_code = 3;
+  string transaction_ref = 4;
+  string status = 5;
+  string created_at = 6;
+  string completed_at = 7;
+  string company_id = 8;
+  string specification = 9;
 }
 
 // --- Get Staff Payment Details ---
