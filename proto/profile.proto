@@ -112,9 +112,12 @@ message StaffPayrollDetails {
   string staff_meta_id = 1;
   string staff_id = 2;
   double base_salary = 3;
-  string currency_code = 4;
-  string created_at = 5;
-  string updated_at = 6;
+  string bank_name = 4;
+  string account_number = 5;
+  string account_name = 6;
+  PAYMENT_FREQUENCY_ENUM payment_frequency = 7;
+  string created_at = 8;
+  string updated_at = 9;
 }
 
 message StaffPaymentAdjustmentProto {
