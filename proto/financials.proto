@@ -96,8 +96,7 @@ message ValidatePaymentDetailsRequest {
   string account_number = 2;
   string bank_code = 3;
   string country_code = 4; // e.g. "NG" for Nigeria, "US" for United States
-  string payment_frequency = 5;
-  string base_salary = 6;
+
 
 }
 
