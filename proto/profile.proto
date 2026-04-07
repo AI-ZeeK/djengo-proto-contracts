@@ -73,19 +73,25 @@ service ProfileService {
 }
 // --- Staff Management Messages ---
 
+enum PAYMENT_FREQUENCY_ENUM {
+  MONTHLY = 0;
+  BIWEEKLY = 1;
+  WEEKLY = 2;
+
+}
+
 message OnboardStaffRequest {
   string staff_id = 1;
   double base_salary = 2;
   string company_id = 3;
   string organization_id = 4;
-  string authorized_by = 5;
   repeated StaffDocument documents = 6;
   optional string probation_end = 7; // ISO date string
   optional string probation_period = 8; 
   string account_name = 9;
   string account_number = 10;
-  string bank_code = 11;
-  string bank_name = 12;
+  string bank_name = 11;
+  PAYMENT_FREQUENCY_ENUM payment_frequency = 12;
 
 
 }
