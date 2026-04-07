@@ -469,15 +469,17 @@ message GetPayrollAnalyticsResponse {
     string name = 2;
     string organization_id = 3;
     string company_id = 4;
-    string branch_id = 5;
+    optional string branch_id = 5;
     string scheduled_at = 6;
-    int32 month = 7;
-    int32 year = 8;
-    string schedule_status = 9; // e.g. "active", "cancelled"
-    string payroll_status = 10; // e.g. "pending", "completed"
-    int32 staff_count = 11;
-    string created_at = 12;
-    string updated_at = 13;
+    optional int32 week = 7;
+    optional int32 month = 8;
+    int32 year = 9;
+    PAYMENT_FREQUENCY_ENUM payment_frequency = 10;
+    string schedule_status = 11; // e.g. "active", "cancelled"
+    string payroll_status = 12; // e.g. "pending", "completed"
+    int32 staff_count = 13;
+    string created_at = 14;
+    string updated_at = 15;
   }
 
   message ListPayrollSchedulesResponse {
