@@ -51,7 +51,7 @@ service FinancialsService {
   rpc GetPayrollAnalytics (GetPayrollAnalyticsRequest) returns (GetPayrollAnalyticsResponse);
 
   // Bank validation
-  rpc ValidateBankDetails (ValidateBankDetailsRequest) returns (ValidateBankDetailsResponse);
+  rpc ValidatePaymentDetails (ValidatePaymentDetailsRequest) returns (ValidatePaymentDetailsResponse);
 }
 
 
@@ -68,14 +68,17 @@ message GetBanksResponse {
   repeated Bank banks = 1;
 }
 // --- Bank Validation ---
-message ValidateBankDetailsRequest {
+message ValidatePaymentDetailsRequest {
   string bank_name = 1;
   string account_number = 2;
   string bank_code = 3;
   string country_code = 4; // e.g. "NG" for Nigeria, "US" for United States
+  string payment_frequency = 5;
+  string base_salary = 6;
+
 }
 
-message ValidateBankDetailsResponse {
+message ValidatePaymentDetailsResponse {
   bool is_valid = 1;
   string account_name = 2; // If available from provider
   string message = 3;
