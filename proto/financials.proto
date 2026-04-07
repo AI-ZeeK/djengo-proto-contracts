@@ -22,6 +22,9 @@ service FinancialsService {
   // Staff Payroll Table for a Payroll Period
   rpc ListStaffPayrollForPeriod(ListStaffPayrollForPeriodRequest) returns (ListStaffPayrollForPeriodResponse);
 
+  // Upsert payroll staff for a payroll period (add/remove staff in bulk)
+  rpc CreateOrUpdatePayrollStaff (CreateOrUpdatePayrollStaffRequest) returns (CreateOrUpdatePayrollStaffResponse);
+
 
   rpc GetBanks (GetBanksRequest) returns (GetBanksResponse);
 
@@ -493,9 +496,27 @@ message ListStaffPayrollForPeriodResponse {
   repeated StaffPayrollRow staff = 2;
   TableMeta meta = 3;
   string error = 4;
+  string payroll_schedule_id = 5; // New field to return the associated payroll schedule ID
 
 
-}message User {
+}
+
+// --- Upsert Payroll Staff for a Payroll Period ---
+message CreateOrUpdatePayrollStaffRequest {
+    string company_id = 1;
+  string organization_id = 2;
+  string payroll_schedule_id = 3; // The payroll schedule/period to update
+  repeated string staff_ids = 4;  // The list of staff IDs to include in payroll for this period
+}
+
+message CreateOrUpdatePayrollStaffResponse {
+  bool success = 1;
+  repeated PayrollStaff staff = 2; // The updated list of PayrollStaff for the period
+  string error = 3;
+  string message = 4;
+}
+
+message User {
   string user_id = 1;
   string email = 2;
   optional string username = 3;
