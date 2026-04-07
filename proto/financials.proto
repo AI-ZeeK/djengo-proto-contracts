@@ -470,13 +470,11 @@ enum StaffPayrollInclusionFilter {
 message ListStaffPayrollForPeriodRequest {
   string company_id = 1;
   string organization_id = 2;
-  string payroll_id = 3; // optional, if searching by payroll id
-  // period: "current" or a stringified integer month (e.g., "4" for April)
-  string period = 4;
-  StaffPayrollInclusionFilter filter = 5;
-  string search = 6;
-  string sort_by = 7;
-  string sort_order = 8;
+  string query_key = 3;
+  StaffPayrollInclusionFilter filter = 4;
+  string search = 5;
+  string sort_by = 6;
+  string sort_order = 7;
 }
 
 message StaffPayrollRow {
