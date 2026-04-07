@@ -13,6 +13,10 @@ service ProfileService {
   rpc GetStaffForPayroll(GetStaffForPayrollRequest) returns (GetStaffForPayrollResponse);
 
 
+  // Get staff payroll details (meta + adjustments)
+  rpc GetStaffPayrollDetails(GetStaffPayrollDetailsRequest) returns (GetStaffPayrollDetailsResponse);
+
+
   rpc GetOverviewAnalytics(OverviewAnalyticsRequest) returns (OverviewAnalyticsResponse);
   rpc GetStaffAnalytics(StaffAnalyticsRequest) returns (StaffAnalyticsResponse);
   // user services
@@ -95,6 +99,42 @@ message OnboardStaffRequest {
 
 
 }
+
+
+// --- Staff Payroll Details ---
+message GetStaffPayrollDetailsRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+}
+
+message StaffPayrollDetails {
+  string staff_meta_id = 1;
+  string staff_id = 2;
+  double base_salary = 3;
+  string currency_code = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+message StaffPaymentAdjustmentProto {
+  string payment_adjustment_id = 1;
+  string meta_id = 2;
+  double amount = 3;
+  string type = 4;
+  optional string reason = 5;
+  string effective_at = 6;
+  optional string expire_at = 7;
+}
+
+message GetStaffPayrollDetailsResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional StaffPayrollDetails details = 3;
+  repeated StaffPaymentAdjustmentProto adjustments = 4;
+}
+
+
 
 message StaffDocument {
   string type = 1;
