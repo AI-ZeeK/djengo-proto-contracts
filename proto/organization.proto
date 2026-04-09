@@ -97,6 +97,7 @@ service OrganizationService {
   rpc DeletePartner(DeletePartnerRequest) returns (UtilitiesResponse);
   rpc AssignPartnerRole(AssignPartnerRoleRequest) returns (UtilitiesResponse);
   rpc RemovePartnerRole(RemovePartnerRoleRequest) returns (UtilitiesResponse);
+  rpc GetPartnerTypes(EmptyRequest) returns (GetPartnerTypesResponse);
 
   // Tables
   rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse);
@@ -1011,6 +1012,20 @@ enum PartnerType {
   CONSULTANT = 4;  // advisory / professional services
   AGENT = 5;       // sales or letting agent
   OTHER = 6;       // catch-all
+}
+
+/// A single partner type entry returned by GetPartnerTypes.
+message PartnerTypeData {
+  int32 value = 1;       // Numeric enum value (matches PartnerType)
+  string key = 2;        // Enum key string e.g. "TENANT"
+  string label = 3;      // Human-readable label e.g. "Tenant"
+
+}
+
+message GetPartnerTypesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated PartnerTypeData partner_types = 3;
 }
 
 /// Full partner record.
