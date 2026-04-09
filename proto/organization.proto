@@ -192,6 +192,7 @@ message CreateBusinessUserRoleRequest {
 enum RoleType {
   STAFF_ROLE = 0;
   BUSINESS_USER_ROLE = 1;
+  PARTNER_ROLE = 2;
 }
 message CreateRoleRequest {
   string company_id = 1;
