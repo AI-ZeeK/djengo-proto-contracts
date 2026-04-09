@@ -207,16 +207,21 @@ enum RoleType {
   BUSINESS_USER_ROLE = 1;
   PARTNER_ROLE = 2;
 }
+
+
+
 message CreateRoleRequest {
   string company_id = 1;
   string role_name = 2;
   string description = 3;
   repeated string staff_ids = 4;
   repeated string business_user_ids = 5;
-  repeated Permission permissions = 6;
-  string creator_id = 7;
-  RoleType role_type = 8;
-  optional string branch_id = 9;
+  repeated string partner_ids = 6;
+  repeated Permission permissions = 7;
+  string creator_id = 8;
+  RoleType role_type = 9;
+  optional string branch_id = 10;
+  optional PartnerType partner_type = 11;
 }
 message UpdateRoleRequest {
   string role_id = 1;
@@ -225,10 +230,12 @@ message UpdateRoleRequest {
   string description = 4;
   repeated string staff_ids = 5;
   repeated string business_user_ids = 6;
-  repeated Permission permissions = 7;
-  string creator_id = 8;
-  RoleType role_type = 9;
-  optional string branch_id = 10;
+  repeated string partner_ids = 7;
+  repeated Permission permissions = 8;
+  string creator_id = 9;
+  RoleType role_type = 10;
+  optional string branch_id = 11;
+  optional PartnerType partner_type = 12;
 }
 
 message Permission {
