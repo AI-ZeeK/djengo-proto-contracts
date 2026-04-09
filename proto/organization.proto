@@ -95,6 +95,8 @@ service OrganizationService {
   rpc GetPartner(GetPartnerRequest) returns (PartnerResponse);
   rpc GetPartners(GetPartnersRequest) returns (GetPartnersResponse);
   rpc DeletePartner(DeletePartnerRequest) returns (UtilitiesResponse);
+  rpc AssignPartnerRole(AssignPartnerRoleRequest) returns (UtilitiesResponse);
+  rpc RemovePartnerRole(RemovePartnerRoleRequest) returns (UtilitiesResponse);
 
   // Tables
   rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse);
@@ -308,6 +310,7 @@ message OrganizationRole {
   string deleted_at = 13;
   repeated BusinessUserRole business_user_roles = 14;
   repeated StaffCompanyRole staff_company_roles = 15;
+  repeated PartnerCompanyRole partner_company_roles = 16;
   repeated EntityPermission entity_permissions = 16 ;
 }
 
@@ -1019,13 +1022,13 @@ message PartnerData {
   string name = 5;
   optional string email = 6;
   optional string phone_number = 7;
-  PartnerType partner_type = 8;
-  optional string description = 9;
-  bool is_active = 10;
-  string created_at = 11;
-  string updated_at = 12;
-  optional string deleted_at = 13;
-  optional string creator_id = 14;
+  optional string description = 8;
+  bool is_active = 9;
+  string created_at = 10;
+  string updated_at = 11;
+  optional string deleted_at = 12;
+  optional string creator_id = 13;
+  repeated PartnerCompanyRoleData partner_company_roles = 14;
 }
 
 message CreatePartnerRequest {
@@ -1035,9 +1038,8 @@ message CreatePartnerRequest {
   string name = 4;
   optional string email = 5;
   optional string phone_number = 6;
-  PartnerType partner_type = 7;
-  optional string description = 8;
-  string creator_id = 9;
+  optional string description = 7;
+  string creator_id = 8;
 }
 
 message UpdatePartnerRequest {
@@ -1048,9 +1050,8 @@ message UpdatePartnerRequest {
   optional string name = 5;
   optional string email = 6;
   optional string phone_number = 7;
-  optional PartnerType partner_type = 8;
-  optional string description = 9;
-  optional bool is_active = 10;
+  optional string description = 8;
+  optional bool is_active = 9;
 }
 
 message GetPartnerRequest {
@@ -1061,7 +1062,7 @@ message GetPartnerRequest {
 message GetPartnersRequest {
   string organization_id = 1;
   optional string company_id = 2;
-  optional PartnerType partner_type = 3;
+  optional string role_id = 3;   // Filter partners assigned to a specific role
   optional bool is_active = 4;
   optional string search = 5;
   optional int32 page = 6;
@@ -1071,6 +1072,28 @@ message GetPartnersRequest {
 message DeletePartnerRequest {
   string partner_id = 1;
   string organization_id = 2;
+}
+
+/// Mirrors StaffCompanyRoleData — one row per role assigned to a partner.
+message PartnerCompanyRoleData {
+  string partner_company_role_id = 1;
+  string partner_id = 2;
+  string company_role_id = 3;
+  bool is_active = 4;
+  optional OrganizationRole company_role = 5;
+}
+
+message AssignPartnerRoleRequest {
+  string partner_id = 1;
+  string role_id = 2;          // Must be an OrganizationRole with role_type = PARTNER_ROLE
+  string organization_id = 3;
+  string company_id = 4;
+}
+
+message RemovePartnerRoleRequest {
+  string partner_id = 1;
+  string role_id = 2;
+  string organization_id = 3;
 }
 
 message PartnerResponse {
