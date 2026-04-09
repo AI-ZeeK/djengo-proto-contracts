@@ -310,8 +310,8 @@ message OrganizationRole {
   string deleted_at = 13;
   repeated BusinessUserRole business_user_roles = 14;
   repeated StaffCompanyRole staff_company_roles = 15;
-  repeated PartnerCompanyRole partner_company_roles = 16;
-  repeated EntityPermission entity_permissions = 16 ;
+  repeated PartnerCompanyRoleData partner_company_roles = 16;
+  repeated EntityPermission entity_permissions = 17 ;
 }
 
 
