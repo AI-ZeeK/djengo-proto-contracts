@@ -309,17 +309,18 @@ message OrganizationRole {
   string branch_id = 4;
   string name = 5;
   string slug = 6;
-  string description = 7;
-  bool is_active = 8;
-  int32 business_user_roles_count = 9;
-  bool is_org_level = 10;
-  string created_at = 11;
-  string updated_at = 12;
-  string deleted_at = 13;
-  repeated BusinessUserRole business_user_roles = 14;
-  repeated StaffCompanyRole staff_company_roles = 15;
-  repeated PartnerCompanyRoleData partner_company_roles = 16;
-  repeated EntityPermission entity_permissions = 17 ;
+  string partner_type = 7;
+  string description = 8;
+  bool is_active = 9;
+  int32 business_user_roles_count = 10;
+  bool is_org_level = 11;
+  string created_at = 12;
+  string updated_at = 13;
+  string deleted_at = 14;
+  repeated BusinessUserRole business_user_roles = 15;
+  repeated StaffCompanyRole staff_company_roles = 16;
+  repeated PartnerCompanyRoleData partner_company_roles = 17;
+  repeated EntityPermission entity_permissions = 18 ;
 }
 
 
