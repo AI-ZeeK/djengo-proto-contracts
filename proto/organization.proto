@@ -51,6 +51,8 @@ service OrganizationService {
   rpc GetCompanyRoleStaff(CompanyRoleRequest) returns (GetCompanyRoleStaffResponse);
   rpc GetCompanyRoleBusinessUsers(CompanyRoleRequest) returns (GetCompanyRoleBusinessUsersResponse);
 
+
+
   // Analytics
   rpc GetOrganizationAnalytics(OrganizationAnalyticsRequest) returns (OrganizationAnalyticsResponse);
   rpc TotalOrganizations(EmptyRequest) returns (TotalOrganizationsResponse);
@@ -80,12 +82,13 @@ service OrganizationService {
   rpc GetDepartmentRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
   rpc GetStaffCompanyRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
   rpc GetBusinessUserRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
+  rpc GetPartnerRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
 
   // Permission Group Catalogs
   rpc GetDepartmentPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
   rpc GetStaffPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
   rpc GetBusinessUserPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
-  
+  rpc GetPartnerPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
   // Tables
   rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse);
 }
