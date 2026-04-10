@@ -43,6 +43,9 @@ service FinancialsService {
   // Returns only the flexible periodical growth trend data for a company (for charting)
   rpc GetCompanyGrowthTrend (CompanyGrowthTrendRequest) returns (CompanyGrowthTrendResponse);
 
+  // Company-wide financial overview (period-aware: expenses, budget, payroll, inventory)
+  rpc GetCompanyFinancialOverview (GetCompanyFinancialOverviewRequest) returns (GetCompanyFinancialOverviewResponse);
+
   // Budget
   rpc CreateMonthlyBudget(CreateMonthlyBudgetRequest) returns (MonthlyBudget);
   rpc GetMonthlyBudget(GetMonthlyBudgetRequest) returns (MonthlyBudget);
@@ -833,5 +836,36 @@ message BudgetAnalyticsChartData {
 message GetBudgetAnalyticsResponse {
   repeated BudgetAnalyticsCard  cards  = 1;
   repeated BudgetAnalyticsChart charts = 2;
+  optional string alert = 3;
+}
+
+// ── Company Financial Overview (period-aware, cards with sparklines) ───────────
+
+message GetCompanyFinancialOverviewRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  Timeline timeline      = 3;
+}
+
+message FinancialOverviewCard {
+  string title              = 1;
+  double total              = 2;
+  double growth             = 3;
+  string description        = 4;
+  string status             = 5;
+  repeated ChartData chart_data = 6;
+}
+
+message FinancialOverviewChart {
+  string title    = 1;
+  string type     = 2;
+  string data_key = 3;
+  string color    = 4;
+  repeated ChartData data = 5;
+}
+
+message GetCompanyFinancialOverviewResponse {
+  repeated FinancialOverviewCard  cards  = 1;
+  repeated FinancialOverviewChart charts = 2;
   optional string alert = 3;
 }
