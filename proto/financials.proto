@@ -848,12 +848,13 @@ message GetCompanyFinancialOverviewRequest {
 }
 
 message FinancialOverviewCard {
-  double total              = 1;
-  string trend = 2;
-  double percentage = 3;
-  string description        = 4;
-  string status             = 5;
-  repeated ChartData chart_data = 6;
+  string title              = 1;
+  double total              = 2;
+  string trend              = 3;
+  double percentage         = 4;
+  string description        = 5;
+  string status             = 6;
+  repeated ChartData chart_data = 7;
 }
 
 message FinancialOverviewChart {
