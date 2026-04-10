@@ -507,6 +507,7 @@ message StaffInvitationItem {
   string role_id = 2;
   optional string branch_id = 4;
   optional string department_id = 6;
+  InvitationType type = 7;
 }
 
 message SendStaffInvitationsRequest {
@@ -540,6 +541,11 @@ enum InvitationStatus {
   EXPIRED = 4;
 }
 
+enum InvitationType {
+  STAFF_INVITATION = 0;
+  PARTNER_INVITATION = 1;
+}
+
 message OrganizationRole {
   string role_id = 1;
   string organization_id = 2;
@@ -571,8 +577,8 @@ message StaffInvitation {
   optional string responsed_at = 12;
   string created_at = 15;
   string status = 16;
- optional Company company = 17;
-
+  optional Company company = 17;
+  InvitationType type = 18;
 }
 
 message GetInvitationByCodeResponse {
