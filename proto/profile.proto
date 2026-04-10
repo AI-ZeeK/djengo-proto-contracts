@@ -306,7 +306,7 @@ message PaginatedCompanyRequest {
 message GetInvitationsByCompanyResponse {
   bool success = 1;
   optional string error = 2;
-  repeated StaffInvitation invitations = 3;
+  repeated Invitation invitations = 3;
   TableMeta meta = 4;
 }
 
@@ -562,7 +562,7 @@ message OrganizationRole {
 }
 
 
-message StaffInvitation {
+message Invitation {
   string invitation_id = 1;
   string company_id = 2;
   optional string branch_id = 3;
@@ -584,7 +584,7 @@ message StaffInvitation {
 message GetInvitationByCodeResponse {
   bool success = 1;
   optional string error = 2;
-  optional StaffInvitation invitation = 3;
+  optional Invitation invitation = 3;
 }
 
 
