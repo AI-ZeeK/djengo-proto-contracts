@@ -848,9 +848,9 @@ message GetCompanyFinancialOverviewRequest {
 }
 
 message FinancialOverviewCard {
-  string title              = 1;
-  double total              = 2;
-  double growth             = 3;
+  double total              = 1;
+  string trend = 2;
+  double percentage = 3;
   string description        = 4;
   string status             = 5;
   repeated ChartData chart_data = 6;
