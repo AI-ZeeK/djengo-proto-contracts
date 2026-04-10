@@ -1042,27 +1042,29 @@ message PartnerData {
   string organization_id = 2;
   optional string company_id = 3;
   optional string profile_id = 4;   // Linked user in the Profile Service (optional)
-  string name = 5;
-  optional string email = 6;
-  optional string phone_number = 7;
-  optional string description = 8;
-  bool is_active = 9;
-  string created_at = 10;
-  string updated_at = 11;
-  optional string deleted_at = 12;
-  optional string creator_id = 13;
-  repeated PartnerCompanyRoleData partner_company_roles = 14;
+  string first_name = 5;
+  string last_name = 6;
+  optional string email = 7;
+  optional string phone_number = 8;
+  optional string description = 9;
+  bool is_active = 10;
+  string created_at = 11;
+  string updated_at = 12;
+  optional string deleted_at = 13;
+  optional string creator_id = 14;
+  repeated PartnerCompanyRoleData partner_company_roles = 15;
 }
 
 message CreatePartnerRequest {
   string organization_id = 1;
   optional string company_id = 2;
   optional string profile_id = 3;   // Optionally tie to an existing user profile
-  string name = 4;
-  optional string email = 5;
-  optional string phone_number = 6;
-  optional string description = 7;
-  string creator_id = 8;
+  string first_name = 4;
+  string last_name = 5;
+  optional string email = 6;
+  optional string phone_number = 7;
+  optional string description = 8;
+  string creator_id = 9;
 }
 
 message UpdatePartnerRequest {
@@ -1070,11 +1072,12 @@ message UpdatePartnerRequest {
   string organization_id = 2;
   optional string company_id = 3;
   optional string profile_id = 4;
-  optional string name = 5;
-  optional string email = 6;
-  optional string phone_number = 7;
-  optional string description = 8;
-  optional bool is_active = 9;
+  optional string first_name = 5;
+  optional string last_name = 6;
+  optional string email = 7;
+  optional string phone_number = 8;
+  optional string description = 9;
+  optional bool is_active = 10;
 }
 
 message GetPartnerRequest {
