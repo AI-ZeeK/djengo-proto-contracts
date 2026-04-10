@@ -50,6 +50,7 @@ service FinancialsService {
   rpc ListMonthlyBudgets(ListMonthlyBudgetsRequest) returns (ListMonthlyBudgetsResponse);
   rpc CreateBudgetAllocation(CreateBudgetAllocationRequest) returns (BudgetAllocation);
   rpc ListBudgetAllocations(ListBudgetAllocationsRequest) returns (ListBudgetAllocationsResponse);
+  rpc GetBudgetAnalytics (GetBudgetAnalyticsRequest) returns (GetBudgetAnalyticsResponse);
   // Payroll
   rpc CreatePayroll(CreatePayrollRequest) returns (Payroll);
   rpc RunPayroll(RunPayrollRequest) returns (Payroll);
@@ -797,5 +798,40 @@ message InventoryAnalyticsChartData {
 message GetInventoryAnalyticsResponse {
   repeated InventoryAnalyticsCard  cards  = 1;
   repeated InventoryAnalyticsChart charts = 2;
+  optional string alert = 3;
+}
+
+// --- Budget Analytics ---
+message GetBudgetAnalyticsRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+}
+
+message BudgetAnalyticsCard {
+  string title       = 1;
+  double total       = 2;
+  string status      = 3;
+  optional string info = 4;
+  double growth      = 5;
+  int32  count       = 6;
+  string description = 7;
+}
+
+message BudgetAnalyticsChart {
+  string title    = 1;
+  string type     = 2;
+  repeated BudgetAnalyticsChartData data = 3;
+  string data_key = 4;
+  string color    = 5;
+}
+
+message BudgetAnalyticsChartData {
+  string name  = 1;
+  double value = 2;
+}
+
+message GetBudgetAnalyticsResponse {
+  repeated BudgetAnalyticsCard  cards  = 1;
+  repeated BudgetAnalyticsChart charts = 2;
   optional string alert = 3;
 }
