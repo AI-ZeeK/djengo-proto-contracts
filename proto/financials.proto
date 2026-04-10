@@ -63,6 +63,16 @@ service FinancialsService {
   rpc ValidatePaymentDetails (ValidatePaymentDetailsRequest) returns (ValidatePaymentDetailsResponse);
 
   rpc CreatePaymentDetails (CreatePaymentDetailsRequest) returns (CreatePaymentDetailsResponse);
+
+  // ── Inventory ──────────────────────────────────────────────────────────────
+  rpc CreateInventory (CreateInventoryRequest) returns (InventoryProto);
+  rpc GetInventory (GetInventoryRequest) returns (InventoryProto);
+  rpc ListInventories (ListInventoriesRequest) returns (ListInventoriesResponse);
+  rpc UpsertInventoryItem (UpsertInventoryItemRequest) returns (InventoryItemProto);
+  rpc ListInventoryItems (ListInventoryItemsRequest) returns (ListInventoryItemsResponse);
+  rpc ApproveInventoryItem (ApproveInventoryItemRequest) returns (InventoryItemProto);
+  rpc RejectInventoryItem (RejectInventoryItemRequest) returns (InventoryItemProto);
+  rpc RequestInventoryAdjustment (RequestInventoryAdjustmentRequest) returns (InventoryItemProto);
 }
 
 
@@ -620,5 +630,136 @@ message User {
   string updated_at = 10;
   string last_login = 11;
   bool email_verified = 12;
+}
 
+// ═══════════════════════════════════════════════════════════════════
+// INVENTORY
+// ═══════════════════════════════════════════════════════════════════
+
+enum InventoryStatusEnum {
+  INVENTORY_PENDING              = 0;
+  INVENTORY_APPROVED             = 1;
+  INVENTORY_REJECTED             = 2;
+  INVENTORY_ADJUSTMENT_REQUESTED = 3;
+}
+
+message InventoryProto {
+  string inventory_id    = 1;
+  string organization_id = 2;
+  string company_id      = 3;
+  optional string branch_id    = 4;
+  string name            = 5;
+  optional string description  = 6;
+  int32  month           = 7;
+  int32  year            = 8;
+  optional int32  week   = 9;
+  InventoryStatusEnum status   = 10;
+  string created_by      = 11;
+  string created_at      = 12;
+  string updated_at      = 13;
+  repeated InventoryItemProto items = 14;
+}
+
+message InventoryItemProto {
+  string inventory_item_id          = 1;
+  string inventory_id               = 2;
+  optional string branch_id                 = 3;
+  string name                       = 4;
+  optional string description               = 5;
+  double amount                     = 6;
+  InventoryStatusEnum status        = 7;
+  optional string approved_by               = 8;
+  optional string approved_at               = 9;
+  optional string rejected_by               = 10;
+  optional string rejection_message         = 11;
+  optional string adjustment_requested_by   = 12;
+  optional string adjustment_note           = 13;
+  optional string reviewed_at               = 14;
+  string created_by                 = 15;
+  string created_at                 = 16;
+  string updated_at                 = 17;
+}
+
+message CreateInventoryRequest {
+  string organization_id = 1;
+  string company_id      = 2;
+  optional string branch_id     = 3;
+  string name            = 4;
+  optional string description   = 5;
+  int32  month           = 6;
+  int32  year            = 7;
+  optional int32  week   = 8;
+  string created_by      = 9;
+  repeated UpsertInventoryItemRequest items = 10;
+}
+
+message GetInventoryRequest {
+  string inventory_id = 1;
+}
+
+// Optional narrowing filters (branch, period, status)
+message InventoryFilter {
+  optional string branch_id           = 1;
+  optional int32  month               = 2;
+  optional int32  year                = 3;
+  optional InventoryStatusEnum status = 4;
+}
+
+message ListInventoriesRequest {
+  // Required scope — always fetching for a specific company inside an org
+  string organization_id      = 1;
+  string company_id           = 2;
+  optional string branch_id   = 3;  // narrow to a single branch if provided
+  optional string search      = 4;
+  optional int32  page        = 5;
+  optional int32  page_size   = 6;
+  optional string sort_by     = 7;
+  optional string sort_order  = 8;
+  optional InventoryFilter filter = 9;
+}
+
+message ListInventoriesResponse {
+  repeated InventoryProto inventories = 1;
+  TableMeta meta                      = 2;
+}
+
+message UpsertInventoryItemRequest {
+  optional string inventory_item_id = 1;
+  string inventory_id   = 2;
+  optional string branch_id         = 3;
+  string name           = 4;
+  optional string description       = 5;
+  double amount         = 6;
+  string created_by     = 7;
+}
+
+message ListInventoryItemsRequest {
+  string inventory_id                    = 1;
+  optional string branch_id             = 2;
+  optional InventoryStatusEnum status   = 3;
+  int32 page      = 4;
+  int32 page_size = 5;
+}
+
+message ListInventoryItemsResponse {
+  repeated InventoryItemProto items = 1;
+  TableMeta meta                    = 2;
+}
+
+message ApproveInventoryItemRequest {
+  string inventory_item_id = 1;
+  string approved_by       = 2;
+  optional string message  = 3;
+}
+
+message RejectInventoryItemRequest {
+  string inventory_item_id  = 1;
+  string rejected_by        = 2;
+  string rejection_message  = 3;
+}
+
+message RequestInventoryAdjustmentRequest {
+  string inventory_item_id = 1;
+  string requested_by      = 2;
+  string adjustment_note   = 3;
 }
