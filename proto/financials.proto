@@ -858,11 +858,13 @@ message FinancialOverviewCard {
 }
 
 message FinancialOverviewChart {
-  string title    = 1;
-  string type     = 2;
-  string data_key = 3;
-  string color    = 4;
+  string title      = 1;
+  string type       = 2;
+  string data_key   = 3;
+  string color      = 4;
   repeated ChartData data = 5;
+  string trend      = 6;
+  double percentage = 7;
 }
 
 message GetCompanyFinancialOverviewResponse {
