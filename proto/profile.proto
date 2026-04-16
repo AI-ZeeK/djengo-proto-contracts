@@ -63,7 +63,7 @@ service ProfileService {
   rpc DeclineInvitation(DeclineInvitationRequest) returns (InvitationStatusResponse);
   rpc DeleteStaffInvitation(GetInvitationByCodeRequest) returns (InvitationStatusResponse);
   rpc ResendStaffInvitation(ResendStaffInvitationRequest) returns (ResendStaffInvitationResponse);
-  rpc GetInvitationsByCompany(PaginatedCompanyRequest) returns (GetInvitationsByCompanyResponse);
+  rpc GetInvitationsByCompany(GetInvitationsByCompanyRequest) returns (GetInvitationsByCompanyResponse);
   
   
   rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
@@ -318,6 +318,11 @@ enum RequestFilter {
   ACTIVE = 1;
   INACTIVE = 2; 
 }
+enum InvitationRequestFilter {
+  INVITATION_ALL = 0;
+  INVITATION_STAFF = 1;
+  INVITATION_PARTNER = 2; 
+}
 
 // Resend Staff Invitation
 message ResendStaffInvitationRequest {
@@ -342,6 +347,21 @@ message PaginatedCompanyRequest {
   optional string sort_by = 6;
   optional string sort_order = 7;
   optional RequestFilter filter = 8;
+
+
+}
+message GetInvitationsByCompanyRequest  {
+  // Company identification
+  string company_id = 1;
+  string organization_id = 2;
+  
+  // Pagination and sorting
+  optional string search = 3;
+  optional int32 page = 4;
+  optional int32 page_size = 5;
+  optional string sort_by = 6;
+  optional string sort_order = 7;
+  optional InvitationRequestFilter filter = 8;
 
 
 }
