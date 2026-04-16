@@ -44,7 +44,7 @@ service FilesService {
   }
 
   message GetFilesByEntityResponse {
-    repeated FileInfo files = 1;
+    repeated File files = 1;
   }
 
   message EntityFile {
@@ -328,6 +328,29 @@ message FileInfo {
   string created_at = 26;
   string updated_at = 27;
   optional string deleted_at = 28;
+}
+
+message EntityType {
+  string entity_type_id = 1;
+  string  entity_type = 2;
+  optional string description = 3;
+}
+message File {
+  string file_id = 1;
+  string file_name = 2;
+  int64 file_size = 3;
+  FileType file_type = 4;
+  string mime_type = 5;
+  string file_url = 6;
+  string uploaded_by_user_id = 7;
+  optional string entity_id = 8;
+  optional string branch_id = 9;
+  EntityType entity_type = 10;
+  optional string description = 11;
+  optional string metadata = 12; // JSON string
+  string created_at = 13;
+  string updated_at = 14;
+  optional string deleted_at = 15;
 }
 
 // 🏷️ ENUMS
