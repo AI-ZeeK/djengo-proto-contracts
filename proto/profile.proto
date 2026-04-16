@@ -9,6 +9,9 @@ package profile;
 
 // 👤 Profile Service - handles user profiles and user management
 service ProfileService {
+    // Get all available staff documents for a staff member (exclude missing ones)
+    rpc GetStaffDocuments(GetStaffDocumentsRequest) returns (GetStaffDocumentsResponse);
+
   // Payroll: Get staff for payroll with base salary and adjustments
   rpc GetStaffForPayroll(GetStaffForPayrollRequest) returns (GetStaffForPayrollResponse);
 
@@ -75,6 +78,26 @@ service ProfileService {
   rpc AddStaffPaymentAdjustment(AddStaffPaymentAdjustmentRequest) returns (AddStaffPaymentAdjustmentResponse);
   rpc StaffProbationHistory(StaffProbationHistoryRequest) returns (StaffProbationHistoryResponse);
 }
+
+
+  // Get all available staff documents for a staff member (exclude missing ones)
+
+  // Get all available staff documents for a staff member (exclude missing ones)
+  message GetStaffDocumentsRequest {
+    string staff_id = 1;
+    string company_id = 2;
+    string organization_id = 3;
+  }
+
+  message GetStaffDocumentsResponse {
+    repeated StaffDocumentItem documents = 1;
+  }
+
+  message StaffDocumentItem {
+    string type = 1;
+    string url = 2;
+  }
+
 // --- Staff Management Messages ---
 
 enum PAYMENT_FREQUENCY_ENUM {
