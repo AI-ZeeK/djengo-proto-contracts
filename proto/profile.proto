@@ -10,7 +10,7 @@ package profile;
 // 👤 Profile Service - handles user profiles and user management
 service ProfileService {
     // Get all available staff documents for a staff member (exclude missing ones)
-    rpc GetStaffDocuments(GetStaffDocumentsRequest) returns (GetStaffDocumentsResponse);
+  rpc GetStaffDocuments(GetStaffDocumentsRequest) returns (GetStaffDocumentsResponse);
 
   // Payroll: Get staff for payroll with base salary and adjustments
   rpc GetStaffForPayroll(GetStaffForPayrollRequest) returns (GetStaffForPayrollResponse);

@@ -44,7 +44,7 @@ service FilesService {
   }
 
   message GetFilesByEntityResponse {
-    repeated EntityFile files = 1;
+    repeated FileInfo files = 1;
   }
 
   message EntityFile {
