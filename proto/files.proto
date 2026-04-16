@@ -6,6 +6,10 @@ package files;
 service FilesService {
 
   rpc VerifyFile(VerifyFileRequest) returns (VerifyFileResponse);
+  // Get all files for an entity and types (e.g. staff documents)
+  rpc GetFilesByEntity(GetFilesByEntityRequest) returns (GetFilesByEntityResponse);
+
+
   rpc CreateOrUpdateFile(CreateOrUpdateFileRequest) returns (CreateOrUpdateFileResponse);
   // Temporary Upload System (Two-Phase)
   rpc UploadTemporaryFile(UploadTemporaryFileRequest) returns (TempFileResponse);
@@ -31,6 +35,22 @@ service FilesService {
   rpc GetProcessingStatus(GetProcessingStatusRequest) returns (ProcessingStatusResponse);
   rpc RetryProcessing(RetryProcessingRequest) returns (RetryProcessingResponse);
 }
+
+
+  // Get all files for an entity and a set of types
+  message GetFilesByEntityRequest {
+    string entity_id = 1;
+    repeated string entity_types = 2;
+  }
+
+  message GetFilesByEntityResponse {
+    repeated EntityFile files = 1;
+  }
+
+  message EntityFile {
+    string type = 1;
+    string url = 2;
+  }
 
 // 📝 REQUEST MESSAGES
 
