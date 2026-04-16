@@ -91,6 +91,7 @@ service ProfileService {
 
   message GetStaffDocumentsResponse {
     repeated File documents = 1;
+    string message = 2;
   }
 
 
