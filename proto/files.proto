@@ -339,7 +339,7 @@ message File {
   string file_id = 1;
   string file_name = 2;
   int64 file_size = 3;
-  FileType file_type = 4;
+  string file_type = 4;
   string mime_type = 5;
   string file_url = 6;
   string uploaded_by_user_id = 7;
