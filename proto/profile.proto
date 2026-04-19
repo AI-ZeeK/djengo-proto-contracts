@@ -107,7 +107,7 @@ message File {
   optional string branch_id = 9;
   EntityType entity_type = 10;
   optional string description = 11;
-  optional string metadata = 12; // JSON string
+  google.protobuf.Struct metadata = 12; // JSON object
   string created_at = 13;
   string updated_at = 14;
   optional string deleted_at = 15;
@@ -186,6 +186,7 @@ message StaffDocument {
   string type = 1;
   string url = 2;
   optional string uploaded_at = 3; // ISO date string
+  google.protobuf.Struct metadata = 4; // JSON object (optional)
 }
 
 message OnboardStaffResponse {

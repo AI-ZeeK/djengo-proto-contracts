@@ -1,0 +1,218 @@
+syntax = "proto3";
+
+package events;
+
+option csharp_namespace = "Events.Grpc";
+
+import "google/protobuf/timestamp.proto";
+
+
+// ─── Shared ──────────────────────────────────────────────────────────────────
+
+message CompanyRequest      { string company_id = 1; }
+message StaffRequest        { string staff_id = 1; string company_id = 2; }
+message CustomerRequest     { string customer_id = 1; string company_id = 2; }
+message DeleteResponse      { bool success = 1; string message = 2; }
+
+// ─── ActivityLog ─────────────────────────────────────────────────────────────
+
+message ActivityLog {
+  string activity_id      = 1;
+  string activity_type    = 2;
+  string category         = 3;
+  string priority         = 4;
+  string status           = 5;
+  string style            = 6;
+  string description      = 7;
+  string entity_type      = 8;
+  string entity_id        = 9;
+  string company_id       = 10;
+  string branch_id        = 11;
+  string department_id    = 12;
+  string performed_by_id  = 13;
+  string performed_by_type = 14;
+  string metadata         = 15;
+  string severity         = 16  ;
+  bool   is_public        = 17;
+  string icon_name        = 18;
+  string color_scheme     = 19;
+  string badge_text       = 20;
+  bool   requires_action  = 21;
+  string avatar_url       = 22;
+  string secondary_text   = 23;
+  string action_type      = 24;
+  string action_value     = 25;
+  string badges           = 26;
+  string extra            = 27;
+  google.protobuf.Timestamp created_at = 28;
+  google.protobuf.Timestamp updated_at = 29;
+  google.protobuf.Timestamp deleted_at = 30;
+}
+
+message ActivityLogId           { string activity_id = 1; }
+message ActivityLogListResponse { repeated ActivityLog logs = 1; int32 total = 2; }
+
+// ─── Task ────────────────────────────────────────────────────────────────────
+
+message Task {
+  string task_id          = 1;
+  string title            = 2;
+  string description      = 3;
+  string status           = 4;
+  string priority         = 5;
+  string type             = 6;
+  google.protobuf.Timestamp due_date      = 7;
+  google.protobuf.Timestamp completed_at  = 8;
+  google.protobuf.Timestamp created_at    = 9;
+  google.protobuf.Timestamp updated_at    = 10;
+  google.protobuf.Timestamp deleted_at    = 11;
+  string assigned_by_id   = 12;
+  string assigned_to_id   = 13;
+  string company_id       = 14;
+  string department_id    = 15;
+  string project_id       = 16;
+  int32  estimated_hours  = 17;
+  int32  actual_hours     = 18;
+  int32  progress         = 19;
+  bool   is_recurring     = 20;
+  string recurrence_rule  = 21;
+  string parent_task_id   = 22;
+  repeated string tags    = 23;
+}
+
+message TaskId              { string task_id = 1; }
+message TaskListResponse    { repeated Task tasks = 1; int32 total = 2; }
+message UpdateTaskStatusRequest { string task_id = 1; string status = 2; }
+
+// ─── CalendarEvent ───────────────────────────────────────────────────────────
+
+message CalendarEvent {
+  string event_id             = 1;
+  string company_id           = 2;
+  string title                = 3;
+  string description          = 4;
+  google.protobuf.Timestamp start_time  = 5;
+  google.protobuf.Timestamp end_time    = 6;
+  string event_type           = 7;
+  bool   is_all_day           = 8;
+  string color                = 9;
+  bool   is_recurring         = 10;
+  string recurrence_rule      = 11;
+  string created_by_staff_id  = 12;
+  bool   is_private           = 13;
+  bool   is_active            = 14;
+  string system_event_id      = 15;
+  string system_event_type    = 16;
+  string system_event_data    = 17;
+  bool   notification_sent    = 18;
+  string task_id              = 19;
+  google.protobuf.Timestamp created_at  = 20;
+  google.protobuf.Timestamp updated_at  = 21;
+  google.protobuf.Timestamp deleted_at  = 22;
+}
+
+message CalendarEventId             { string event_id = 1; }
+message CalendarEventListResponse   { repeated CalendarEvent events = 1; int32 total = 2; }
+
+// ─── StaffEvent ──────────────────────────────────────────────────────────────
+
+message StaffEvent {
+  string event_id       = 1;
+  string category       = 2;
+  string status         = 3;
+  string staff_id       = 4;
+  google.protobuf.Timestamp scheduled_start = 5;
+  google.protobuf.Timestamp scheduled_end   = 6;
+  google.protobuf.Timestamp actual_start    = 7;
+  google.protobuf.Timestamp actual_end      = 8;
+  string company_id     = 9;
+  string branch_id      = 10;
+  string department_id  = 11;
+  string notes          = 12;
+  string metadata       = 13;
+  bool   is_approved    = 14;
+  string approved_by    = 15;
+  google.protobuf.Timestamp approved_at = 16;
+  google.protobuf.Timestamp created_at  = 17;
+  google.protobuf.Timestamp updated_at  = 18;
+  google.protobuf.Timestamp deleted_at  = 19;
+}
+
+message StaffEventId                { string event_id = 1; }
+message StaffEventListResponse      { repeated StaffEvent events = 1; int32 total = 2; }
+message ApproveStaffEventRequest    { string event_id = 1; string approved_by = 2; }
+
+// ─── DailyEvent ──────────────────────────────────────────────────────────────
+
+message DailyEvent {
+  string event_id         = 1;
+  string category         = 2;
+  string status           = 3;
+  string customer_id      = 4;
+  string entity_type      = 5;
+  string entity_id        = 6;
+  google.protobuf.Timestamp scheduled_start = 7;
+  google.protobuf.Timestamp scheduled_end   = 8;
+  google.protobuf.Timestamp actual_start    = 9;
+  google.protobuf.Timestamp actual_end      = 10;
+  string company_id       = 11;
+  string branch_id        = 12;
+  string notes            = 13;
+  string metadata         = 14;
+  string checkout_status  = 15;
+  double total_amount     = 16;
+  string payment_status   = 17;
+  google.protobuf.Timestamp created_at = 18;
+  google.protobuf.Timestamp updated_at = 19;
+  google.protobuf.Timestamp deleted_at = 20;
+}
+
+message DailyEventId            { string event_id = 1; }
+message DailyEventListResponse  { repeated DailyEvent events = 1; int32 total = 2; }
+
+// ─── Services ────────────────────────────────────────────────────────────────
+
+service ActivityLogService {
+  rpc CreateActivityLog   (ActivityLog)   returns (ActivityLogId);
+  rpc GetActivityLog      (ActivityLogId) returns (ActivityLog);
+  rpc ListActivityLogs    (CompanyRequest) returns (ActivityLogListResponse);
+  rpc DeleteActivityLog   (ActivityLogId) returns (DeleteResponse);
+}
+
+service TaskService {
+  rpc CreateTask          (Task)                    returns (TaskId);
+  rpc GetTask             (TaskId)                  returns (Task);
+  rpc UpdateTask          (Task)                    returns (Task);
+  rpc UpdateTaskStatus    (UpdateTaskStatusRequest) returns (Task);
+  rpc DeleteTask          (TaskId)                  returns (DeleteResponse);
+  rpc ListTasksByCompany  (CompanyRequest)           returns (TaskListResponse);
+  rpc ListTasksByAssignee (StaffRequest)             returns (TaskListResponse);
+}
+
+service CalendarEventService {
+  rpc CreateCalendarEvent         (CalendarEvent)   returns (CalendarEventId);
+  rpc GetCalendarEvent            (CalendarEventId) returns (CalendarEvent);
+  rpc UpdateCalendarEvent         (CalendarEvent)   returns (CalendarEvent);
+  rpc DeleteCalendarEvent         (CalendarEventId) returns (DeleteResponse);
+  rpc ListCalendarEventsByCompany (CompanyRequest)  returns (CalendarEventListResponse);
+  rpc ListCalendarEventsByStaff   (StaffRequest)    returns (CalendarEventListResponse);
+}
+
+service StaffEventService {
+  rpc CreateStaffEvent         (StaffEvent)              returns (StaffEventId);
+  rpc GetStaffEvent            (StaffEventId)            returns (StaffEvent);
+  rpc UpdateStaffEvent         (StaffEvent)              returns (StaffEvent);
+  rpc ApproveStaffEvent        (ApproveStaffEventRequest) returns (StaffEvent);
+  rpc DeleteStaffEvent         (StaffEventId)            returns (DeleteResponse);
+  rpc ListStaffEventsByStaff   (StaffRequest)            returns (StaffEventListResponse);
+  rpc ListStaffEventsByCompany (CompanyRequest)          returns (StaffEventListResponse);
+}
+
+service DailyEventService {
+  rpc CreateDailyEvent         (DailyEvent)      returns (DailyEventId);
+  rpc GetDailyEvent            (DailyEventId)    returns (DailyEvent);
+  rpc UpdateDailyEvent         (DailyEvent)      returns (DailyEvent);
+  rpc DeleteDailyEvent         (DailyEventId)    returns (DeleteResponse);
+  rpc ListDailyEventsByCustomer (CustomerRequest) returns (DailyEventListResponse);
+  rpc ListDailyEventsByCompany  (CompanyRequest)  returns (DailyEventListResponse);
+}
