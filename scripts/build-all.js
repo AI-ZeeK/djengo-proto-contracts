@@ -271,6 +271,20 @@ function main() {
     const protocPath = findProtoc();
     generateTypeScript(protocPath);
 
+    // Patch generated ServiceClient interfaces to include `metadata?: Metadata`
+    // on every method — this is a transport-level concern that ts-proto omits.
+    logger.step(5, "Patching ServiceClient interfaces with gRPC metadata...");
+    try {
+      const patchScript = path.join(__dirname, "patch-grpc-metadata.js");
+      execSync(`node "${patchScript}" "${targetDepsDir}"`, {
+        cwd: projectRoot,
+        stdio: "inherit",
+      });
+    } catch (patchError) {
+      logger.warn(`Metadata patch step failed: ${patchError.message}`);
+      // Non-fatal — generated files are still usable without the patch
+    }
+
     logger.title("🎉 Complete build finished successfully!");
     logger.success(
       `Proto files: ${path.relative(projectRoot, targetProtoDir)}`
