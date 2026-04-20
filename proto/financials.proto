@@ -78,6 +78,22 @@ service FinancialsService {
   rpc RejectInventoryItem (RejectInventoryItemRequest) returns (InventoryItemProto);
   rpc RequestInventoryAdjustment (RequestInventoryAdjustmentRequest) returns (InventoryItemProto);
   rpc GetInventoryAnalytics (GetInventoryAnalyticsRequest) returns (GetInventoryAnalyticsResponse);
+
+  // ── Cost Centers ───────────────────────────────────────────────────────────
+  rpc CreateCostCenter (CreateCostCenterRequest) returns (CostCenterProto);
+  rpc GetCostCenter    (GetCostCenterRequest)    returns (CostCenterProto);
+  rpc ListCostCenters  (ListCostCentersRequest)  returns (ListCostCentersResponse);
+  rpc UpdateCostCenter (UpdateCostCenterRequest) returns (CostCenterProto);
+
+  // ── Financial Periods ──────────────────────────────────────────────────────
+  rpc OpenFinancialPeriod  (OpenFinancialPeriodRequest)  returns (FinancialPeriodProto);
+  rpc LockFinancialPeriod  (LockFinancialPeriodRequest)  returns (FinancialPeriodProto);
+  rpc GetFinancialPeriod   (GetFinancialPeriodRequest)   returns (FinancialPeriodProto);
+  rpc ListFinancialPeriods (ListFinancialPeriodsRequest) returns (ListFinancialPeriodsResponse);
+
+  // ── Budget Approval Chain ─────────────────────────────────────────────────
+  rpc ApproveBudget (ApproveBudgetRequest) returns (MonthlyBudget);
+  rpc RejectBudget  (RejectBudgetRequest)  returns (MonthlyBudget);
 }
 
 
@@ -336,6 +352,16 @@ message BudgetAllocation {
   string allocated_by = 11;
 }
 
+// Payroll snapshot embedded in budget responses
+message PayrollSummary {
+  string payroll_id    = 1;
+  string schedule_id   = 2;
+  PayrollState status  = 3;
+  double total_amount  = 4;
+  int32  staff_count   = 5;
+  bool   is_settled    = 6; // true when APPROVED / PAID / CLOSED
+}
+
 // Monthly budget resource
 message MonthlyBudget {
   string budget_id = 1;
@@ -347,6 +373,7 @@ message MonthlyBudget {
   double allocated_amount = 7;
   repeated BudgetAllocation allocations = 8;
   BudgetState budget_state = 9;
+  optional PayrollSummary payroll_summary = 10;
 }
 
 // Payroll resource
@@ -360,6 +387,7 @@ message Payroll {
   double total_amount = 7;
   PayrollState payroll_state = 8;
   repeated PayrollStaff staff = 9;
+  string schedule_id = 10;
 }
 
 // Payroll staff resource
@@ -613,6 +641,8 @@ message CreateOrUpdatePayrollStaffRequest {
   string organization_id = 2;
   string payroll_schedule_id = 3; // The payroll schedule/period to update
   repeated string staff_ids = 4;  // The list of staff IDs to include in payroll for this period
+  int32 month = 5;  // Used to create the schedule if it does not yet exist
+  int32 year = 6;   // Used to create the schedule if it does not yet exist
 }
 
 message CreateOrUpdatePayrollStaffResponse {
@@ -871,4 +901,122 @@ message GetCompanyFinancialOverviewResponse {
   repeated FinancialOverviewCard  cards  = 1;
   repeated FinancialOverviewChart charts = 2;
   optional string alert = 3;
+}
+
+// Cost Center messages
+
+message CostCenterProto {
+  string cost_center_id        = 1;
+  string parent_cost_center_id = 2;
+  string organization_id       = 3;
+  string company_id            = 4;
+  string name                  = 5;
+  string code                  = 6;
+  string owner_staff_id        = 7;
+  string status                = 8;
+  string created_at            = 9;
+  string updated_at            = 10;
+  repeated CostCenterProto children = 11;
+}
+
+message CreateCostCenterRequest {
+  string organization_id       = 1;
+  string company_id            = 2;
+  string name                  = 3;
+  string code                  = 4;
+  string parent_cost_center_id = 5;
+  string owner_staff_id        = 6;
+}
+
+message GetCostCenterRequest {
+  string cost_center_id  = 1;
+  string organization_id = 2;
+  string company_id      = 3;
+}
+
+message ListCostCentersRequest {
+  string organization_id       = 1;
+  string company_id            = 2;
+  string parent_cost_center_id = 3;
+  int32  page_size             = 4;
+  string page_token            = 5;
+}
+
+message ListCostCentersResponse {
+  repeated CostCenterProto cost_centers = 1;
+  string next_page_token                = 2;
+}
+
+message UpdateCostCenterRequest {
+  string cost_center_id  = 1;
+  string organization_id = 2;
+  string company_id      = 3;
+  string name            = 4;
+  string code            = 5;
+  string owner_staff_id  = 6;
+  string status          = 7;
+}
+
+// Financial Period messages
+
+message FinancialPeriodProto {
+  string period_id       = 1;
+  string organization_id = 2;
+  string company_id      = 3;
+  int32  year            = 4;
+  int32  month           = 5;
+  string status          = 6;
+  string locked_by       = 7;
+  string locked_at       = 8;
+  string created_at      = 9;
+  string updated_at      = 10;
+}
+
+message OpenFinancialPeriodRequest {
+  string organization_id = 1;
+  string company_id      = 2;
+  int32  year            = 3;
+  int32  month           = 4;
+}
+
+message LockFinancialPeriodRequest {
+  string organization_id    = 1;
+  string company_id         = 2;
+  int32  year               = 3;
+  int32  month              = 4;
+  string locked_by_staff_id = 5;
+  bool   archive            = 6;
+}
+
+message GetFinancialPeriodRequest {
+  string organization_id = 1;
+  string company_id      = 2;
+  int32  year            = 3;
+  int32  month           = 4;
+}
+
+message ListFinancialPeriodsRequest {
+  string organization_id = 1;
+  string company_id      = 2;
+  int32  page_size       = 3;
+  string page_token      = 4;
+}
+
+message ListFinancialPeriodsResponse {
+  repeated FinancialPeriodProto periods = 1;
+  string next_page_token                = 2;
+}
+
+// Budget Approval messages
+
+message ApproveBudgetRequest {
+  string budget_id         = 1;
+  string approver_staff_id = 2;
+  string comment           = 3;
+}
+
+message RejectBudgetRequest {
+  string budget_id         = 1;
+  string approver_staff_id = 2;
+  string comment           = 3;
 }
