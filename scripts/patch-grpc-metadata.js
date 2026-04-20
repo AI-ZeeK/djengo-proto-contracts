@@ -43,18 +43,32 @@ for (const file of pbFiles) {
   let src = fs.readFileSync(filePath, "utf8");
   const original = src;
 
-  // 1. Ensure `import { Metadata } from '@grpc/grpc-js'` is present.
-  if (
-    !src.includes("from '@grpc/grpc-js'") &&
-    !src.includes('from "@grpc/grpc-js"')
-  ) {
-    // Insert after the last existing import line
-    const lastImportIdx = src.lastIndexOf("\nimport ");
-    const insertAt = src.indexOf("\n", lastImportIdx + 1);
-    src =
-      src.slice(0, insertAt) +
-      "\nimport { Metadata } from '@grpc/grpc-js';" +
-      src.slice(insertAt);
+  // 1. Ensure `Metadata` is imported from '@grpc/grpc-js'.
+  //    The file may already import OTHER things from grpc-js (e.g. handleUnaryCall)
+  //    without importing Metadata specifically — so we check for Metadata by name.
+  const hasMetadataImport = /import[^;]*\bMetadata\b[^;]*from ['"]@grpc\/grpc-js['"]/.test(src);
+  if (!hasMetadataImport) {
+    if (src.includes("from '@grpc/grpc-js'") || src.includes('from "@grpc/grpc-js"')) {
+      // A grpc-js import already exists — add Metadata to it.
+      // Handle both `import { ... }` and `import type { ... }` forms.
+      src = src.replace(
+        /import(?:\s+type)?\s*\{([^}]*)\}\s*from\s*(['"])@grpc\/grpc-js\2/,
+        (match, imports) => {
+          const names = imports.split(",").map((s) => s.trim()).filter(Boolean);
+          if (!names.includes("Metadata")) names.push("Metadata");
+          // Keep as a value import (not `import type`) so Metadata is available at runtime
+          return `import { ${names.join(", ")} } from '@grpc/grpc-js'`;
+        }
+      );
+    } else {
+      // No grpc-js import at all — insert a new one after the last import line
+      const lastImportIdx = src.lastIndexOf("\nimport ");
+      const insertAt = src.indexOf("\n", lastImportIdx + 1);
+      src =
+        src.slice(0, insertAt) +
+        "\nimport { Metadata } from '@grpc/grpc-js';" +
+        src.slice(insertAt);
+    }
   }
 
   // 2. Inside *ServiceClient interfaces, add `metadata?: Metadata` to every
