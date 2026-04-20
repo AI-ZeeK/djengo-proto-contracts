@@ -221,3 +221,252 @@ service DailyEventService {
   rpc ListDailyEventsByCustomer (CustomerRequest) returns (DailyEventListResponse);
   rpc ListDailyEventsByCompany  (CompanyRequest)  returns (DailyEventListResponse);
 }
+
+service PositionHistoryService {
+  rpc RecordPositionChange    (StaffPositionHistory) returns (PositionHistoryId);
+  rpc GetPositionEntry        (PositionHistoryId)    returns (StaffPositionHistory);
+  rpc ListPositionHistory     (StaffRequest)         returns (PositionHistoryList);
+  rpc ClosePositionEntry      (PositionHistoryId)    returns (DeleteResponse);
+}
+
+// ─── HR: Position History ─────────────────────────────────────────────────────
+
+message StaffPositionHistory {
+  string position_history_id = 1;
+  string staff_id            = 2;
+  string company_id          = 3;
+  string organization_id     = 4;
+  string job_title           = 5;
+  string designation         = 6;
+  string department_id       = 7;
+  string branch_id           = 8;
+  string role_id             = 9;
+  double salary              = 10;
+  string currency_code       = 11;
+  string change_type         = 12; // PositionChangeType enum value
+  string change_reason       = 13;
+  string changed_by          = 14;
+  google.protobuf.Timestamp effective_date = 15;
+  google.protobuf.Timestamp end_date       = 16;
+  google.protobuf.Timestamp created_at     = 17;
+}
+
+message PositionHistoryId       { string position_history_id = 1; }
+message PositionHistoryList     { repeated StaffPositionHistory entries = 1; }
+
+
+// ─── HR: Leave Policy ────────────────────────────────────────────────────────
+
+message LeavePolicy {
+  string leave_policy_id  = 1;
+  string company_id       = 2;
+  string organization_id  = 3;
+  string name             = 4;
+  string leave_type       = 5; // LeaveType enum value
+  int32  days_per_year    = 6;
+  int32  carry_over_days  = 7;
+  bool   is_paid          = 8;
+  bool   requires_approval = 9;
+  int32  min_notice_days  = 10;
+  bool   is_active        = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}
+
+message LeavePolicyId       { string leave_policy_id = 1; }
+message LeavePolicyList     { repeated LeavePolicy policies = 1; }
+
+service LeavePolicyService {
+  rpc CreateLeavePolicy   (LeavePolicy)   returns (LeavePolicyId);
+  rpc GetLeavePolicy      (LeavePolicyId) returns (LeavePolicy);
+  rpc UpdateLeavePolicy   (LeavePolicy)   returns (LeavePolicy);
+  rpc ListLeavePolicies   (CompanyRequest) returns (LeavePolicyList);
+  rpc DeactivateLeavePolicy (LeavePolicyId) returns (DeleteResponse);
+}
+
+// ─── HR: Leave Balance ───────────────────────────────────────────────────────
+
+message LeaveBalance {
+  string leave_balance_id  = 1;
+  string staff_id          = 2;
+  string leave_policy_id   = 3;
+  int32  year              = 4;
+  int32  allocated_days    = 5;
+  int32  used_days         = 6;
+  int32  pending_days      = 7;
+  int32  carried_over      = 8;
+  int32  remaining_days    = 9; // computed: allocated + carried - used - pending
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+message LeaveBalanceId      { string leave_balance_id = 1; }
+message LeaveBalanceList    { repeated LeaveBalance balances = 1; }
+message GetLeaveBalanceRequest { string staff_id = 1; int32 year = 2; }
+message AdjustLeaveBalanceRequest {
+  string staff_id        = 1;
+  string leave_policy_id = 2;
+  int32  year            = 3;
+  int32  allocated_days  = 4;
+  int32  carried_over    = 5;
+}
+
+service LeaveBalanceService {
+  rpc AllocateLeaveBalance (AdjustLeaveBalanceRequest) returns (LeaveBalance);
+  rpc GetLeaveBalance      (LeaveBalanceId)            returns (LeaveBalance);
+  rpc GetStaffLeaveBalances (GetLeaveBalanceRequest)   returns (LeaveBalanceList);
+  rpc AdjustLeaveBalance   (AdjustLeaveBalanceRequest) returns (LeaveBalance);
+}
+
+// ─── HR: Leave Request ───────────────────────────────────────────────────────
+
+message LeaveRequest {
+  string leave_request_id  = 1;
+  string staff_id          = 2;
+  string leave_policy_id   = 3;
+  string company_id        = 4;
+  string organization_id   = 5;
+  google.protobuf.Timestamp start_date   = 6;
+  google.protobuf.Timestamp end_date     = 7;
+  int32  days_requested    = 8;
+  string reason            = 9;
+  string status            = 10; // LeaveStatus enum value
+  string reviewed_by       = 11;
+  google.protobuf.Timestamp reviewed_at  = 12;
+  string rejection_reason  = 13;
+  string staff_event_ref_id = 14; // links to StaffEvent on approval
+  google.protobuf.Timestamp created_at   = 15;
+  google.protobuf.Timestamp updated_at   = 16;
+}
+
+message LeaveRequestId          { string leave_request_id = 1; }
+message LeaveRequestListResponse { repeated LeaveRequest requests = 1; int32 total = 2; }
+message ReviewLeaveInput {
+  string leave_request_id = 1;
+  string reviewed_by      = 2;
+  string action           = 3; // "APPROVED" or "REJECTED"
+  string rejection_reason = 4;
+}
+message GetLeaveRequestsRequest {
+  string company_id  = 1;
+  string staff_id    = 2; // optional filter
+  string status      = 3; // optional filter
+  int32  page        = 4;
+  int32  page_size   = 5;
+}
+
+service LeaveRequestService {
+  rpc CreateLeaveRequest  (LeaveRequest)           returns (LeaveRequestId);
+  rpc GetLeaveRequest     (LeaveRequestId)         returns (LeaveRequest);
+  rpc ReviewLeaveRequest  (ReviewLeaveInput)     returns (LeaveRequest);
+  rpc CancelLeaveRequest  (LeaveRequestId)         returns (LeaveRequest);
+  rpc ListLeaveRequests   (GetLeaveRequestsRequest) returns (LeaveRequestListResponse);
+  rpc ListStaffLeaveRequests (StaffRequest)         returns (LeaveRequestListResponse);
+}
+
+// ─── HR: Performance Review ──────────────────────────────────────────────────
+
+message PerformanceReview {
+  string review_id       = 1;
+  string staff_id        = 2;
+  string company_id      = 3;
+  string organization_id = 4;
+  string reviewed_by     = 5;
+  string review_period   = 6;
+  double score           = 7;
+  string rating          = 8; // PerformanceRating enum value
+  string comments        = 9;
+  string goals_set       = 10; // JSON string
+  google.protobuf.Timestamp completed_at = 11;
+  google.protobuf.Timestamp created_at   = 12;
+  google.protobuf.Timestamp updated_at   = 13;
+}
+
+message PerformanceReviewId     { string review_id = 1; }
+message PerformanceReviewList   { repeated PerformanceReview reviews = 1; }
+
+service PerformanceReviewService {
+  rpc CreatePerformanceReview (PerformanceReview)   returns (PerformanceReviewId);
+  rpc GetPerformanceReview    (PerformanceReviewId) returns (PerformanceReview);
+  rpc UpdatePerformanceReview (PerformanceReview)   returns (PerformanceReview);
+  rpc ListPerformanceReviews  (StaffRequest)        returns (PerformanceReviewList);
+  rpc ListCompanyReviews      (CompanyRequest)      returns (PerformanceReviewList);
+}
+
+// ─── HR: Disciplinary Record ─────────────────────────────────────────────────
+
+message DisciplinaryRecord {
+  string record_id       = 1;
+  string staff_id        = 2;
+  string company_id      = 3;
+  string organization_id = 4;
+  string issued_by       = 5;
+  google.protobuf.Timestamp incident_date = 6;
+  string incident_type   = 7; // DisciplinaryType enum value
+  string severity        = 8; // DisciplinarySeverity enum value
+  string description     = 9;
+  string action_taken    = 10;
+  string outcome         = 11;
+  string appeal_status   = 12; // AppealStatus enum value
+  string appeal_notes    = 13;
+  bool   is_active       = 14;
+  google.protobuf.Timestamp created_at = 15;
+  google.protobuf.Timestamp updated_at = 16;
+}
+
+message DisciplinaryRecordId    { string record_id = 1; }
+message DisciplinaryRecordList  { repeated DisciplinaryRecord records = 1; }
+message UpdateDisciplinaryRequest {
+  string record_id    = 1;
+  string outcome      = 2;
+  string appeal_status = 3;
+  string appeal_notes = 4;
+  bool   is_active    = 5;
+}
+
+service DisciplinaryService {
+  rpc CreateDisciplinaryRecord (DisciplinaryRecord)        returns (DisciplinaryRecordId);
+  rpc GetDisciplinaryRecord    (DisciplinaryRecordId)      returns (DisciplinaryRecord);
+  rpc UpdateDisciplinaryRecord (UpdateDisciplinaryRequest) returns (DisciplinaryRecord);
+  rpc ListStaffDisciplinary    (StaffRequest)              returns (DisciplinaryRecordList);
+  rpc ListCompanyDisciplinary  (CompanyRequest)            returns (DisciplinaryRecordList);
+}
+
+// ─── HR: Training Record ─────────────────────────────────────────────────────
+
+message TrainingRecord {
+  string training_id     = 1;
+  string staff_id        = 2;
+  string company_id      = 3;
+  string organization_id = 4;
+  string title           = 5;
+  string description     = 6;
+  string training_type   = 7; // TrainingType enum value
+  string provider        = 8;
+  google.protobuf.Timestamp start_date    = 9;
+  google.protobuf.Timestamp end_date      = 10;
+  string status          = 11; // TrainingStatus enum value
+  double score           = 12;
+  string certificate_url = 13;
+  bool   is_mandatory    = 14;
+  google.protobuf.Timestamp completed_at  = 15;
+  google.protobuf.Timestamp created_at    = 16;
+  google.protobuf.Timestamp updated_at    = 17;
+}
+
+message TrainingRecordId    { string training_id = 1; }
+message TrainingRecordList  { repeated TrainingRecord records = 1; }
+message UpdateTrainingStatusRequest {
+  string training_id    = 1;
+  string status         = 2;
+  double score          = 3;
+  string certificate_url = 4;
+}
+
+service TrainingService {
+  rpc CreateTrainingRecord (TrainingRecord)             returns (TrainingRecordId);
+  rpc GetTrainingRecord    (TrainingRecordId)           returns (TrainingRecord);
+  rpc UpdateTrainingStatus (UpdateTrainingStatusRequest) returns (TrainingRecord);
+  rpc ListStaffTraining    (StaffRequest)               returns (TrainingRecordList);
+  rpc ListCompanyTraining  (CompanyRequest)             returns (TrainingRecordList);
+}
