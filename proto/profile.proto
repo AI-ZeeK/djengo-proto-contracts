@@ -77,6 +77,8 @@ service ProfileService {
   rpc OnboardStaff(OnboardStaffRequest) returns (OnboardStaffResponse);
   rpc AddStaffPaymentAdjustment(AddStaffPaymentAdjustmentRequest) returns (AddStaffPaymentAdjustmentResponse);
   rpc StaffProbationHistory(StaffProbationHistoryRequest) returns (StaffProbationHistoryResponse);
+  // ── HR: Termination ───────────────────────────────────────────────────────
+  rpc TerminateStaff(TerminateStaffRequest) returns (TerminateStaffResponse);
 }
 
 
@@ -1119,3 +1121,19 @@ message PayrollAdjustment {
   optional string expire_at = 5;
 
 }
+message TerminateStaffRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string terminated_by = 4; // user_id
+  string termination_date = 5; // ISO date
+  optional string termination_reason = 6;
+  optional string notes = 7;
+}
+
+message TerminateStaffResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
+}
+

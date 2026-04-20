@@ -101,6 +101,24 @@ service OrganizationService {
 
   // Tables
   rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse);
+
+  rpc GenerateEmployeeNumber(GenerateEmployeeNumberRequest) returns (GenerateEmployeeNumberResponse);
+
+}
+
+// ============================================================================
+// HR — EMPLOYEE NUMBER
+// ============================================================================
+
+message GenerateEmployeeNumberRequest {
+  string organization_id = 1;
+  string prefix = 2; // e.g. "ACME"
+}
+
+message GenerateEmployeeNumberResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string employee_number = 3; // e.g. "ACME-2025-0042"
 }
   // Branch Analytics Messages
   message BranchesAnalyticsRequest {
