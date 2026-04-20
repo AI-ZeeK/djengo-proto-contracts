@@ -60,8 +60,14 @@ service FinancialsService {
   rpc GetPayroll(GetPayrollRequest) returns (Payroll);
   rpc ListPayrolls(ListPayrollsRequest) returns (ListPayrollsResponse);
 
+
   // Payroll Analytics
   rpc GetPayrollAnalytics (GetPayrollAnalyticsRequest) returns (GetPayrollAnalyticsResponse);
+
+  // Bulk export payroll schedules (CSV/Excel)
+  rpc ExportPayrollSchedules (ExportPayrollSchedulesRequest) returns (ExportPayrollSchedulesResponse);
+
+
 
   // Bank validation
   rpc ValidatePaymentDetails (ValidatePaymentDetailsRequest) returns (ValidatePaymentDetailsResponse);
@@ -96,6 +102,24 @@ service FinancialsService {
   rpc RejectBudget  (RejectBudgetRequest)  returns (MonthlyBudget);
 }
 
+// --- Bulk Export Payroll Schedules ---
+message ExportPayrollSchedulesRequest {
+  repeated string schedule_ids = 1; // List of PayrollSchedule IDs to export
+  string company_id = 2;
+  string organization_id = 3;
+  enum ExportType {
+    CSV = 0;
+    EXCEL = 1;
+  }
+  ExportType export_type = 4;
+}
+
+message ExportPayrollSchedulesResponse {
+  bool success = 1;
+  string message = 2;
+  bytes file_content = 3; // The exported file as bytes (for direct download)
+  string file_name = 4;   // Suggested file name (e.g., payrolls.xlsx or payrolls.csv)
+}
 
 // --- Staff Payment History ---
 message GetStaffPaymentHistoryRequest {
