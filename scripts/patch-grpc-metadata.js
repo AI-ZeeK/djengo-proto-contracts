@@ -14,23 +14,25 @@
  *   node scripts/patch-grpc-metadata.js [path/to/dependencies]
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 const projectRoot = process.cwd();
 const depsDir = process.argv[2]
   ? path.resolve(process.argv[2])
-  : path.join(projectRoot, 'src/shared/dependencies');
+  : path.join(projectRoot, "src/shared/dependencies");
 
 if (!fs.existsSync(depsDir)) {
   console.error(`[patch-grpc-metadata] Directory not found: ${depsDir}`);
   process.exit(1);
 }
 
-const pbFiles = fs.readdirSync(depsDir).filter((f) => f.endsWith('.pb.ts'));
+const pbFiles = fs.readdirSync(depsDir).filter((f) => f.endsWith(".pb.ts"));
 
 if (pbFiles.length === 0) {
-  console.warn('[patch-grpc-metadata] No *.pb.ts files found — nothing to patch.');
+  console.warn(
+    "[patch-grpc-metadata] No *.pb.ts files found — nothing to patch.",
+  );
   process.exit(0);
 }
 
@@ -38,14 +40,17 @@ let totalPatched = 0;
 
 for (const file of pbFiles) {
   const filePath = path.join(depsDir, file);
-  let src = fs.readFileSync(filePath, 'utf8');
+  let src = fs.readFileSync(filePath, "utf8");
   const original = src;
 
   // 1. Ensure `import { Metadata } from '@grpc/grpc-js'` is present.
-  if (!src.includes("from '@grpc/grpc-js'") && !src.includes('from "@grpc/grpc-js"')) {
+  if (
+    !src.includes("from '@grpc/grpc-js'") &&
+    !src.includes('from "@grpc/grpc-js"')
+  ) {
     // Insert after the last existing import line
-    const lastImportIdx = src.lastIndexOf('\nimport ');
-    const insertAt = src.indexOf('\n', lastImportIdx + 1);
+    const lastImportIdx = src.lastIndexOf("\nimport ");
+    const insertAt = src.indexOf("\n", lastImportIdx + 1);
     src =
       src.slice(0, insertAt) +
       "\nimport { Metadata } from '@grpc/grpc-js';" +
@@ -71,7 +76,7 @@ for (const file of pbFiles) {
       // Add metadata to single-line method signatures
       interfaceBlock = interfaceBlock.replace(
         /(\w+\(request: \w+)\): Observable</g,
-        '$1, metadata?: Metadata): Observable<',
+        "$1, metadata?: Metadata): Observable<",
       );
 
       // Add metadata to multi-line method signatures — the closing paren
@@ -92,15 +97,15 @@ for (const file of pbFiles) {
   //    that might appear if the script runs twice.
   src = src.replace(
     /(metadata\?: Metadata,\s*\n\s*metadata\?: Metadata)/g,
-    'metadata?: Metadata',
+    "metadata?: Metadata",
   );
   src = src.replace(
     /(, metadata\?: Metadata, metadata\?: Metadata)/g,
-    ', metadata?: Metadata',
+    ", metadata?: Metadata",
   );
 
   if (src !== original) {
-    fs.writeFileSync(filePath, src, 'utf8');
+    fs.writeFileSync(filePath, src, "utf8");
     totalPatched++;
     console.log(`[patch-grpc-metadata] ✅ Patched: ${file}`);
   } else {

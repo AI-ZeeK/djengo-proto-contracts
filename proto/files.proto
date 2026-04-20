@@ -313,7 +313,7 @@ message FileInfo {
   ProcessingStatus processing_status = 11;
   optional string processing_error = 12;
   FileVisibility visibility = 13;
-  int32 download_count = 14;
+  // int32 download_count = 14;
   int32 view_count = 15;
   bool is_public = 16;
   string uploaded_by = 17;

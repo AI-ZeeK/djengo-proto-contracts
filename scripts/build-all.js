@@ -26,7 +26,7 @@ const logger = {
     console.log(chalk.green(`[DJENGO-PROTO-CONTRACTS] ✅ ${message}`)),
   step: (step, message) =>
     console.log(
-      chalk.cyan(`[DJENGO-PROTO-CONTRACTS] 📋 Step ${step}: ${message}`)
+      chalk.cyan(`[DJENGO-PROTO-CONTRACTS] 📋 Step ${step}: ${message}`),
     ),
   title: (title) => {
     console.log(chalk.magenta.bold(`\n🚀 ${title}`));
@@ -133,7 +133,7 @@ function findProtoc() {
     possiblePaths.push(
       "C:\\protoc\\bin\\protoc.exe",
       "C:\\Program Files\\protoc\\bin\\protoc.exe",
-      "C:\\tools\\protoc\\bin\\protoc.exe"
+      "C:\\tools\\protoc\\bin\\protoc.exe",
     );
 
     // Try to find via where command
@@ -160,7 +160,7 @@ function findProtoc() {
     possiblePaths.push(
       "/usr/local/bin/protoc",
       "/usr/bin/protoc",
-      "/opt/protoc/bin/protoc"
+      "/opt/protoc/bin/protoc",
     );
 
     try {
@@ -195,7 +195,7 @@ function findProtoc() {
     logger.error("Could not find protoc executable");
     logger.info("Please install protoc:");
     logger.info(
-      "   - Windows: Download from https://github.com/protocolbuffers/protobuf/releases"
+      "   - Windows: Download from https://github.com/protocolbuffers/protobuf/releases",
     );
     logger.info("   - macOS: brew install protobuf");
     logger.info("   - Ubuntu: apt-get install protobuf-compiler");
@@ -226,7 +226,7 @@ function generateTypeScript(protocPath) {
     "node_modules",
     "google-protobuf",
     "google",
-    "protobuf"
+    "protobuf",
   );
 
   // Use the working command format from the gateway service
@@ -287,10 +287,10 @@ function main() {
 
     logger.title("🎉 Complete build finished successfully!");
     logger.success(
-      `Proto files: ${path.relative(projectRoot, targetProtoDir)}`
+      `Proto files: ${path.relative(projectRoot, targetProtoDir)}`,
     );
     logger.success(
-      `Generated files: ${path.relative(projectRoot, targetDepsDir)}`
+      `Generated files: ${path.relative(projectRoot, targetDepsDir)}`,
     );
     logger.info("You can now import the generated types in your services!");
   } catch (error) {
