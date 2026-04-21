@@ -694,6 +694,8 @@ message ValidateAccountResponse {
 
 message OrganizationRoleIdRequest {
   string organization_role_id = 1;
+  string organization_id = 2;
+
 }
 
 message FetchOrganizationRolesResponse {
