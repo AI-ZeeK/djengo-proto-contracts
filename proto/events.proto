@@ -10,15 +10,20 @@ import "google/protobuf/empty.proto";
 
 // ─── ENUMS ────────────────────────────────────────────────────────────────
 
-enum ApprovalChainStatus {
-  APPROVAL_CHAIN_STATUS_UNSPECIFIED = 0;
-  IN_PROGRESS = 1;
-  CLOSED = 2;
+/// Status of a live Approval instance.
+enum ApprovalInstanceStatus {
+  APPROVAL_INSTANCE_STATUS_UNSPECIFIED = 0;
+  APPROVAL_INSTANCE_PENDING            = 1;
+  APPROVAL_INSTANCE_IN_PROGRESS        = 2;
+  APPROVAL_INSTANCE_APPROVED           = 3;
+  APPROVAL_INSTANCE_REJECTED           = 4;
+  APPROVAL_INSTANCE_CLOSED             = 5;
 }
 
+/// Status of a single live ApprovalStep.
 enum ApprovalStatus {
   APPROVAL_STATUS_UNSPECIFIED = 0;
-  PENDING = 1;
+  PENDING  = 1;
   APPROVED = 2;
   REJECTED = 3;
 }
@@ -26,244 +31,260 @@ enum ApprovalStatus {
 enum ApprovalEntityType {
   APPROVAL_ENTITY_TYPE_UNSPECIFIED = 0;
   PAYROLL = 1;
-  BUDGET = 2;
+  BUDGET  = 2;
+  LEAVE   = 3;
 }
 
-// --- Approval Chain ---
-
-message ApprovalChain {
-  string approval_chain_id = 1;
-  string entity_id = 2;
-  ApprovalEntityType entity_type = 3;
-  string organization_id = 4;
-  string company_id = 5;
-  ApprovalChainStatus status = 6;
-  int32 current_step_order = 7;
-  int32 total_steps = 8;
-  string initiator_user_id = 9;
-  string created_at = 10;
-  string updated_at = 11;
-  string completed_at = 12;
-  string closed_at = 13;
-  string closed_by_user_id = 14;
-  string closed_comment = 15;
+message TableMeta {
+  int32 total       = 1;
+  int32 current_page = 2;
+  int32 page_size   = 3;
+  int32 total_pages = 4;
+  int32 next_page   = 5;
+  int32 prev_page   = 6;
 }
 
-message CreateApprovalChainRequest {
-  string entity_id = 1;
-  ApprovalEntityType entity_type = 2;
-  string organization_id = 3;
-  string company_id = 4;
-  string initiator_user_id = 5;
-}
+// ─── ApprovalEntityType info ──────────────────────────────────────────────
 
-message GetApprovalChainRequest {
-  string approval_chain_id = 1;
-}
-
-message UpdateApprovalChainRequest {
-  ApprovalChain chain = 1;
-}
-
-message ListApprovalChainsRequest {
-  string entity_id = 1;
-  ApprovalEntityType entity_type = 2;
-}
-
-message CloseApprovalChainRequest {
-  string entity_id = 1;
-  ApprovalEntityType entity_type = 2;
-  string organization_id = 3;
-  string company_id = 4;
-  string closed_by_user_id = 5;
-  string closed_comment = 6;
-}
-
-message ListApprovalChainsResponse {
-  repeated ApprovalChain chains = 1;
-}
-
-message CloseApprovalChainResponse {
-  bool success = 1;
-  string message = 2;
-  ApprovalChain chain = 3;
-}
-
-// --- Approval Chain Step (instance) ---
-
-message ApprovalChainStep {
-  string approval_chain_step_id = 1;
-  string approval_chain_id = 2;
-  int32 step_order = 3;
-  string role_id = 4;
-  string role_type = 5;
-  string approver_user_id = 6;
-  ApprovalStatus status = 7;
-  string approved_at = 8;
-  string comment = 9;
-  string created_at = 10;
-  string updated_at = 11;
-}
-
-message CreateApprovalChainStepRequest {
-  ApprovalChainStep step = 1;
-}
-
-message GetApprovalChainStepRequest {
-  string approval_chain_step_id = 1;
-}
-
-message UpdateApprovalChainStepRequest {
-  ApprovalChainStep step = 1;
-}
-
-message ListApprovalChainStepsRequest {
-  string approval_chain_id = 1;
-}
-
-message ListApprovalChainStepsResponse {
-  repeated ApprovalChainStep steps = 1;
-}
-
-// --- Approval Chain Workflow ---
-
-message ApproveChainStepRequest {
-  ApprovalEntityType entity_type = 1;
-  string entity_id = 2;
-  string organization_id = 3;
-  string company_id = 4;
-  string approver_user_id = 5;
-  string approver_role_id = 6;
-  string approver_role_type = 7;
-  string comment = 8;
-}
-
-message ApproveChainStepResponse {
-  bool success = 1;
-  string message = 2;
-  ApprovalChain chain = 3;
-}
-
-message RejectChainStepRequest {
-  ApprovalEntityType entity_type = 1;
-  string entity_id = 2;
-  string organization_id = 3;
-  string company_id = 4;
-  string approver_user_id = 5;
-  string approver_role_id = 6;
-  string approver_role_type = 7;
-  string comment = 8;
-}
-
-message RejectChainStepResponse {
-  bool success = 1;
-  string message = 2;
-  ApprovalChain chain = 3;
-}
-
-// --- Approval Step Template ---
-
-message ApprovalStep {
-  string approval_step_id = 1;
-  int32 step_order = 2;
-  string organization_id = 3;
-  string company_id = 4;
-  string role_id = 5;
-  string role_type = 6; // BUSINESS_USER or STAFF
-  string comment = 7;
-  string entity_id = 8;
-  ApprovalEntityType entity_type = 9;
-}
-
-message CreateApprovalStepRequest {
-  ApprovalStep step = 1;
-}
-
-message GetApprovalStepRequest {
-  string approval_step_id = 1;
-}
-
-message UpdateApprovalStepRequest {
-  ApprovalStep step = 1;
-}
-
-message ListApprovalStepsRequest {
-  string entity_id = 1;
-  ApprovalEntityType entity_type = 2;
-}
-
-message ListApprovalStepsResponse {
-  repeated ApprovalStep steps = 1;
+message ApprovalEntityTypeInfo {
+  string             slug         = 1; // e.g. "payroll"
+  string             display_name = 2; // e.g. "Payroll"
+  ApprovalEntityType type         = 3;
 }
 
 message ListApprovalEntityTypesResponse {
   repeated ApprovalEntityTypeInfo types = 1;
 }
 
-message ApprovalEntityTypeInfo {
-  string slug = 1; // e.g. "payroll"
-  string display_name = 2; // e.g. "Payroll"
-  ApprovalEntityType type = 3;
+// ─── Approval Chain (template) ────────────────────────────────────────────
+// Defines the company-wide hierarchy of approvers for a given entity type.
+// One chain per entity type per company. Not tied to any live entity instance.
+
+message ApprovalChainStep {
+  string approval_chain_step_id = 1;
+  string approval_chain_id      = 2;
+  int32  step_order             = 3;
+  string role_id                = 4;
+  string role_type              = 5; // BUSINESS_USER or STAFF
+  string description            = 6;
+  string created_at             = 7;
+  string updated_at             = 8;
 }
 
-// --- Approval Step Actions ---
+/// Returned by GetApprovalChain — includes all steps inline.
+message ApprovalChainWithSteps {
+  string             approval_chain_id = 1;
+  ApprovalEntityType entity_type       = 2;
+  string             entity_type_slug  = 3; // e.g. "payroll"
+  string             organization_id   = 4;
+  string             company_id        = 5;
+  string             name              = 6;
+  bool               is_active         = 7;
+  string             created_at        = 8;
+  string             updated_at        = 9;
+  repeated ApprovalChainStep steps     = 10;
+}
+
+/// Lightweight chain (no steps) — used in list responses.
+message ApprovalChain {
+  string             approval_chain_id = 1;
+  ApprovalEntityType entity_type       = 2;
+  string             entity_type_slug  = 3;
+  string             organization_id   = 4;
+  string             company_id        = 5;
+  string             name              = 6;
+  bool               is_active         = 7;
+  string             created_at        = 8;
+  string             updated_at        = 9;
+}
+
+// ─── Approval Chain requests ──────────────────────────────────────────────
+
+/// Fetch a chain (+ steps) by entity type slug for a specific company.
+/// If the chain doesn't exist yet, the frontend knows to create one.
+message GetApprovalChainBySlugRequest {
+  string entity_type_slug = 1; // e.g. "payroll"
+  string company_id       = 2;
+  string organization_id  = 3;
+}
+
+/// Create or update the chain for a given entity type + company (upsert).
+/// Each company can only have ONE chain per entity type.
+/// Steps are always passed in full — they replace the existing steps atomically.
+message UpsertApprovalChainStepInput {
+  int32  step_order   = 1;
+  string role_id      = 2;
+  string role_type    = 3; // BUSINESS_USER or STAFF
+  string description  = 4;
+}
+
+message UpsertApprovalChainRequest {
+  string                              entity_type_slug = 1; // used to resolve ApprovalEntityType
+  string                              organization_id  = 2;
+  string                              company_id       = 3;
+  string                              name             = 4;
+  bool                                is_active        = 5;
+  repeated UpsertApprovalChainStepInput steps          = 6; // replaces all existing steps
+}
+
+message GetApprovalChainRequest {
+  string approval_chain_id = 1;
+}
+
+// ─── Approval (live instance) ──────────────────────────────────────────────
+// Created when a specific entity (payroll run, leave request, budget) enters
+// the approval workflow. Derived from an ApprovalChain template.
+
+message Approval {
+  string                 approval_id        = 1;
+  string                 approval_chain_id  = 2;
+  ApprovalEntityType     entity_type        = 3;
+  string                 entity_id          = 4;
+  string                 organization_id    = 5;
+  string                 company_id         = 6;
+  ApprovalInstanceStatus status             = 7;
+  int32                  current_step_order = 8;
+  int32                  total_steps        = 9;
+  string                 initiator_user_id  = 10;
+  string                 created_at         = 11;
+  string                 updated_at         = 12;
+  string                 completed_at       = 13;
+  string                 closed_at          = 14;
+  string                 closed_by_user_id  = 15;
+  string                 closed_comment     = 16;
+}
+
+/// Live step — tracks an actual approve/reject decision.
+message ApprovalStep {
+  string         approval_step_id = 1;
+  string         approval_id      = 2;
+  int32          step_order       = 3;
+  string         role_id          = 4;
+  string         role_type        = 5;
+  string         approver_user_id = 6;
+  ApprovalStatus status           = 7;
+  string         approved_at      = 8;
+  string         comment          = 9;
+  string         created_at       = 10;
+  string         updated_at       = 11;
+}
+
+// ─── Approval requests ────────────────────────────────────────────────────
+
+message CreateApprovalRequest {
+  string             approval_chain_id = 1; // chain template to derive steps from
+  ApprovalEntityType entity_type       = 2;
+  string             entity_id         = 3;
+  string             organization_id   = 4;
+  string             company_id        = 5;
+  string             initiator_user_id = 6;
+}
+
+message GetApprovalRequest {
+  string approval_id = 1;
+}
+
+message ListApprovalsRequest {
+  string             entity_id       = 1;
+  ApprovalEntityType entity_type     = 2;
+  string             company_id      = 3;
+  string             organization_id = 4;
+  int32              page            = 5;
+  int32              page_size       = 6;
+  string             sort_by         = 7;
+  string             sort_order      = 8; // "asc" | "desc"
+}
+
+message ListApprovalsResponse {
+  repeated Approval approvals = 1;
+  TableMeta         meta      = 2;
+}
+
+message ListApprovalStepsRequest {
+  string approval_id = 1;
+  int32  page        = 2;
+  int32  page_size   = 3;
+  string sort_by     = 4; // e.g. "step_order"
+  string sort_order  = 5; // "asc" | "desc"
+}
+
+message ListApprovalStepsResponse {
+  repeated ApprovalStep steps = 1;
+  TableMeta             meta  = 2;
+}
+
+message CloseApprovalRequest {
+  string approval_id       = 1;
+  string closed_by_user_id = 2;
+  string closed_comment    = 3;
+}
+
+message CloseApprovalResponse {
+  bool     success  = 1;
+  string   message  = 2;
+  Approval approval = 3;
+}
 
 message ApproveApprovalStepRequest {
-  string approval_step_id = 1;
-  string approver_user_id = 2;
-  string comment = 3;
+  string approval_id        = 1;
+  string approver_user_id   = 2;
+  string approver_role_id   = 3;
+  string approver_role_type = 4;
+  string comment            = 5;
 }
 
 message ApproveApprovalStepResponse {
-  bool success = 1;
-  string message = 2;
-  ApprovalStep step = 3;
+  bool     success  = 1;
+  string   message  = 2;
+  Approval approval = 3;
 }
 
 message RejectApprovalStepRequest {
-  string approval_step_id = 1;
-  string approver_user_id = 2;
-  string comment = 3;
+  string approval_id        = 1;
+  string approver_user_id   = 2;
+  string approver_role_id   = 3;
+  string approver_role_type = 4;
+  string comment            = 5;
 }
 
 message RejectApprovalStepResponse {
-  bool success = 1;
-  string message = 2;
-  ApprovalStep step = 3;
+  bool     success  = 1;
+  string   message  = 2;
+  Approval approval = 3;
 }
 
-// --- Services ---
+// ─── Services ─────────────────────────────────────────────────────────────
 
+/// Manages ApprovalChain templates and their steps (admin / company setup).
+/// One chain per entity type per company.
+/// Steps are always managed inline with the chain — no separate step endpoints.
 service ApprovalChainService {
-  rpc CreateApprovalChain (CreateApprovalChainRequest) returns (ApprovalChain);
-  rpc GetApprovalChain (GetApprovalChainRequest) returns (ApprovalChain);
-  rpc UpdateApprovalChain (UpdateApprovalChainRequest) returns (ApprovalChain);
-  rpc ListApprovalChains (ListApprovalChainsRequest) returns (ListApprovalChainsResponse);
-  rpc CloseApprovalChain (CloseApprovalChainRequest) returns (CloseApprovalChainResponse);
+  // Entity type catalogue
+  rpc ListApprovalEntityTypes  (google.protobuf.Empty)           returns (ListApprovalEntityTypesResponse);
 
-  // Workflow actions
-  rpc ApproveChainStep (ApproveChainStepRequest) returns (ApproveChainStepResponse);
-  rpc RejectChainStep (RejectChainStepRequest) returns (RejectChainStepResponse);
+  // Fetch chain + all current steps by entity type slug.
+  // Returns NOT_FOUND if no chain exists yet for this company + entity type.
+  rpc GetApprovalChain         (GetApprovalChainBySlugRequest)   returns (ApprovalChainWithSteps);
+
+  // Create or update the chain and atomically replace its steps.
+  rpc UpsertApprovalChain      (UpsertApprovalChainRequest)      returns (ApprovalChainWithSteps);
+
+  rpc DeleteApprovalChain      (GetApprovalChainRequest)         returns (DeleteResponse);
 }
 
-service ApprovalChainStepService {
-  rpc CreateApprovalChainStep (CreateApprovalChainStepRequest) returns (ApprovalChainStep);
-  rpc GetApprovalChainStep (GetApprovalChainStepRequest) returns (ApprovalChainStep);
-  rpc UpdateApprovalChainStep (UpdateApprovalChainStepRequest) returns (ApprovalChainStep);
-  rpc ListApprovalChainSteps (ListApprovalChainStepsRequest) returns (ListApprovalChainStepsResponse);
-}
+/// Manages live Approval instances for specific entities, and their step decisions.
+service ApprovalService {
+  // Approval lifecycle
+  rpc CreateApproval      (CreateApprovalRequest)       returns (Approval);
+  rpc GetApproval         (GetApprovalRequest)           returns (Approval);
+  rpc ListApprovals       (ListApprovalsRequest)         returns (ListApprovalsResponse);
+  rpc CloseApproval       (CloseApprovalRequest)        returns (CloseApprovalResponse);
 
-service ApprovalStepService {
-  rpc CreateApprovalStep (CreateApprovalStepRequest) returns (ApprovalStep);
-  rpc GetApprovalStep (GetApprovalStepRequest) returns (ApprovalStep);
-  rpc UpdateApprovalStep (UpdateApprovalStepRequest) returns (ApprovalStep);
-  rpc ListApprovalSteps (ListApprovalStepsRequest) returns (ListApprovalStepsResponse);
-  rpc ListApprovalEntityTypes (google.protobuf.Empty) returns (ListApprovalEntityTypesResponse);
-  rpc ApproveApprovalStep (ApproveApprovalStepRequest) returns (ApproveApprovalStepResponse);
-  rpc RejectApprovalStep (RejectApprovalStepRequest) returns (RejectApprovalStepResponse);
+  // Step decisions
+  rpc ApproveStep         (ApproveApprovalStepRequest)  returns (ApproveApprovalStepResponse);
+  rpc RejectStep          (RejectApprovalStepRequest)   returns (RejectApprovalStepResponse);
+  rpc ListApprovalSteps   (ListApprovalStepsRequest)    returns (ListApprovalStepsResponse);
 }
-
-// ─── Approval Step ──────────────────────────────────────────────────────────
 
 // ─── Shared ──────────────────────────────────────────────────────────────────
 
