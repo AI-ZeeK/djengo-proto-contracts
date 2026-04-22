@@ -265,11 +265,21 @@ service ApprovalChainService {
   // Fetch chain + all current steps by entity type slug.
   // Returns NOT_FOUND if no chain exists yet for this company + entity type.
   rpc GetApprovalChain         (GetApprovalChainBySlugRequest)   returns (ApprovalChainWithSteps);
+  rpc ListApprovalChains         (ListApprovalChainsRequest)   returns (ListApprovalChainsResponse);
 
   // Create or update the chain and atomically replace its steps.
   rpc UpsertApprovalChain      (UpsertApprovalChainRequest)      returns (ApprovalChainWithSteps);
 
   rpc DeleteApprovalChain      (GetApprovalChainRequest)         returns (DeleteResponse);
+}
+
+message ListApprovalChainsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+}
+
+message ListApprovalChainsResponse {
+  repeated ApprovalChainWithSteps approval_chains = 1;
 }
 
 /// Manages live Approval instances for specific entities, and their step decisions.
