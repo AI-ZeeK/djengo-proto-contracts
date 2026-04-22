@@ -280,6 +280,7 @@ message ListApprovalChainsRequest {
 
 message ListApprovalChainsResponse {
   repeated ApprovalChainWithSteps approval_chains = 1;
+  string message = 2;
 }
 
 /// Manages live Approval instances for specific entities, and their step decisions.
