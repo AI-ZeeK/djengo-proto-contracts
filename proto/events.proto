@@ -5,7 +5,67 @@ package events;
 option csharp_namespace = "Events.Grpc";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+// ─── Approval Step ──────────────────────────────────────────────────────────
 
+enum ApprovalEntityType {
+  APPROVAL_ENTITY_TYPE_UNSPECIFIED = 0;
+  PAYROLL = 1;
+  BUDGET = 2;
+}
+
+message ApprovalStep {
+  string approval_step_id = 1;
+  int32 step_order = 2;
+  string organization_id = 3;
+  string company_id = 4;
+  string role_id = 5;
+  string role_type = 6; // BUSINESS_USER or STAFF
+  string comment = 7;
+  string entity_id = 8;
+  ApprovalEntityType entity_type = 9;
+}
+
+message CreateApprovalStepRequest {
+  ApprovalStep step = 1;
+}
+
+message GetApprovalStepRequest {
+  string approval_step_id = 1;
+}
+
+message UpdateApprovalStepRequest {
+  ApprovalStep step = 1;
+}
+
+message ListApprovalStepsRequest {
+  string entity_id = 1;
+  ApprovalEntityType entity_type = 2;
+}
+
+message ListApprovalStepsResponse {
+  repeated ApprovalStep steps = 1;
+}
+
+message ListApprovalEntityTypesResponse {
+  repeated ApprovalEntityTypeInfo types = 1;
+}
+
+message ApprovalEntityTypeInfo {
+  string slug = 1; // e.g. "payroll"
+  string display_name = 2; // e.g. "Payroll"
+  ApprovalEntityType type = 3;
+}
+
+service ApprovalStepService {
+  rpc CreateApprovalStep (CreateApprovalStepRequest) returns (ApprovalStep);
+  rpc GetApprovalStep (GetApprovalStepRequest) returns (ApprovalStep);
+  rpc UpdateApprovalStep (UpdateApprovalStepRequest) returns (ApprovalStep);
+  rpc ListApprovalSteps (ListApprovalStepsRequest) returns (ListApprovalStepsResponse);
+  rpc ListApprovalEntityTypes (google.protobuf.Empty) returns (ListApprovalEntityTypesResponse);
+  rpc ApproveApprovalStep (ApproveApprovalStepRequest) returns (ApproveApprovalStepResponse);
+  rpc RejectApprovalStep (RejectApprovalStepRequest) returns (RejectApprovalStepResponse);
+}
 
 // ─── Shared ──────────────────────────────────────────────────────────────────
 
@@ -519,4 +579,138 @@ service TrainingService {
   rpc UpdateTrainingStatus (UpdateTrainingStatusRequest) returns (TrainingRecord);
   rpc ListStaffTraining    (StaffRequest)               returns (TrainingRecordList);
   rpc ListCompanyTraining  (CompanyRequest)             returns (TrainingRecordList);
+}
+
+// --- Approval Step Actions ---
+
+message ApproveApprovalStepRequest {
+  string approval_step_id = 1;
+  string approver_user_id = 2;
+  string comment = 3;
+}
+
+message ApproveApprovalStepResponse {
+  bool success = 1;
+  string message = 2;
+  ApprovalStep step = 3;
+}
+
+message RejectApprovalStepRequest {
+  string approval_step_id = 1;
+  string approver_user_id = 2;
+  string comment = 3;
+}
+
+message RejectApprovalStepResponse {
+  bool success = 1;
+  string message = 2;
+  ApprovalStep step = 3;
+}
+
+
+// --- Approval Chain ---
+
+message ApprovalChain {
+  string approval_chain_id = 1;
+  string entity_id = 2;
+  ApprovalEntityType entity_type = 3;
+  string organization_id = 4;
+  string company_id = 5;
+  string status = 6; // IN_PROGRESS, COMPLETED, REJECTED, CLOSED, etc.
+  int32 current_step_order = 7;
+  int32 total_steps = 8;
+  string initiator_user_id = 9;
+  string created_at = 10;
+  string updated_at = 11;
+  string completed_at = 12;
+  string closed_at = 13;
+  string closed_by_user_id = 14;
+  string closed_comment = 15;
+}
+message CloseApprovalChainRequest {
+  string entity_id = 1;
+  ApprovalEntityType entity_type = 2;
+  string organization_id = 3;
+  string company_id = 4;
+  string closed_by_user_id = 5;
+  string closed_comment = 6;
+}
+
+message CloseApprovalChainResponse {
+  bool success = 1;
+  string message = 2;
+  ApprovalChain chain = 3;
+}
+
+
+message CreateApprovalChainRequest {
+  ApprovalChain chain = 1;
+}
+
+message GetApprovalChainRequest {
+  string approval_chain_id = 1;
+}
+
+message UpdateApprovalChainRequest {
+  ApprovalChain chain = 1;
+}
+
+message ListApprovalChainsRequest {
+  string entity_id = 1;
+  ApprovalEntityType entity_type = 2;
+}
+
+message ListApprovalChainsResponse {
+  repeated ApprovalChain chains = 1;
+}
+
+service ApprovalChainService {
+  rpc CreateApprovalChain (CreateApprovalChainRequest) returns (ApprovalChain);
+  rpc GetApprovalChain (GetApprovalChainRequest) returns (ApprovalChain);
+  rpc UpdateApprovalChain (UpdateApprovalChainRequest) returns (ApprovalChain);
+  rpc ListApprovalChains (ListApprovalChainsRequest) returns (ListApprovalChainsResponse);
+  rpc CloseApprovalChain (CloseApprovalChainRequest) returns (CloseApprovalChainResponse);
+}
+
+// --- Approval Chain Step (instance) ---
+
+message ApprovalChainStep {
+  string approval_chain_step_id = 1;
+  string approval_chain_id = 2;
+  int32 step_order = 3;
+  string role_id = 4;
+  string role_type = 5;
+  string approver_user_id = 6;
+  string status = 7; // PENDING, APPROVED, REJECTED, etc.
+  string approved_at = 8;
+  string comment = 9;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+message CreateApprovalChainStepRequest {
+  ApprovalChainStep step = 1;
+}
+
+message GetApprovalChainStepRequest {
+  string approval_chain_step_id = 1;
+}
+
+message UpdateApprovalChainStepRequest {
+  ApprovalChainStep step = 1;
+}
+
+message ListApprovalChainStepsRequest {
+  string approval_chain_id = 1;
+}
+
+message ListApprovalChainStepsResponse {
+  repeated ApprovalChainStep steps = 1;
+}
+
+service ApprovalChainStepService {
+  rpc CreateApprovalChainStep (CreateApprovalChainStepRequest) returns (ApprovalChainStep);
+  rpc GetApprovalChainStep (GetApprovalChainStepRequest) returns (ApprovalChainStep);
+  rpc UpdateApprovalChainStep (UpdateApprovalChainStepRequest) returns (ApprovalChainStep);
+  rpc ListApprovalChainSteps (ListApprovalChainStepsRequest) returns (ListApprovalChainStepsResponse);
 }

@@ -4,6 +4,39 @@ option csharp_namespace = "Financials.Grpc";
 
 package financials;
 
+// --- Event Log Listing ---
+service EventLogService {
+  rpc ListAllEventLogs (ListEventLogsRequest) returns (ListEventLogsResponse);
+  rpc ListOrganizationEventLogs (ListEventLogsRequest) returns (ListEventLogsResponse);
+}
+
+message ListEventLogsRequest {
+  optional string search = 1;
+  optional int32 page = 2;
+  optional int32 page_size = 3;
+  optional string sort_by = 4;
+  optional string sort_order = 5;
+  optional string role = 6; // For RBAC (e.g. "admin", "org_head")
+  optional string organization_id = 7;
+  optional string company_id = 8;
+  optional string event_type = 9;
+}
+
+message ListEventLogsResponse {
+  repeated EventLogRow logs = 1;
+  TableMeta meta = 5;
+}
+
+message EventLogRow {
+  string event_id = 1;
+  string event_type = 2;
+  string user_id = 3;
+  string organization_id = 4;
+  string company_id = 5;
+  string timestamp = 6;
+  string details = 7;
+}
+
 // --- Bank List ---
 
 
