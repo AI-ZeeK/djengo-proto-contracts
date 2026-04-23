@@ -45,9 +45,8 @@ service ApprovalService {
 }
 
 service LeavePolicyService {
-  rpc CreateLeavePolicy   (LeavePolicy)   returns (LeavePolicyId);
+  rpc UpsertLeavePolicy   (LeavePolicy)   returns (LeavePolicyId);
   rpc GetLeavePolicy      (LeavePolicyType) returns (LeavePolicy);
-  rpc UpdateLeavePolicy   (LeavePolicy)   returns (LeavePolicy);
   rpc ListLeavePolicies   (CompanyRequest) returns (LeavePolicyList);
   rpc DeactivateLeavePolicy (LeavePolicyId) returns (DeleteResponse);
   rpc ListLeaveTypes  (google.protobuf.Empty) returns (ListLeaveTypesResponse);
@@ -379,8 +378,8 @@ message LeavePolicy {
   bool   requires_approval = 9;
   int32  min_notice_days  = 10;
   bool   is_active        = 11;
-  google.protobuf.Timestamp created_at = 12;
-  google.protobuf.Timestamp updated_at = 13;
+  string created_at = 12;
+  string updated_at = 13;
 }
 
 message LeavePolicyId       { string leave_policy_id = 1; }
