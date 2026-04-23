@@ -45,7 +45,7 @@ service ApprovalService {
 }
 
 service LeavePolicyService {
-  rpc UpsertLeavePolicy   (LeavePolicy)   returns (LeavePolicyId);
+  rpc UpsertLeavePolicy   (LeavePolicyRequest)   returns (LeavePolicyId);
   rpc GetLeavePolicy      (LeavePolicyType) returns (LeavePolicy);
   rpc ListLeavePolicies   (CompanyRequest) returns (LeavePolicyList);
   rpc DeactivateLeavePolicy (LeavePolicyId) returns (DeleteResponse);
@@ -380,6 +380,18 @@ message LeavePolicy {
   bool   is_active        = 11;
   string created_at = 12;
   string updated_at = 13;
+}
+message LeavePolicyRequest {
+  string company_id       = 1;
+  string organization_id  = 2;
+  string name             = 3;
+  string leave_type       = 4; // LeaveType enum value
+  int32  days_per_year    = 5;
+  int32  carry_over_days  = 6;
+  bool   is_paid          = 7;
+  bool   requires_approval = 8;
+  int32  min_notice_days  = 9;
+  bool   is_active        = 10;
 }
 
 message LeavePolicyId       { string leave_policy_id = 1; }
