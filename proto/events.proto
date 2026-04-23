@@ -394,8 +394,8 @@ message LeavePolicyRequest {
   bool   is_active        = 10;
 }
 
-message LeavePolicyId       { string leave_policy_id = 1; }
-message LeavePolicyType     { string leave_type = 1; }
+message LeavePolicyId       { string leave_policy_id = 1;string company_id =2 ; string organization_id =3;} 
+message LeavePolicyType     { string leave_type = 1; string company_id =2 ; string organization_id =3;}
 message LeavePolicyList     { repeated LeavePolicy policies = 1; }
 
 
