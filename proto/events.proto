@@ -277,7 +277,7 @@ message CalendarEvent {
 }
 
 message CalendarEventId             { string event_id = 1; }
-message CalendarEventListResponse   { repeated CalendarEvent events = 1; int32 total = 2; }
+message CalendarEventListResponse   { repeated CalendarEvent events = 1; int32 total = 2; string message = 3; }
 
 // ─── StaffEvent ──────────────────────────────────────────────────────────────
 
