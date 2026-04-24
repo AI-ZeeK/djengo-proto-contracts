@@ -182,6 +182,9 @@ service FinancialsService {
   // ── Budget Approval Chain ─────────────────────────────────────────────────
   rpc ApproveBudget (ApproveBudgetRequest) returns (MonthlyBudget);
   rpc RejectBudget  (RejectBudgetRequest)  returns (MonthlyBudget);
+
+  // ── Financial Audit Log (admin) ───────────────────────────────────────────
+  rpc ListFinancialAuditLogs (ListFinancialAuditLogsRequest) returns (ListFinancialAuditLogsResponse);
 }
 
   // --- Bulk Export Payroll Schedules ---
@@ -1151,4 +1154,40 @@ message RejectBudgetRequest {
   string budget_id         = 1;
   string approver_staff_id = 2;
   string comment           = 3;
+}
+
+// ── Financial Audit Log messages ──────────────────────────────────────────
+
+message FinancialAuditLogEntry {
+  string audit_id         = 1;
+  string entity_type      = 2;
+  string entity_id        = 3;
+  string action           = 4;
+  string user_id          = 5;
+  string user_role        = 6;
+  string organization_id  = 7;
+  string company_id       = 8;
+  string old_value        = 9;
+  string new_value        = 10;
+  string description      = 11;
+  string ip_address       = 12;
+  string source           = 13;
+  string timestamp        = 14;
+}
+
+message ListFinancialAuditLogsRequest {
+  string organization_id = 1;
+  string company_id      = 2;
+  string entity_type     = 3;  // optional filter (e.g. "PAYROLL", "BUDGET")
+  string entity_id       = 4;  // optional filter
+  string action          = 5;  // optional filter (e.g. "CREATE", "RUN")
+  string user_id         = 6;  // optional filter
+  int32  page            = 7;
+  int32  page_size       = 8;
+  string sort_order      = 9;  // "asc" | "desc", default "desc"
+}
+
+message ListFinancialAuditLogsResponse {
+  repeated FinancialAuditLogEntry logs = 1;
+  TableMeta meta                       = 2;
 }
