@@ -1179,12 +1179,11 @@ message ListFinancialAuditLogsRequest {
   string organization_id = 1;
   string company_id      = 2;
   string entity_type     = 3;  // optional filter (e.g. "PAYROLL", "BUDGET")
-  string entity_id       = 4;  // optional filter
-  string action          = 5;  // optional filter (e.g. "CREATE", "RUN")
-  string user_id         = 6;  // optional filter
-  int32  page            = 7;
-  int32  page_size       = 8;
-  string sort_order      = 9;  // "asc" | "desc", default "desc"
+  string user_id         = 4;  // optional filter
+  int32  page            = 5;
+  int32  page_size       = 6;
+  string sort_order      = 7;  // "asc" | "desc", default "desc"
+  string sort_by        = 8; // e.g. "timestamp", default "timestamp"
 }
 
 message ListFinancialAuditLogsResponse {
