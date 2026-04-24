@@ -71,7 +71,8 @@ service LeaveRequestService {
   rpc CancelLeaveRequest     (LeaveRequestId)          returns (LeaveRequest);
   rpc ListLeaveRequests      (GetLeaveRequestsRequest) returns (LeaveRequestListResponse);
   rpc ListStaffLeaveRequests (StaffRequest)            returns (LeaveRequestListResponse);
-  rpc GetLeaveAnalytics      (GetLeaveAnalyticsRequest) returns (GetLeaveAnalyticsResponse);
+  rpc GetLeaveAnalytics         (GetLeaveAnalyticsRequest)         returns (GetLeaveAnalyticsResponse);
+  rpc GetLeaveAnalyticsOverview (GetLeaveAnalyticsOverviewRequest) returns (GetLeaveAnalyticsOverviewResponse);
 }
 
 // ─── Services ────────────────────────────────────────────────────────────────
@@ -859,4 +860,52 @@ message RejectApprovalStepResponse {
   bool     success  = 1;
   string   message  = 2;
   Approval approval = 3;
+}
+
+// ─── Leave Analytics Overview ─────────────────────────────────────────────────
+
+enum LeaveTimeline {
+  LEAVE_1M  = 0;
+  LEAVE_3M  = 1;
+  LEAVE_6M  = 2;
+  LEAVE_1Y  = 3;
+  LEAVE_ALL = 4;
+}
+
+message LeaveChartData {
+  string name  = 1;
+  double value = 2;
+}
+
+message LeaveOverviewCard {
+  string title       = 1;
+  double total       = 2;
+  string trend       = 3;
+  double percentage  = 4;
+  string description = 5;
+  repeated LeaveChartData chart_data = 6;
+}
+
+message LeaveOverviewChart {
+  string title      = 1;
+  string type       = 2;
+  string data_key   = 3;
+  string color      = 4;
+  string trend      = 5;
+  double percentage = 6;
+  repeated LeaveChartData data = 7;
+}
+
+message GetLeaveAnalyticsOverviewRequest {
+  string        company_id      = 1;
+  LeaveTimeline timeline        = 2;
+  string        start_date      = 3;
+  string        end_date        = 4;
+  string        organization_id = 5;
+}
+
+message GetLeaveAnalyticsOverviewResponse {
+  repeated LeaveOverviewCard  cards  = 1;
+  repeated LeaveOverviewChart charts = 2;
+  string                      period_label = 3;
 }
