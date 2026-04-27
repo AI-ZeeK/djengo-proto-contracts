@@ -54,11 +54,10 @@ service LeavePolicyService {
 }
 
 service LeaveBalanceService {
-  rpc AllocateLeaveBalance       (AdjustLeaveBalanceRequest)      returns (LeaveBalance);
-  rpc GetLeaveBalance            (LeaveBalanceId)                 returns (LeaveBalance);
+  rpc UpsertLeaveBalance         (UpsertLeaveBalanceRequest)      returns (LeaveBalance);
+  rpc GetLeaveBalance            (GetLeaveBalanceRequest)         returns (LeaveBalanceList);
   rpc GetStaffLeaveBalances      (GetLeaveBalanceRequest)         returns (LeaveBalanceList);
   rpc ListCompanyLeaveBalances   (CompanyLeaveBalancesRequest)    returns (LeaveBalanceList);
-  rpc AdjustLeaveBalance         (AdjustLeaveBalanceRequest)      returns (LeaveBalance);
   rpc BulkAllocateLeaveBalances  (BulkAllocateRequest)            returns (BulkAllocateResponse);
   rpc RolloverLeaveBalances      (RolloverRequest)                returns (RolloverResponse);
 }
@@ -412,20 +411,26 @@ message LeaveBalance {
   int32  pending_days      = 7;
   int32  carried_over      = 8;
   int32  remaining_days    = 9; // computed: allocated + carried - used - pending
-  string created_at = 10;
-  string updated_at = 11;
+  string created_at        = 10;
+  string updated_at        = 11;
+  string company_id        = 12;
+  string organization_id   = 13;
 }
 
 message LeaveBalanceId             { string leave_balance_id = 1; }
 message LeaveBalanceList           { repeated LeaveBalance balances = 1; string message = 2; }
 message GetLeaveBalanceRequest     { string organization_id =1; string company_id = 2; string staff_id = 3; int32 year = 4 ; }
 message CompanyLeaveBalancesRequest {string organization_id =1; string company_id = 2; optional string staff_id = 3; optional int32 year = 4; }
-message AdjustLeaveBalanceRequest {
-  string staff_id        = 1;
-  string leave_policy_id = 2;
-  int32  year            = 3;
-  int32  allocated_days  = 4;
-  int32  carried_over    = 5;
+
+
+message UpsertLeaveBalanceRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string staff_id        = 3;
+  string leave_policy_id = 4;
+  int32  year            = 5;
+  int32  allocated_days  = 6;
+  int32  carried_over    = 7;
 }
 
 message BulkAllocateRequest {
