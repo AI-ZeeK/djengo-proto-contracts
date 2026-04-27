@@ -64,7 +64,7 @@ service LeaveBalanceService {
 }
 
 service LeaveRequestService {
-  rpc CreateLeaveRequest     (LeaveRequest)            returns (LeaveRequestId);
+  rpc CreateLeaveRequest     (CreateLeaveRequestRequest) returns (LeaveRequestId);
   rpc GetLeaveRequest        (LeaveRequestId)          returns (LeaveRequest);
   rpc ReviewLeaveRequest     (ReviewLeaveInput)        returns (LeaveRequest);
   rpc CancelLeaveRequest     (LeaveRequestId)          returns (LeaveRequest);
@@ -464,9 +464,9 @@ message LeaveBalance {
 }
 message GetLeaveBalanceResponse { LeaveBalance balance = 1; string message = 2; }
 message LeaveBalanceId             { string leave_balance_id = 1; }
-message LeaveBalanceList           { repeated LeaveBalance balances = 1; string message = 2; }
+message LeaveBalanceList           { repeated LeaveBalance balances = 1; string message = 2; TableMeta meta = 3; }
 message GetLeaveBalanceRequest     { string organization_id =1; string company_id = 2; string staff_id = 3; string leave_policy_id = 4; int32 year = 5 ; }
-message CompanyLeaveBalancesRequest {string organization_id =1; string company_id = 2; optional string staff_id = 3; optional int32 year = 4; }
+message CompanyLeaveBalancesRequest {string organization_id =1; string company_id = 2; optional string staff_id = 3; optional int32 year = 4; int32 page = 5; int32 page_size = 6; string search = 7; }
 
 
 message UpsertLeaveBalanceRequest {
@@ -525,7 +525,17 @@ message LeaveRequest {
 }
 
 message LeaveRequestId          { string leave_request_id = 1; }
-message LeaveRequestListResponse { repeated LeaveRequest requests = 1; int32 total = 2; }
+message LeaveRequestListResponse { repeated LeaveRequest requests = 1; int32 total = 2; TableMeta meta = 3; }
+message CreateLeaveRequestRequest {
+  string staff_id        = 1;
+  string leave_policy_id = 2;
+  string company_id      = 3;
+  string organization_id = 4;
+  string start_date      = 5;
+  string end_date        = 6;
+  int32  days_requested  = 7;
+  string reason          = 8;
+}
 message ReviewLeaveInput {
   string leave_request_id = 1;
   string reviewed_by      = 2;
@@ -535,10 +545,11 @@ message ReviewLeaveInput {
 message GetLeaveRequestsRequest {
   string organization_id = 1;
   string company_id      = 2;
-  string staff_id        = 3; // optional filter
-  string status          = 4; // optional filter
+  string staff_id        = 3;
+  string status          = 4;
   int32  page            = 5;
   int32  page_size       = 6;
+  string search          = 7;
 }
 
 message GetLeaveAnalyticsRequest {
