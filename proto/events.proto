@@ -68,8 +68,9 @@ service LeaveRequestService {
   rpc GetLeaveRequest        (LeaveRequestId)          returns (LeaveRequest);
   rpc ReviewLeaveRequest     (ReviewLeaveInput)        returns (LeaveRequest);
   rpc CancelLeaveRequest     (LeaveRequestId)          returns (LeaveRequest);
-  rpc ListLeaveRequests      (GetLeaveRequestsRequest) returns (LeaveRequestListResponse);
-  rpc ListStaffLeaveRequests (StaffRequest)            returns (LeaveRequestListResponse);
+  rpc ListLeaveRequests         (GetLeaveRequestsRequest) returns (LeaveRequestListResponse);
+  rpc ListStaffLeaveRequests    (StaffRequest)            returns (LeaveRequestListResponse);
+  rpc GetLeaveRequestDetail     (LeaveRequestId)          returns (LeaveRequestDetail);
   rpc GetLeaveAnalytics         (GetLeaveAnalyticsRequest)         returns (GetLeaveAnalyticsResponse);
   rpc GetLeaveAnalyticsOverview (GetLeaveAnalyticsOverviewRequest) returns (GetLeaveAnalyticsOverviewResponse);
 }
@@ -466,7 +467,7 @@ message GetLeaveBalanceResponse { LeaveBalance balance = 1; string message = 2; 
 message LeaveBalanceId             { string leave_balance_id = 1; }
 message LeaveBalanceList           { repeated LeaveBalance balances = 1; string message = 2; TableMeta meta = 3; }
 message GetLeaveBalanceRequest     { string organization_id =1; string company_id = 2; string staff_id = 3; string leave_policy_id = 4; int32 year = 5 ; }
-message CompanyLeaveBalancesRequest {string organization_id =1; string company_id = 2; optional string staff_id = 3; optional int32 year = 4; int32 page = 5; int32 page_size = 6; string search = 7; }
+message CompanyLeaveBalancesRequest {string organization_id =1; string company_id = 2; optional string staff_id = 3; optional int32 year = 4; int32 page = 5; int32 page_size = 6; string search = 7; string sort_by = 8; string sort_order = 9; }
 
 
 message UpsertLeaveBalanceRequest {
@@ -550,6 +551,14 @@ message GetLeaveRequestsRequest {
   int32  page            = 5;
   int32  page_size       = 6;
   string search          = 7;
+  string sort_by         = 8;
+  string sort_order      = 9;
+}
+
+message LeaveRequestDetail {
+  LeaveRequest          leave_request = 1;
+  Approval              approval      = 2;
+  repeated ApprovalStep steps         = 3;
 }
 
 message GetLeaveAnalyticsRequest {
