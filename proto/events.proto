@@ -205,9 +205,9 @@ message ActivityLog {
   string action_value     = 25;
   string badges           = 26;
   string extra            = 27;
-  google.protobuf.Timestamp created_at = 28;
-  google.protobuf.Timestamp updated_at = 29;
-  google.protobuf.Timestamp deleted_at = 30;
+  string created_at = 28;
+  string updated_at = 29;
+  string deleted_at = 30;
   string organization_id  = 31;
 }
 
@@ -223,11 +223,11 @@ message Task {
   string status           = 4;
   string priority         = 5;
   string type             = 6;
-  google.protobuf.Timestamp due_date      = 7;
-  google.protobuf.Timestamp completed_at  = 8;
-  google.protobuf.Timestamp created_at    = 9;
-  google.protobuf.Timestamp updated_at    = 10;
-  google.protobuf.Timestamp deleted_at    = 11;
+  string due_date      = 7;
+  string completed_at  = 8;
+  string created_at    = 9;
+  string updated_at    = 10;
+  string deleted_at    = 11;
   string assigned_by_id   = 12;
   string assigned_to_id   = 13;
   string company_id       = 14;
@@ -254,8 +254,8 @@ message CalendarEvent {
   string company_id           = 2;
   string title                = 3;
   string description          = 4;
-  google.protobuf.Timestamp start_time  = 5;
-  google.protobuf.Timestamp end_time    = 6;
+  string start_time  = 5;
+  string end_time    = 6;
   string event_type           = 7;
   bool   is_all_day           = 8;
   string color                = 9;
@@ -269,9 +269,9 @@ message CalendarEvent {
   string system_event_data    = 17;
   bool   notification_sent    = 18;
   string task_id              = 19;
-  google.protobuf.Timestamp created_at  = 20;
-  google.protobuf.Timestamp updated_at  = 21;
-  google.protobuf.Timestamp deleted_at  = 22;
+  string created_at  = 20;
+  string updated_at  = 21;
+  string deleted_at  = 22;
   string organization_id      = 23;
 }
 
@@ -286,10 +286,10 @@ message StaffEvent {
   string category       = 2;
   string status         = 3;
   string staff_id       = 4;
-  google.protobuf.Timestamp scheduled_start = 5;
-  google.protobuf.Timestamp scheduled_end   = 6;
-  google.protobuf.Timestamp actual_start    = 7;
-  google.protobuf.Timestamp actual_end      = 8;
+  string scheduled_start = 5;
+  string scheduled_end   = 6;
+  string actual_start    = 7;
+  string actual_end      = 8;
   string company_id     = 9;
   string branch_id      = 10;
   string department_id  = 11;
@@ -297,10 +297,10 @@ message StaffEvent {
   string metadata       = 13;
   bool   is_approved    = 14;
   string approved_by    = 15;
-  google.protobuf.Timestamp approved_at = 16;
-  google.protobuf.Timestamp created_at  = 17;
-  google.protobuf.Timestamp updated_at  = 18;
-  google.protobuf.Timestamp deleted_at  = 19;
+  string approved_at = 16;
+  string created_at  = 17;
+  string updated_at  = 18;
+  string deleted_at  = 19;
   string organization_id  = 20;
 }
 
@@ -317,10 +317,10 @@ message DailyEvent {
   string customer_id      = 4;
   string entity_type      = 5;
   string entity_id        = 6;
-  google.protobuf.Timestamp scheduled_start = 7;
-  google.protobuf.Timestamp scheduled_end   = 8;
-  google.protobuf.Timestamp actual_start    = 9;
-  google.protobuf.Timestamp actual_end      = 10;
+  string scheduled_start = 7;
+  string scheduled_end   = 8;
+  string actual_start    = 9;
+  string actual_end      = 10;
   string company_id       = 11;
   string branch_id        = 12;
   string notes            = 13;
@@ -328,9 +328,9 @@ message DailyEvent {
   string checkout_status  = 15;
   double total_amount     = 16;
   string payment_status   = 17;
-  google.protobuf.Timestamp created_at = 18;
-  google.protobuf.Timestamp updated_at = 19;
-  google.protobuf.Timestamp deleted_at = 20;
+  string created_at = 18;
+  string updated_at = 19;  
+  string deleted_at = 20;
   string organization_id  = 21;
 }
 
@@ -356,9 +356,9 @@ message StaffPositionHistory {
   string change_type         = 12; // PositionChangeType enum value
   string change_reason       = 13;
   string changed_by          = 14;
-  google.protobuf.Timestamp effective_date = 15;
-  google.protobuf.Timestamp end_date       = 16;
-  google.protobuf.Timestamp created_at     = 17;
+  string effective_date = 15;
+  string end_date       = 16;
+  string created_at     = 17;
 }
 
 message PositionHistoryId       { string position_history_id = 1; }
@@ -412,8 +412,8 @@ message LeaveBalance {
   int32  pending_days      = 7;
   int32  carried_over      = 8;
   int32  remaining_days    = 9; // computed: allocated + carried - used - pending
-  google.protobuf.Timestamp created_at = 10;
-  google.protobuf.Timestamp updated_at = 11;
+  string created_at = 10;
+  string updated_at = 11;
 }
 
 message LeaveBalanceId             { string leave_balance_id = 1; }
@@ -459,17 +459,17 @@ message LeaveRequest {
   string leave_policy_id   = 3;
   string company_id        = 4;
   string organization_id   = 5;
-  google.protobuf.Timestamp start_date   = 6;
-  google.protobuf.Timestamp end_date     = 7;
+  string start_date   = 6;
+  string end_date     = 7;
   int32  days_requested    = 8;
   string reason            = 9;
   string status            = 10; // LeaveStatus enum value
   string reviewed_by       = 11;
-  google.protobuf.Timestamp reviewed_at  = 12;
+  string reviewed_at  = 12;
   string rejection_reason  = 13;
   string staff_event_ref_id = 14; // links to StaffEvent on approval
-  google.protobuf.Timestamp created_at   = 15;
-  google.protobuf.Timestamp updated_at   = 16;
+  string created_at   = 15;
+  string updated_at   = 16;
 }
 
 message LeaveRequestId          { string leave_request_id = 1; }
@@ -524,9 +524,9 @@ message PerformanceReview {
   string rating          = 8; // PerformanceRating enum value
   string comments        = 9;
   string goals_set       = 10; // JSON string
-  google.protobuf.Timestamp completed_at = 11;
-  google.protobuf.Timestamp created_at   = 12;
-  google.protobuf.Timestamp updated_at   = 13;
+  string completed_at = 11;
+  string created_at   = 12;
+  string updated_at   = 13;
 }
 
 message PerformanceReviewId     { string review_id = 1; }
@@ -542,7 +542,7 @@ message DisciplinaryRecord {
   string company_id      = 3;
   string organization_id = 4;
   string issued_by       = 5;
-  google.protobuf.Timestamp incident_date = 6;
+  string incident_date = 6;
   string incident_type   = 7; // DisciplinaryType enum value
   string severity        = 8; // DisciplinarySeverity enum value
   string description     = 9;
@@ -551,8 +551,8 @@ message DisciplinaryRecord {
   string appeal_status   = 12; // AppealStatus enum value
   string appeal_notes    = 13;
   bool   is_active       = 14;
-  google.protobuf.Timestamp created_at = 15;
-  google.protobuf.Timestamp updated_at = 16;
+  string created_at = 15;
+  string updated_at = 16;
 }
 
 message DisciplinaryRecordId    { string record_id = 1; }
@@ -576,15 +576,15 @@ message TrainingRecord {
   string description     = 6;
   string training_type   = 7; // TrainingType enum value
   string provider        = 8;
-  google.protobuf.Timestamp start_date    = 9;
-  google.protobuf.Timestamp end_date      = 10;
+  string start_date    = 9;
+  string end_date      = 10;
   string status          = 11; // TrainingStatus enum value
   double score           = 12;
   string certificate_url = 13;
   bool   is_mandatory    = 14;
-  google.protobuf.Timestamp completed_at  = 15;
-  google.protobuf.Timestamp created_at    = 16;
-  google.protobuf.Timestamp updated_at    = 17;
+  string completed_at  = 15;
+  string created_at    = 16;
+  string updated_at    = 17;
 }
 
 message TrainingRecordId    { string training_id = 1; }
