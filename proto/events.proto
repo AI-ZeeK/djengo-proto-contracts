@@ -54,14 +54,13 @@ service LeavePolicyService {
 }
 
 service LeaveBalanceService {
-  rpc AllocateLeaveBalance  (AdjustLeaveBalanceRequest) returns (LeaveBalance);
-  rpc GetLeaveBalance       (LeaveBalanceId)            returns (LeaveBalance);
-  rpc GetStaffLeaveBalances (GetLeaveBalanceRequest)    returns (LeaveBalanceList);
-  rpc AdjustLeaveBalance    (AdjustLeaveBalanceRequest) returns (LeaveBalance);
-  // Seed leave balances for all staff in a company for a given year
-  rpc BulkAllocateLeaveBalances (BulkAllocateRequest)  returns (BulkAllocateResponse);
-  // Roll carried-over days from from_year into to_year balances
-  rpc RolloverLeaveBalances     (RolloverRequest)       returns (RolloverResponse);
+  rpc AllocateLeaveBalance       (AdjustLeaveBalanceRequest)      returns (LeaveBalance);
+  rpc GetLeaveBalance            (LeaveBalanceId)                 returns (LeaveBalance);
+  rpc GetStaffLeaveBalances      (GetLeaveBalanceRequest)         returns (LeaveBalanceList);
+  rpc ListCompanyLeaveBalances   (CompanyLeaveBalancesRequest)    returns (LeaveBalanceList);
+  rpc AdjustLeaveBalance         (AdjustLeaveBalanceRequest)      returns (LeaveBalance);
+  rpc BulkAllocateLeaveBalances  (BulkAllocateRequest)            returns (BulkAllocateResponse);
+  rpc RolloverLeaveBalances      (RolloverRequest)                returns (RolloverResponse);
 }
 
 service LeaveRequestService {
