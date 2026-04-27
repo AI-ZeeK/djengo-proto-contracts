@@ -417,9 +417,9 @@ message LeaveBalance {
 }
 
 message LeaveBalanceId             { string leave_balance_id = 1; }
-message LeaveBalanceList           { repeated LeaveBalance balances = 1; }
-message GetLeaveBalanceRequest     { string organization_id =1; string company_id = 2; string staff_id = 3; int32 year = 4 ; }
-message CompanyLeaveBalancesRequest {string organization_id =1; string company_id = 2; optional string staff_id = 3; optional int32 year = 4; }
+message LeaveBalanceList           { repeated LeaveBalance balances = 1; string message = 2; }
+message GetLeaveBalanceRequest     { string staff_id = 1; int32 year = 2; }
+message CompanyLeaveBalancesRequest { string company_id = 1; optional string staff_id = 2; optional int32 year = 3; }
 message AdjustLeaveBalanceRequest {
   string staff_id        = 1;
   string leave_policy_id = 2;
