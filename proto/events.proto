@@ -57,6 +57,7 @@ service LeaveBalanceService {
   rpc UpsertLeaveBalance         (UpsertLeaveBalanceRequest)      returns (LeaveBalance);
   rpc GetLeaveBalance            (GetLeaveBalanceRequest)         returns (LeaveBalanceList);
   rpc GetStaffLeaveBalances      (GetLeaveBalanceRequest)         returns (LeaveBalanceList);
+  rpc GetStaffLeaveBalance      (GetLeaveBalanceRequest)         returns (GetLeaveBalanceResponse);
   rpc ListCompanyLeaveBalances   (CompanyLeaveBalancesRequest)    returns (LeaveBalanceList);
   rpc BulkAllocateLeaveBalances  (BulkAllocateRequest)            returns (BulkAllocateResponse);
   rpc RolloverLeaveBalances      (RolloverRequest)                returns (RolloverResponse);
@@ -416,10 +417,10 @@ message LeaveBalance {
   string company_id        = 12;
   string organization_id   = 13;
 }
-
+message GetLeaveBalanceResponse { LeaveBalance balance = 1; string message = 2; }
 message LeaveBalanceId             { string leave_balance_id = 1; }
 message LeaveBalanceList           { repeated LeaveBalance balances = 1; string message = 2; }
-message GetLeaveBalanceRequest     { string organization_id =1; string company_id = 2; string staff_id = 3; int32 year = 4 ; }
+message GetLeaveBalanceRequest     { string organization_id =1; string company_id = 2; string staff_id = 3; string leave_policy_id = 4; int32 year = 5 ; }
 message CompanyLeaveBalancesRequest {string organization_id =1; string company_id = 2; optional string staff_id = 3; optional int32 year = 4; }
 
 
