@@ -5,7 +5,7 @@ package events;
 
 option csharp_namespace = "Events.Grpc";
 
-import "google/protobuf/timestamp.proto";
+
 import "google/protobuf/empty.proto";
 
 
@@ -103,12 +103,12 @@ service TrainingService {
 }
 
 service CalendarEventService {
-  rpc CreateCalendarEvent         (CalendarEvent)   returns (CalendarEventId);
-  rpc GetCalendarEvent            (CalendarEventId) returns (CalendarEvent);
-  rpc UpdateCalendarEvent         (CalendarEvent)   returns (CalendarEvent);
-  rpc DeleteCalendarEvent         (CalendarEventId) returns (DeleteResponse);
+  rpc CreateCalendarEvent         (CalendarEvent)    returns (CalendarEventRef);
+  rpc GetCalendarEvent            (CalendarEventId)  returns (CalendarEventListResponse);
+  rpc UpdateCalendarEvent         (CalendarEvent)    returns (CalendarEvent);
+  rpc DeleteCalendarEvent         (CalendarEventRef) returns (DeleteResponse);
   rpc ListCalendarEventsByCompany (ListCalendarEventsRequest) returns (CalendarEventListResponse);
-  rpc ListCalendarEventsByStaff   (StaffRequest)    returns (CalendarEventListResponse);
+  rpc ListCalendarEventsByStaff   (StaffRequest)     returns (CalendarEventListResponse);
 }
 
 service StaffEventService {
@@ -276,7 +276,8 @@ message CalendarEvent {
   string organization_id      = 23;
 }
 
-message CalendarEventId             { string event_id = 1; }
+message CalendarEventRef            { string event_id = 1; }
+message CalendarEventId             { string company_id = 1; string organization_id = 2; string date = 3; }
 message CalendarEventListResponse   { repeated CalendarEvent events = 1; int32 total = 2; string message = 3; }
 message ListCalendarEventsRequest   { string company_id = 1; string organization_id = 2; string event_type = 3; }
 
