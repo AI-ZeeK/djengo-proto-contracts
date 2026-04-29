@@ -277,7 +277,7 @@ message CalendarEvent {
 }
 
 message CalendarEventRef            { string event_id = 1; }
-message CalendarEventId             { string company_id = 1; string organization_id = 2; string date = 3; }
+message CalendarEventId             { string company_id = 1; string organization_id = 2; string date = 3; string event_type = 4; }
 message CalendarEventListResponse   { repeated CalendarEvent events = 1; int32 total = 2; string message = 3; }
 message ListCalendarEventsRequest   { string company_id = 1; string organization_id = 2; string event_type = 3; }
 
