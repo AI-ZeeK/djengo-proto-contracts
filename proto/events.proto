@@ -121,6 +121,33 @@ service StaffEventService {
   rpc ListStaffEventsByCompany (CompanyRequest)          returns (StaffEventListResponse);
 }
 
+service AttendanceService {
+  rpc ClockIn               (ClockInRequest)                  returns (StaffEventId);
+  rpc ClockOut              (ClockOutRequest)                  returns (StaffEvent);
+  rpc StartBreak            (StartBreakRequest)                returns (StaffEventId);
+  rpc EndBreak              (EndBreakRequest)                  returns (StaffEvent);
+  rpc GetAttendanceByStaff  (GetAttendanceRequest)             returns (AttendanceListResponse);
+  rpc GetAttendanceSummary  (GetAttendanceRequest)             returns (AttendanceSummary);
+  rpc GetAttendanceByCompany (GetAttendanceByCompanyRequest)   returns (AttendanceListResponse);
+}
+
+service BusinessHoursService {
+  rpc UpsertBusinessHours   (BusinessHours)     returns (BusinessHoursId);
+  rpc GetBusinessHours      (CompanyRequest)    returns (BusinessHours);
+}
+
+service ShiftTemplateService {
+  rpc CreateShiftTemplate   (ShiftTemplate)         returns (ShiftTemplateId);
+  rpc UpdateShiftTemplate   (ShiftTemplate)         returns (ShiftTemplate);
+  rpc DeleteShiftTemplate   (ShiftTemplateId)       returns (DeleteResponse);
+  rpc ListShiftTemplates    (CompanyRequest)         returns (ShiftTemplateListResponse);
+  rpc AssignStaffShift      (StaffShiftAssignment)  returns (ShiftAssignmentId);
+  rpc UpdateStaffShift      (StaffShiftAssignment)  returns (StaffShiftAssignment);
+  rpc GetStaffShift         (StaffShiftRequest)     returns (StaffShiftAssignment);
+  rpc ListStaffShifts       (StaffRequest)          returns (StaffShiftListResponse);
+  rpc ListCompanyShiftAssignments (CompanyRequest)  returns (StaffShiftListResponse);
+}
+
 service DailyEventService {
   rpc CreateDailyEvent         (DailyEvent)      returns (DailyEventId);
   rpc GetDailyEvent            (DailyEventId)    returns (DailyEvent);
@@ -309,6 +336,137 @@ message StaffEvent {
 message StaffEventId                { string event_id = 1; }
 message StaffEventListResponse      { repeated StaffEvent events = 1; int32 total = 2; }
 message ApproveStaffEventRequest    { string event_id = 1; string approved_by = 2; }
+
+// ─── Attendance ───────────────────────────────────────────────────────────────
+
+message ClockInRequest {
+  string staff_id        = 1;
+  string company_id      = 2;
+  string organization_id = 3;
+  string scheduled_start = 4;
+  string scheduled_end   = 5;
+  string branch_id       = 6;
+  string department_id   = 7;
+  string notes           = 8;
+}
+
+message ClockOutRequest {
+  string event_id        = 1;
+  string notes           = 2;
+}
+
+message StartBreakRequest {
+  string staff_id             = 1;
+  string company_id           = 2;
+  string organization_id      = 3;
+  string attendance_event_id  = 4;
+}
+
+message EndBreakRequest {
+  string event_id = 1;
+}
+
+message GetAttendanceRequest {
+  string staff_id        = 1;
+  string company_id      = 2;
+  string organization_id = 3;
+  string from            = 4;
+  string to              = 5;
+}
+
+message GetAttendanceByCompanyRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string from            = 3;
+  string to              = 4;
+}
+
+message AttendanceDayRecord {
+  string date              = 1;
+  StaffEvent attendance    = 2;
+  repeated StaffEvent breaks = 3;
+}
+
+message AttendanceListResponse {
+  repeated AttendanceDayRecord days = 1;
+  int32 total                       = 2;
+}
+
+message AttendanceSummary {
+  string total_worked          = 1;
+  int32  total_worked_minutes  = 2;
+  string overtime              = 3;
+  int32  overtime_minutes      = 4;
+  string break_time            = 5;
+  int32  break_minutes         = 6;
+  int32  late_days             = 7;
+  int32  early_days            = 8;
+  int32  attendance_days       = 9;
+}
+
+// ─── Business Hours ──────────────────────────────────────────────────────────
+
+message DaySchedule {
+  bool   enabled = 1;
+  string open    = 2;   // "HH:mm"
+  string close   = 3;   // "HH:mm"
+}
+
+message BusinessHours {
+  string      hours_id        = 1;
+  string      company_id      = 2;
+  string      organization_id = 3;
+  bool        is_24_hours     = 4;
+  string      timezone        = 5;
+  DaySchedule monday          = 6;
+  DaySchedule tuesday         = 7;
+  DaySchedule wednesday       = 8;
+  DaySchedule thursday        = 9;
+  DaySchedule friday          = 10;
+  DaySchedule saturday        = 11;
+  DaySchedule sunday          = 12;
+  string      created_at      = 13;
+  string      updated_at      = 14;
+}
+
+message BusinessHoursId { string hours_id = 1; }
+
+// ─── Shift Templates ──────────────────────────────────────────────────────────
+
+message ShiftTemplate {
+  string shift_template_id = 1;
+  string company_id        = 2;
+  string organization_id   = 3;
+  string name              = 4;
+  string start_time        = 5;   // "HH:mm"
+  string end_time          = 6;   // "HH:mm"
+  bool   is_overnight      = 7;
+  string days_of_week      = 8;   // JSON array "[1,2,3,4,5]"
+  string color             = 9;
+  bool   is_active         = 10;
+  string created_at        = 11;
+  string updated_at        = 12;
+}
+
+message ShiftTemplateId            { string shift_template_id = 1; }
+message ShiftTemplateListResponse  { repeated ShiftTemplate templates = 1; int32 total = 2; }
+
+message StaffShiftAssignment {
+  string assignment_id     = 1;
+  string staff_id          = 2;
+  string shift_template_id = 3;
+  string company_id        = 4;
+  string organization_id   = 5;
+  string effective_from    = 6;   // "YYYY-MM-DD"
+  string effective_to      = 7;   // "YYYY-MM-DD" or empty
+  string created_at        = 8;
+  string updated_at        = 9;
+  ShiftTemplate shift_template = 10;
+}
+
+message ShiftAssignmentId    { string assignment_id = 1; }
+message StaffShiftRequest    { string assignment_id = 1; string company_id = 2; }
+message StaffShiftListResponse { repeated StaffShiftAssignment assignments = 1; int32 total = 2; }
 
 // ─── DailyEvent ──────────────────────────────────────────────────────────────
 
