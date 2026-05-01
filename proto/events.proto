@@ -132,7 +132,7 @@ service AttendanceService {
 }
 
 service BusinessHoursService {
-  rpc UpsertBusinessHours   (BusinessHours)     returns (BusinessHoursId);
+  rpc UpsertBusinessHours   (SetupBusinessHoursRequest)     returns (BusinessHoursId);
   rpc GetBusinessHours      (CompanyRequest)    returns (BusinessHours);
 }
 
@@ -412,6 +412,19 @@ message DaySchedule {
   string close   = 3;   // "HH:mm"
 }
 
+message SetupBusinessHoursRequest {
+  string      company_id      = 2;
+  string      organization_id = 3;
+  bool        is_24_hours     = 4;
+  string      timezone        = 5;
+  DaySchedule monday          = 6;
+  DaySchedule tuesday         = 7;
+  DaySchedule wednesday       = 8;
+  DaySchedule thursday        = 9;
+  DaySchedule friday          = 10;
+  DaySchedule saturday        = 11;
+  DaySchedule sunday          = 12;
+}
 message BusinessHours {
   string      hours_id        = 1;
   string      company_id      = 2;
