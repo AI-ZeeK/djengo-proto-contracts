@@ -103,12 +103,14 @@ service TrainingService {
 }
 
 service CalendarEventService {
-  rpc CreateCalendarEvent         (CalendarEvent)    returns (CalendarEventRef);
-  rpc GetCalendarEvent            (CalendarEventId)  returns (CalendarEventListResponse);
-  rpc UpdateCalendarEvent         (CalendarEvent)    returns (CalendarEvent);
-  rpc DeleteCalendarEvent         (CalendarEventRef) returns (DeleteResponse);
-  rpc ListCalendarEventsByCompany (ListCalendarEventsRequest) returns (CalendarEventListResponse);
-  rpc ListCalendarEventsByStaff   (StaffRequest)     returns (CalendarEventListResponse);
+  rpc CreateCalendarEvent         (CalendarEvent)              returns (CalendarEventRef);
+  rpc GetCalendarEvent            (CalendarEventId)            returns (CalendarEventListResponse);
+  rpc UpdateCalendarEvent         (CalendarEvent)              returns (CalendarEvent);
+  rpc DeleteCalendarEvent         (CalendarEventRef)           returns (DeleteResponse);
+  rpc ListCalendarEventsByCompany (ListCalendarEventsRequest)  returns (CalendarEventListResponse);
+  rpc ListCalendarEventsByEntity  (ListCalendarEventsRequest)  returns (CalendarEventListResponse);
+  rpc ListCalendarEventsByStaff   (StaffRequest)               returns (CalendarEventListResponse);
+  rpc ImportPublicHolidays        (ImportPublicHolidaysRequest) returns (CalendarEventListResponse);
 }
 
 service StaffEventService {
@@ -135,6 +137,7 @@ service BusinessHoursService {
   rpc UpsertBusinessHours   (SetupBusinessHoursRequest)     returns (BusinessHoursId);
   rpc GetBusinessHours      (CompanyRequest)    returns (BusinessHours);
 }
+
 
 service ShiftTemplateService {
   rpc CreateShiftTemplate   (ShiftTemplate)         returns (ShiftTemplateId);
@@ -282,8 +285,8 @@ message CalendarEvent {
   string company_id           = 2;
   string title                = 3;
   string description          = 4;
-  string start_time  = 5;
-  string end_time    = 6;
+  string start_time           = 5;
+  string end_time             = 6;
   string event_type           = 7;
   bool   is_all_day           = 8;
   string color                = 9;
@@ -297,16 +300,40 @@ message CalendarEvent {
   string system_event_data    = 17;
   bool   notification_sent    = 18;
   string task_id              = 19;
-  string created_at  = 20;
-  string updated_at  = 21;
-  string deleted_at  = 22;
+  string created_at           = 20;
+  string updated_at           = 21;
+  string deleted_at           = 22;
   string organization_id      = 23;
+  // Polymorphic ownership
+  string entity_type          = 24;  // COMPANY | ORGANIZATION | STAFF | BRANCH | DEPARTMENT
+  string entity_id            = 25;  // PK of the owning entity
+  // Business calendar classification
+  string calendar_category    = 26;  // HOLIDAY | MAINTENANCE | OFFICE_CLOSURE | ANNOUNCEMENT | TRAINING | PAYDAY | GENERAL
+  string country_code         = 27;  // ISO code for imported public holidays
 }
 
 message CalendarEventRef            { string event_id = 1; }
 message CalendarEventId             { string company_id = 1; string organization_id = 2; string date = 3; string event_type = 4; }
 message CalendarEventListResponse   { repeated CalendarEvent events = 1; int32 total = 2; string message = 3; }
-message ListCalendarEventsRequest   { string company_id = 1; string organization_id = 2; string event_type = 3; }
+
+message ListCalendarEventsRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  string event_type         = 3;
+  string entity_type        = 4;
+  string entity_id          = 5;
+  string calendar_category  = 6;
+  string from               = 7;  // "yyyy-MM-dd"
+  string to                 = 8;  // "yyyy-MM-dd"
+}
+
+message ImportPublicHolidaysRequest {
+  string          company_id      = 1;
+  string          organization_id = 2;
+  string          country_code    = 3;
+  int32           year            = 4;
+  repeated string selected_dates  = 5;  // empty = import all
+}
 
 // ─── StaffEvent ──────────────────────────────────────────────────────────────
 
