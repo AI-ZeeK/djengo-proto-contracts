@@ -322,9 +322,8 @@ message ListCalendarEventsRequest {
   string event_type         = 3;
   string entity_type        = 4;
   string entity_id          = 5;
-  string calendar_category  = 6;  // Deprecated: prefer event_type; kept for backward-compatible filters
-  string from               = 7;  // "yyyy-MM-dd"
-  string to                 = 8;  // "yyyy-MM-dd"
+  string from               = 6;  // "yyyy-MM-dd"
+  string to                 = 7;  // "yyyy-MM-dd"
 }
 
 message ImportPublicHolidaysRequest {
