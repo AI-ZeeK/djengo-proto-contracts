@@ -104,7 +104,8 @@ service TrainingService {
 
 service CalendarEventService {
   rpc CreateCalendarEvent         (CreateCalendarEventRequest)              returns (CalendarEventRef);
-  rpc GetCalendarEvent            (CalendarEventId)            returns (CalendarEventListResponse);
+  rpc GetCalendarEventById        (CalendarEventById)            returns (CalendarEvent);
+  rpc GetCalendarEvent            (GetCalendarEventRequest)            returns (CalendarEventListResponse);
   rpc UpdateCalendarEvent         (UpdateCalendarEventRequest)              returns (CalendarEvent);
   rpc DeleteCalendarEvent         (CalendarEventRef)           returns (DeleteResponse);
   rpc ListCalendarEventsByCompany (ListCalendarEventsRequest)  returns (CalendarEventListResponse);
@@ -206,7 +207,6 @@ message StaffRequest        { string staff_id = 1; string company_id = 2; string
 message CustomerRequest     { string customer_id = 1; string company_id = 2; string organization_id = 3; }
 message DeleteResponse      { bool success = 1; string message = 2; }
 
-/** Stable recurrence contract; server maps to RFC 5545 RRULE + DB fields. */
 enum CalendarRecurrencePreset {
   RECURRENCE_NONE = 0;
   RECURRENCE_DAILY = 1;
@@ -223,14 +223,16 @@ message CreateCalendarEventRequest {
   optional string date = 5;
   optional string start_time = 6;
   optional string end_time = 7;
-  string event_type = 8;
-  string color = 9;
-  bool is_all_day = 10;
-  bool is_multiple_days = 11;
-  string created_by_user_id = 12;
-  string recurrence_rule = 13;
-  bool is_recurring = 14;
-  CalendarRecurrencePreset recurrence_preset = 15;
+  optional string start_date = 8;
+  optional string end_date = 9;
+  string event_type = 10;
+  string color = 11;
+  bool is_all_day = 12;
+  bool is_multiple_days = 13;
+  string created_by_user_id = 14;
+  string recurrence_rule = 15;
+  bool is_recurring = 16;
+  CalendarRecurrencePreset recurrence_preset = 17;
 }
 
 
@@ -243,14 +245,16 @@ message UpdateCalendarEventRequest {
   optional string date = 6;
   optional string start_time = 7;
   optional string end_time = 8;
-  string event_type = 9;
-  string color = 10;
-  bool is_all_day = 11;
-  bool is_multiple_days = 12;
-  string created_by_user_id = 13;
-  string recurrence_rule = 14;
-  bool is_recurring = 15;
-  CalendarRecurrencePreset recurrence_preset = 16;
+  optional string start_date = 9;
+  optional string end_date = 10;
+  string event_type = 11;
+  string color = 12;
+  bool is_all_day = 13;
+  bool is_multiple_days = 14;
+  string created_by_user_id = 15;
+  string recurrence_rule = 16;
+  bool is_recurring = 17;
+  CalendarRecurrencePreset recurrence_preset = 18;
 }
 
 // ─── ActivityLog ─────────────────────────────────────────────────────────────
@@ -360,7 +364,8 @@ message CalendarEvent {
 }
 
 message CalendarEventRef            { string event_id = 1; }
-message CalendarEventId             { string company_id = 1; string organization_id = 2; string date = 3; string event_type = 4; }
+message GetCalendarEventRequest             { string company_id = 1; string organization_id = 2; string date = 3; string event_type = 4; }
+message CalendarEventById           { string event_id = 1; }
 message CalendarEventListResponse   { repeated CalendarEvent events = 1; int32 total = 2; string message = 3; }
 
 message ListCalendarEventsRequest {
