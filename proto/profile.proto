@@ -80,6 +80,10 @@ service ProfileService {
   rpc StaffProbationHistory(StaffProbationHistoryRequest) returns (StaffProbationHistoryResponse);
   // ── HR: Termination ───────────────────────────────────────────────────────
   rpc TerminateStaff(TerminateStaffRequest) returns (TerminateStaffResponse);
+
+  // ── Admin Security ────────────────────────────────────────────────────────
+  rpc GetAuthAuditLogs(GetAuthAuditLogsRequest) returns (GetAuthAuditLogsResponse);
+  rpc GetLoginAttemptStatus(GetLoginAttemptStatusRequest) returns (GetLoginAttemptStatusResponse);
 }
 
 message GetStaffRequest {
@@ -1143,5 +1147,52 @@ message TerminateStaffResponse {
   bool success = 1;
   optional string error = 2;
   optional string message = 3;
+}
+
+// ── Admin Security: Auth Audit Logs ──────────────────────────────────────────
+
+message GetAuthAuditLogsRequest {
+  optional string user_id    = 1;
+  optional string email      = 2;
+  optional string event_type = 3; // e.g. "auth.login.failure"
+  optional string outcome    = 4; // "success" | "failure"
+  optional string start_date = 5; // ISO date string
+  optional string end_date   = 6; // ISO date string
+  optional int32  page       = 7;
+  optional int32  page_size  = 8;
+}
+
+message AuthAuditLogEntry {
+  string  log_id      = 1;
+  optional string user_id     = 2;
+  optional string email       = 3;
+  string  event_type  = 4;
+  string  outcome     = 5;
+  optional string reason      = 6;
+  optional string source      = 7;
+  optional string device_info = 8;
+  optional string ip          = 9;
+  string  created_at  = 10;
+}
+
+message GetAuthAuditLogsResponse {
+  bool   success  = 1;
+  optional string error    = 2;
+  repeated AuthAuditLogEntry logs = 3;
+  TableMeta meta    = 4;
+}
+
+// ── Admin Security: Login Attempt Status ─────────────────────────────────────
+
+message GetLoginAttemptStatusRequest {
+  string email = 1;
+}
+
+message GetLoginAttemptStatusResponse {
+  bool   success       = 1;
+  optional string error         = 2;
+  bool   is_locked     = 3;
+  int32  attempt_count = 4;
+  optional int64  locked_until  = 5; // unix ms, present when locked
 }
 
