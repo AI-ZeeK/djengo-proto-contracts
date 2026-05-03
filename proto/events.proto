@@ -233,6 +233,7 @@ message CreateCalendarEventRequest {
   string recurrence_rule = 15;
   bool is_recurring = 16;
   CalendarRecurrencePreset recurrence_preset = 17;
+  optional string recurrence_series_end_date = 18;
 }
 
 
@@ -255,6 +256,7 @@ message UpdateCalendarEventRequest {
   string recurrence_rule = 16;
   bool is_recurring = 17;
   CalendarRecurrencePreset recurrence_preset = 18;
+  optional string recurrence_series_end_date = 19;
 }
 
 // ─── ActivityLog ─────────────────────────────────────────────────────────────
