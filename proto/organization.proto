@@ -120,6 +120,44 @@ message GenerateEmployeeNumberResponse {
   optional string error = 2;
   optional string employee_number = 3; // e.g. "ACME-2025-0042"
 }
+
+/// Payroll vs budgeting control mode (company default; branch may override via `Branch.payroll_budget_linkage`).
+enum PayrollBudgetLinkage {
+  PAYROLL_BUDGET_LINKAGE_UNSPECIFIED = 0;
+  FLEXIBLE = 1;
+  PAYROLL_FORECAST_FEEDS_BUDGET = 2;
+  BUDGET_HARD_CAP = 3;
+  BUDGET_APPROVAL_GATE = 4;
+}
+
+/// First operational day-of-week — rosters, labor roll-ups (`CompanyMetaData` in org DB).
+enum OperatingWeekday {
+  OPERATING_WEEKDAY_UNSPECIFIED = 0;
+  MONDAY = 1;
+  TUESDAY = 2;
+  WEDNESDAY = 3;
+  THURSDAY = 4;
+  FRIDAY = 5;
+  SATURDAY = 6;
+  SUNDAY = 7;
+}
+
+enum CompanyOperationalPayFrequency {
+  COMPANY_OPERATIONAL_PAY_FREQUENCY_UNSPECIFIED = 0;
+  OP_PAY_FREQ_NOT_SET = 1;
+  OP_PAY_FREQ_WEEKLY = 2;
+  OP_PAY_FREQ_BIWEEKLY = 3;
+  OP_PAY_FREQ_SEMI_MONTHLY = 4;
+  OP_PAY_FREQ_MONTHLY = 5;
+}
+
+enum CompanyBudgetGranularity {
+  COMPANY_BUDGET_GRANULARITY_UNSPECIFIED = 0;
+  BUDGET_MONTHLY = 1;
+  BUDGET_QUARTERLY = 2;
+  BUDGET_ANNUAL = 3;
+}
+
   // Branch Analytics Messages
   message BranchesAnalyticsRequest {
     string company_id = 1;
@@ -161,6 +199,7 @@ message UpdateCompanyDetailsRequest {
   string company_logo = 8;
   string base_currency = 9;
   optional AddressRequest address = 10;
+  PayrollBudgetLinkage payroll_budget_linkage = 11;
 }
 
 message OrganizationRoleIdRequest {
@@ -428,7 +467,7 @@ message CreateCompanyRequest {
   string company_logo = 9;
   bool is_multi_branch = 10;
   MainBranch main_branch = 11;
-  // repeated BusinessType business_types = 12;
+  PayrollBudgetLinkage payroll_budget_linkage = 12;
 }
 
 message CreateDepartmentRequest {  string organization_id = 1;
@@ -760,6 +799,7 @@ message Company {
   CompanyMetaData company_meta_data = 16;
   Branch main_branch = 17;
   repeated Branch branches = 18;
+  PayrollBudgetLinkage payroll_budget_linkage = 19;
 }
 
 
@@ -768,7 +808,13 @@ message CompanyMetaData {
   string staff_count = 2;
   string branch_count = 3;
   bool is_multi_branch = 4;
-
+  int32 fiscal_year_start_month = 5;
+  OperatingWeekday operating_week_starts_on = 6;
+  CompanyOperationalPayFrequency default_payroll_frequency = 7;
+  CompanyBudgetGranularity budget_reporting_granularity = 8;
+  bool require_cost_center_on_budget_lines = 9;
+  bool require_payroll_dimensions_on_run = 10;
+  optional int64 petty_cash_approval_threshold_minor = 11;
 }
 
 message Branch {
@@ -784,6 +830,7 @@ message Branch {
   string updated_at = 10;
   optional string deleted_at = 11;
   optional string creator_id = 12;
+  PayrollBudgetLinkage payroll_budget_linkage = 13;
 }
 
 message Department {
