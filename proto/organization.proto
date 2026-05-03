@@ -200,6 +200,13 @@ message UpdateCompanyDetailsRequest {
   string base_currency = 9;
   optional AddressRequest address = 10;
   PayrollBudgetLinkage payroll_budget_linkage = 11;
+  optional int32 fiscal_year_start_month = 12;
+  optional OperatingWeekday operating_week_starts_on = 13;
+  optional CompanyOperationalPayFrequency default_payroll_frequency = 14;
+  optional CompanyBudgetGranularity budget_reporting_granularity = 15;
+  optional bool require_cost_center_on_budget_lines = 16;
+  optional bool require_payroll_dimensions_on_run = 17;
+  optional int64 petty_cash_approval_threshold_minor = 18;
 }
 
 message OrganizationRoleIdRequest {
@@ -468,6 +475,13 @@ message CreateCompanyRequest {
   bool is_multi_branch = 10;
   MainBranch main_branch = 11;
   PayrollBudgetLinkage payroll_budget_linkage = 12;
+  optional int32 fiscal_year_start_month = 13;
+  optional OperatingWeekday operating_week_starts_on = 14;
+  optional CompanyOperationalPayFrequency default_payroll_frequency = 15;
+  optional CompanyBudgetGranularity budget_reporting_granularity = 16;
+  optional bool require_cost_center_on_budget_lines = 17;
+  optional bool require_payroll_dimensions_on_run = 18;
+  optional int64 petty_cash_approval_threshold_minor = 19;
 }
 
 message CreateDepartmentRequest {  string organization_id = 1;
