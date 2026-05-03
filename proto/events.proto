@@ -103,12 +103,12 @@ service TrainingService {
 }
 
 service CalendarEventService {
-  rpc CreateCalendarEvent         (CalendarEvent)              returns (CalendarEventRef);
-  rpc GetCalendarEvent            (CalendarEventId)            returns (CalendarEventListResponse);
-  rpc UpdateCalendarEvent         (CalendarEvent)              returns (CalendarEvent);
+  rpc CreateCalendarEvent         (CreateCalendarEventRequest)              returns (CalendarEventRef);
+  rpc GetCalendarEvent            (CalendarEventId)            returns (CalendarEvent);
+  rpc UpdateCalendarEvent         (UpdateCalendarEventRequest)              returns (CalendarEvent);
   rpc DeleteCalendarEvent         (CalendarEventRef)           returns (DeleteResponse);
   rpc ListCalendarEventsByCompany (ListCalendarEventsRequest)  returns (CalendarEventListResponse);
-  rpc ListCalendarEventsByEntity  (ListCalendarEventsRequest)  returns (CalendarEventListResponse);
+  rpc ListCalendarEventsByEntity  (ListCalendarEventsRequest)  returns (CalendarEventListResponse);  
   rpc ListCalendarEventsByStaff   (StaffRequest)               returns (CalendarEventListResponse);
   rpc ImportPublicHolidays        (ImportPublicHolidaysRequest) returns (CalendarEventListResponse);
 }
@@ -205,6 +205,38 @@ message CompanyRequest      { string company_id = 1; string organization_id = 2;
 message StaffRequest        { string staff_id = 1; string company_id = 2; string organization_id = 3; }
 message CustomerRequest     { string customer_id = 1; string company_id = 2; string organization_id = 3; }
 message DeleteResponse      { bool success = 1; string message = 2; }
+
+message CreateCalendarEventRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string title = 3;
+  string description = 4;
+  optional string date = 5;
+  optional string start_time = 6;
+  optional string end_time = 7;
+  string event_type = 8;
+  string color = 9;
+  bool is_all_day = 10;
+  bool is_multiple_days = 11;
+  string created_by_user_id = 12;
+}
+
+
+message UpdateCalendarEventRequest {
+  string calendar_event_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string title = 4;
+  string description = 5;
+  optional string date = 6;
+  optional string start_time = 7;
+  optional string end_time = 8;
+  string event_type = 9;
+  string color = 10;
+  bool is_all_day = 11;
+  bool is_multiple_days = 12;
+  string created_by_user_id = 13;
+}
 
 // ─── ActivityLog ─────────────────────────────────────────────────────────────
 
