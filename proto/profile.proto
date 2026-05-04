@@ -54,6 +54,7 @@ service ProfileService {
   rpc GetStaffDetails(StaffDetailsRequest) returns (StaffDetailsResponse);
   rpc GetManyStaffDetails(ManyStaffDetailsRequest) returns (ManyStaffDetailsResponse);
   rpc GetCompanyStaffs(PaginatedCompanyRequest) returns (ManyStaffDetailsResponse);
+  rpc ListCompanyStaffPicker(ListCompanyStaffPickerRequest) returns (ManyStaffDetailsResponse);
   rpc GetCompanyStaff(GetCompanyStaffRequest) returns (GetCompanyStaffResponse);
 
   
@@ -362,6 +363,16 @@ message PaginatedCompanyRequest {
   optional RequestFilter filter = 8;
 
 
+}
+
+message ListCompanyStaffPickerRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string exclude_user_id = 3;
+  optional string search = 4;
+  optional int32 page = 5;
+  optional int32 page_size = 6;
+  optional RequestFilter filter = 7;
 }
 message GetInvitationsByCompanyRequest  {
   // Company identification
