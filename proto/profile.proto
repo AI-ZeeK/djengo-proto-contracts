@@ -66,6 +66,7 @@ service ProfileService {
   rpc DeleteStaffInvitation(GetInvitationByCodeRequest) returns (InvitationStatusResponse);
   rpc ResendStaffInvitation(ResendStaffInvitationRequest) returns (ResendStaffInvitationResponse);
   rpc GetInvitationsByCompany(GetInvitationsByCompanyRequest) returns (GetInvitationsByCompanyResponse);
+  rpc GetBulkStaffInviteTemplate(GetBulkStaffInviteTemplateRequest) returns (GetBulkStaffInviteTemplateResponse);
   
   
   rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
@@ -614,6 +615,23 @@ message SendStaffInvitationsResponse {
   optional string error = 2;
   string message = 3;
   repeated InvitationResult results = 4;
+}
+
+enum BulkInviteTemplateAudience {
+  BULK_INVITE_AUDIENCE_STAFF = 0;
+  BULK_INVITE_AUDIENCE_PARTNER = 1;
+}
+
+message GetBulkStaffInviteTemplateRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  BulkInviteTemplateAudience audience = 3;
+}
+
+message GetBulkStaffInviteTemplateResponse {
+  bytes file_content = 1;
+  string file_name = 2;
+  string mime_type = 3;
 }
 
 message GetInvitationByCodeRequest {
