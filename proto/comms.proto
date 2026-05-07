@@ -38,6 +38,7 @@ enum NotificationType {
   NEW_MESSAGE = 0;
   FRIEND_REQUEST = 1;
   SYSTEM_ALERT = 2;
+  STAFF_INVITATION = 3;
   // Add more types as needed
 }
 
