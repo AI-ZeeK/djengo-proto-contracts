@@ -580,6 +580,7 @@ message Staff {
   optional StaffMeta meta_data = 15;
   repeated StaffProbationHistory probation_history = 16;
   repeated StaffCompanyRole staff_company_roles = 17;
+  optional Company company = 18;
 }
 
 

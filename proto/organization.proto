@@ -109,6 +109,16 @@ service OrganizationService {
 service AdminOrganizationService {
   rpc GetRole(GetRoleRequest) returns (GetRoleResponse);
   rpc getStaffCompanyRoles(GetStaffCompanyRolesRequest) returns (GetStaffCompanyRolesResponse);
+  rpc GetCompany(GetAdminCompanyRequest) returns (GetAdminCompanyResponse);
+}
+
+message GetAdminCompanyRequest {
+  string company_id = 1;
+}
+
+message GetAdminCompanyResponse {
+  optional string message = 2;
+  optional Company company = 3;
 }
 
 message GetRoleRequest {
