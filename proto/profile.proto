@@ -36,6 +36,7 @@ service ProfileService {
   
   // User Management
   rpc GetUser(GetUserRequest) returns (UserResponse);
+  rpc GetUserOverview(GetUserRequest) returns (User);
   rpc GetBusinessUser(GetUserRequest) returns (BusinessUserResponse);
   rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse);
   rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse);
@@ -953,6 +954,7 @@ message UserResponse {
   optional User user = 3;
 }
 
+
 message GetUserByEmailResponse {
   bool success = 1;
   optional string error = 2;
@@ -998,6 +1000,7 @@ message User {
   optional UserRole user_role = 14;
   repeated UserRole user_roles = 15;
   optional BusinessUser business_user = 16;
+  repeated Staff staff = 17;
 }
 
 // message BasicUser {
