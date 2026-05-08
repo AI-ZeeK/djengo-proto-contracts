@@ -68,10 +68,7 @@ service ProfileService {
   rpc GetInvitationsByCompany(GetInvitationsByCompanyRequest) returns (GetInvitationsByCompanyResponse);
   rpc GetBulkStaffInviteTemplate(GetBulkStaffInviteTemplateRequest) returns (GetBulkStaffInviteTemplateResponse);
   
-  
-  rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
-  rpc AdminUsersAnalytics(AdminUsersAnalyticsRequest) returns (AdminUsersAnalyticsResponse);
-// ANALYTICS
+  // ANALYTICS
   rpc ActiveUsersCount(EmptyRequest) returns (ActiveUsersCountResponse);
   rpc DailyActiveUsersAnalytics(EmptyRequest) returns (DailyActiveUsersAnalyticsResponse);
   rpc GetOrganizationBusinessUsers(GetOrganizationBusinessUsersRequest) returns (GetOrganizationBusinessUsersResponse);
@@ -82,17 +79,20 @@ service ProfileService {
   rpc StaffProbationHistory(StaffProbationHistoryRequest) returns (StaffProbationHistoryResponse);
   // ── HR: Termination ───────────────────────────────────────────────────────
   rpc TerminateStaff(TerminateStaffRequest) returns (TerminateStaffResponse);
+  
+}
 
+service AdminProfileService {
+  rpc GetUserOverview(GetUserRequest) returns (User);
   // ── Admin Security ────────────────────────────────────────────────────────
   rpc GetAuthAuditLogs(GetAuthAuditLogsRequest) returns (GetAuthAuditLogsResponse);
   rpc GetLoginAttemptStatus(GetLoginAttemptStatusRequest) returns (GetLoginAttemptStatusResponse);
   rpc GetSecurityPrincipal(GetSecurityPrincipalRequest) returns (GetSecurityPrincipalResponse);
   rpc ApplySecurityRestriction(ApplySecurityRestrictionRequest) returns (ApplySecurityRestrictionResponse);
   rpc LiftSecurityRestriction(LiftSecurityRestrictionRequest) returns (LiftSecurityRestrictionResponse);
-}
-
-service AdminProfileService {
-  rpc GetUserOverview(GetUserRequest) returns (User);
+  
+  rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
+  rpc AdminUsersAnalytics(AdminUsersAnalyticsRequest) returns (AdminUsersAnalyticsResponse);
 }
 
 message GetStaffRequest {
