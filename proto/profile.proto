@@ -86,6 +86,9 @@ service ProfileService {
   // ── Admin Security ────────────────────────────────────────────────────────
   rpc GetAuthAuditLogs(GetAuthAuditLogsRequest) returns (GetAuthAuditLogsResponse);
   rpc GetLoginAttemptStatus(GetLoginAttemptStatusRequest) returns (GetLoginAttemptStatusResponse);
+  rpc GetSecurityPrincipal(GetSecurityPrincipalRequest) returns (GetSecurityPrincipalResponse);
+  rpc ApplySecurityRestriction(ApplySecurityRestrictionRequest) returns (ApplySecurityRestrictionResponse);
+  rpc LiftSecurityRestriction(LiftSecurityRestrictionRequest) returns (LiftSecurityRestrictionResponse);
 }
 
 message GetStaffRequest {
@@ -1223,5 +1226,62 @@ message GetLoginAttemptStatusResponse {
   bool   is_locked     = 3;
   int32  attempt_count = 4;
   optional int64  locked_until  = 5; // unix ms, present when locked
+}
+
+message SecurityRestrictionEntry {
+  string restriction_id = 1;
+  string target_type = 2; // USER | EMAIL | IP
+  string target_value = 3;
+  optional string reason = 4;
+  optional string created_by = 5;
+  string created_at = 6;
+  optional string expires_at = 7;
+  bool is_active = 8;
+}
+
+message GetSecurityPrincipalRequest {
+  optional string user_id = 1;
+  optional string email = 2;
+  optional string ip = 3;
+}
+
+message GetSecurityPrincipalResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string user_id = 3;
+  optional string email = 4;
+  bool is_blocked = 5;
+  bool is_locked = 6;
+  int32 attempt_count = 7;
+  optional int64 locked_until = 8;
+  repeated SecurityRestrictionEntry restrictions = 9;
+}
+
+message ApplySecurityRestrictionRequest {
+  string target_type = 1; // USER | EMAIL | IP
+  string target_value = 2;
+  optional int32 duration_minutes = 3; // unset/<=0 means indefinite
+  optional string reason = 4;
+  optional string created_by = 5;
+}
+
+message ApplySecurityRestrictionResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
+  optional string restriction_id = 4;
+  optional string expires_at = 5;
+}
+
+message LiftSecurityRestrictionRequest {
+  string restriction_id = 1;
+  optional string lifted_by = 2;
+  optional string note = 3;
+}
+
+message LiftSecurityRestrictionResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
 }
 
