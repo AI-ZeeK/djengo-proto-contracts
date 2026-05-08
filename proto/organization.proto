@@ -108,16 +108,25 @@ service OrganizationService {
 
 service AdminOrganizationService {
   rpc GetRole(GetRoleRequest) returns (GetRoleResponse);
+  rpc getStaffCompanyRoles(GetStaffCompanyRolesRequest) returns (GetStaffCompanyRolesResponse);
 }
 
 message GetRoleRequest {
   string role_id = 1;
 }
 
+message GetStaffCompanyRolesRequest {
+  string staff_id = 1;
+}
+
 message GetRoleResponse {
-  bool success = 1;
-  optional string error = 2;
+  optional string message = 2;
   optional OrganizationRole role = 3;
+}
+
+message GetStaffCompanyRolesResponse {
+  optional string message = 1;
+  repeated StaffCompanyRole staff_company_roles = 3;
 }
 
 // ============================================================================
