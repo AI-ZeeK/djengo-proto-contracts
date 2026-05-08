@@ -36,7 +36,6 @@ service ProfileService {
   
   // User Management
   rpc GetUser(GetUserRequest) returns (UserResponse);
-  rpc GetUserOverview(GetUserRequest) returns (User);
   rpc GetBusinessUser(GetUserRequest) returns (BusinessUserResponse);
   rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse);
   rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse);
@@ -90,6 +89,10 @@ service ProfileService {
   rpc GetSecurityPrincipal(GetSecurityPrincipalRequest) returns (GetSecurityPrincipalResponse);
   rpc ApplySecurityRestriction(ApplySecurityRestrictionRequest) returns (ApplySecurityRestrictionResponse);
   rpc LiftSecurityRestriction(LiftSecurityRestrictionRequest) returns (LiftSecurityRestrictionResponse);
+}
+
+service AdminProfileService {
+  rpc GetUserOverview(GetUserRequest) returns (User);
 }
 
 message GetStaffRequest {
