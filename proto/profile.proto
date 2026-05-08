@@ -576,7 +576,16 @@ message Staff {
   optional OrganizationRole role = 14;
   optional StaffMeta meta_data = 15;
   repeated StaffProbationHistory probation_history = 16;
+  repeated StaffCompanyRole staff_company_roles = 17;
+}
 
+
+message StaffCompanyRole {
+  string staff_company_role_id = 1;
+  string staff_id = 2;
+  string company_role_id = 3;
+  bool is_active = 4;
+  OrganizationRole company_role = 5;
 }
 
 message StaffDetailsResponse {
