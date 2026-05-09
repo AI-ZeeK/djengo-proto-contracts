@@ -137,6 +137,8 @@ service FinancialsService {
   rpc CreateBudgetAllocation(CreateBudgetAllocationRequest) returns (BudgetAllocation);
   rpc ListBudgetAllocations(ListBudgetAllocationsRequest) returns (ListBudgetAllocationsResponse);
   rpc GetBudgetAnalytics (GetBudgetAnalyticsRequest) returns (GetBudgetAnalyticsResponse);
+  /** Single payload for monthly budget create UI: payroll totals + settlement (authoritative). */
+  rpc GetBudgetCreatePayrollContext (GetBudgetCreatePayrollContextRequest) returns (GetBudgetCreatePayrollContextResponse);
   // Payroll
   rpc CreatePayroll(CreatePayrollRequest) returns (Payroll);
   rpc RunPayroll(RunPayrollRequest) returns (Payroll);
@@ -612,6 +614,29 @@ message ListBudgetAllocationsResponse {
   repeated BudgetAllocation allocations = 1;
   string next_page_token = 2;
 }
+
+message GetBudgetCreatePayrollContextRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  int32 month = 3;
+  int32 year = 4;
+  /** Empty = company-wide schedule (BranchId null); otherwise match branch. */
+  string branch_id = 5;
+}
+
+message GetBudgetCreatePayrollContextResponse {
+  bool found = 1;
+  string payroll_id = 2;
+  string schedule_id = 3;
+  string branch_id = 4;
+  int64 payroll_total_minor = 5;
+  int32 staff_count = 6;
+  bool is_settled = 7;
+  string payroll_status = 8;
+  string schedule_status = 9;
+  PayrollState payroll_state = 10;
+}
+
 message CreatePayrollRequest {
   string organization_id = 1;
   string company_id = 2;
