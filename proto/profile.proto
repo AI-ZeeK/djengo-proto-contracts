@@ -937,9 +937,11 @@ message BusinessUser {
   int32 access_level = 7;
   bool is_active = 8;
   optional string notes = 9;
-    string created_at = 10;
-    string updated_at = 11;
-    optional User user = 12;
+  string created_at = 10;
+  string updated_at = 11;
+  optional User user = 12;
+  optional Organization organization = 13;
+  optional Company company = 14;
 }
 
 message BusinessUserResponse {
@@ -1014,6 +1016,7 @@ message User {
   repeated UserRole user_roles = 15;
   optional BusinessUser business_user = 16;
   repeated Staff staff = 17;
+  repeated BusinessUser business_users = 18;
 }
 
 // message BasicUser {

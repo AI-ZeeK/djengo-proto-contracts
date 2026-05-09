@@ -9,7 +9,6 @@ service OrganizationService {
 
   // Organization Management
   rpc CreateOrganization(CreateOrganizationRequest) returns (OrganizationResponse);
-  rpc GetOrganization(GetOrganizationRequest) returns (OrganizationResponse);
 
   // Validate Company Reference
   rpc ValidateCompanyReference(ValidateCompanyReferenceRequest) returns (ValidateCompanyReferenceResponse);
@@ -110,6 +109,9 @@ service AdminOrganizationService {
   rpc GetRole(GetRoleRequest) returns (GetRoleResponse);
   rpc getStaffCompanyRoles(GetStaffCompanyRolesRequest) returns (GetStaffCompanyRolesResponse);
   rpc GetCompany(GetAdminCompanyRequest) returns (GetAdminCompanyResponse);
+
+  rpc GetOrganization(GetOrganizationRequest) returns (OrganizationResponse);
+
 }
 
 message GetAdminCompanyRequest {
