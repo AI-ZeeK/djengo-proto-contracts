@@ -482,6 +482,7 @@ message BudgetAllocation {
   string description = 9;
   double allocated_amount = 10;
   string allocated_by = 11;
+  optional string cost_center_id = 12;
 }
 
 // Payroll snapshot embedded in budget responses
@@ -616,6 +617,8 @@ message CreatePayrollRequest {
 }
 message RunPayrollRequest {
   string name = 1;
+  // When set, overrides schedule branch only for linkage + budget-scope resolution.
+  optional string branch_id = 2;
 }
 message GetPayrollRequest {
   string name = 1;
