@@ -373,6 +373,7 @@ message BusinessUserRole {
   string created_at = 6;
   string updated_at = 7;
   string deleted_at = 8;
+  OrganizationRole organization_role = 9;
 }
 
 message StaffCompanyRole {

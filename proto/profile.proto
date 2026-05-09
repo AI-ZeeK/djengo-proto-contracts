@@ -800,6 +800,7 @@ message BusinessUserRole {
   string business_user_id = 2;
   string organization_role_id = 3;
   bool is_active = 4;
+  OrganizationRole organization_role = 5;
 }
 
 message GetRolesResponse {
@@ -942,7 +943,7 @@ message BusinessUser {
   optional User user = 12;
   optional Organization organization = 13;
   optional Company company = 14;
-  repeated OrganizationRole business_user_roles = 15;
+  repeated BusinessUserRole business_user_roles = 15;
 }
 
 message BusinessUserResponse {
