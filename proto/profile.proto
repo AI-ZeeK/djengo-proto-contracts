@@ -942,6 +942,7 @@ message BusinessUser {
   optional User user = 12;
   optional Organization organization = 13;
   optional Company company = 14;
+  repeated OrganizationRole business_user_roles = 15;
 }
 
 message BusinessUserResponse {
