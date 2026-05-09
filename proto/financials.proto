@@ -482,6 +482,7 @@ message BudgetAllocation {
   string description = 9;
   double allocated_amount = 10;
   string allocated_by = 11;
+  /// When set, ties the line to a cost center (minor units path unchanged).
   optional string cost_center_id = 12;
 }
 
@@ -490,7 +491,8 @@ message PayrollSummary {
   string payroll_id    = 1;
   string schedule_id   = 2;
   PayrollState status  = 3;
-  double total_amount  = 4;
+  // Minor currency units (e.g. kobo/cents) — never IEEE float for money at API boundary.
+  int64 total_amount_minor  = 4;
   int32  staff_count   = 5;
   bool   is_settled    = 6; // true when APPROVED / PAID / CLOSED
 }
@@ -517,7 +519,8 @@ message Payroll {
   int32 year = 4;
   string entity_id = 5;
   BUDGET_ENTITY_TYPE_ENUM entity_type = 6;
-  double total_amount = 7;
+  // Sum of staff lines in minor units (matches EF PayrollStaff.amount int).
+  int64 total_amount_minor = 7;
   PayrollState payroll_state = 8;
   repeated PayrollStaff staff = 9;
   string schedule_id = 10;
@@ -528,7 +531,7 @@ message PayrollStaff {
   string payroll_staff_id = 1;
   string staff_id = 2;
   string payroll_id = 3;
-  double amount = 4;
+  int64 amount_minor = 4;
   PayrollState payroll_state = 5;
 }
 
@@ -756,9 +759,9 @@ message StaffPayrollRow {
     User user = 3;
   // Optionally add more user fields as needed
   bool included_in_payroll = 4;
-  double payroll_amount = 5;
-  double base_salary = 6;
-  double total_adjustment = 7;
+  int64 payroll_amount_minor = 5;
+  int64 base_salary_minor = 6;
+  int64 total_adjustment_minor = 7;
   // Optionally: repeated PayrollAdjustment adjustments = 8;
 }
 
@@ -768,8 +771,9 @@ message ListStaffPayrollForPeriodResponse {
   TableMeta meta = 3;
   string error = 4;
   string payroll_schedule_id = 5; // New field to return the associated payroll schedule ID
-
-
+  int32 period_month = 6;
+  int32 period_year = 7;
+  string schedule_scheduled_at = 8; // From payroll schedule (e.g. planned run / payout date reference)
 }
 
 // --- Upsert Payroll Staff for a Payroll Period ---
@@ -1192,4 +1196,47 @@ message ListFinancialAuditLogsRequest {
 message ListFinancialAuditLogsResponse {
   repeated FinancialAuditLogEntry logs = 1;
   TableMeta meta                       = 2;
+}
+
+// ── Module 6: Facility & asset management (scaffold) ──────────────────────
+
+service FacilityAssetService {
+  rpc ListAssets (ListFacilityAssetsRequest) returns (ListFacilityAssetsResponse);
+  rpc RegisterAsset (RegisterFacilityAssetRequest) returns (FacilityAssetRecord);
+}
+
+message ListFacilityAssetsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+}
+
+message ListFacilityAssetsResponse {
+  repeated FacilityAssetRecord assets = 1;
+  TableMeta meta = 2;
+}
+
+message RegisterFacilityAssetRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  string name = 4;
+  string category_code = 5;
+  optional string serial_number = 6;
+  int64 acquisition_cost_minor = 7;
+}
+
+message FacilityAssetRecord {
+  string asset_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  optional string branch_id = 4;
+  string name = 5;
+  string category_code = 6;
+  optional string serial_number = 7;
+  int64 acquisition_cost_minor = 8;
+  string status = 9;
+  string created_at = 10;
 }
