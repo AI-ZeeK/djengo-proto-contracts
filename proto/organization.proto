@@ -56,6 +56,10 @@ service OrganizationService {
   rpc UpdateRoleHierarchy(UpdateRoleHierarchyRequest) returns (UtilitiesResponse);
   rpc DeleteCompanyRole(DeleteCompanyRoleRequest) returns (UtilitiesResponse);
 
+  // Role Levels — named grades/bands per company
+  rpc GetRoleLevels(GetRoleLevelsRequest) returns (GetRoleLevelsResponse);
+  rpc UpsertRoleLevels(UpsertRoleLevelsRequest) returns (GetRoleLevelsResponse);
+
   // Analytics
   rpc GetOrganizationAnalytics(OrganizationAnalyticsRequest) returns (OrganizationAnalyticsResponse);
   rpc TotalOrganizations(EmptyRequest) returns (TotalOrganizationsResponse);
@@ -1315,4 +1319,44 @@ message DeleteCompanyRoleRequest {
   string role_id = 1;
   string company_id = 2;
   string organization_id = 3;
+}
+
+// ─── Role Levels ────────────────────────────────────────────────────────────
+
+message RoleLevel {
+  string level_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string name = 4;
+  int32 level_number = 5;
+  optional string description = 6;
+  optional string color = 7;
+  bool is_active = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message GetRoleLevelsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+}
+
+message GetRoleLevelsResponse {
+  bool success = 1;
+  repeated RoleLevel role_levels = 2;
+}
+
+message UpsertRoleLevelInput {
+  optional string level_id = 1;  // present = update existing, absent = create new
+  string name = 2;
+  int32 level_number = 3;
+  optional string description = 4;
+  optional string color = 5;
+  bool is_active = 6;
+}
+
+message UpsertRoleLevelsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  repeated UpsertRoleLevelInput levels = 3;  // replaces all existing levels
 }
