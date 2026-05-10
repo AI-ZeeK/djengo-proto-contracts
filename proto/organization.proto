@@ -2,41 +2,47 @@ syntax = "proto3";
 
 package organization;
 
-// 🏢 Organization Service - handles organization and branch management
+/// Core lifecycle: organizations, companies, partners, listings, employee numbers.
 service OrganizationService {
-    // Branch Analytics
-  rpc GetBranchesAnalytics(BranchesAnalyticsRequest) returns (BranchesAnalyticsResponse);
-
-  // Organization Management
   rpc CreateOrganization(CreateOrganizationRequest) returns (OrganizationResponse);
 
-  // Validate Company Reference
   rpc ValidateCompanyReference(ValidateCompanyReferenceRequest) returns (ValidateCompanyReferenceResponse);
-  
-  // Verify IDs
-  rpc VerifyCompanyId(VerifyCompanyIdRequest) returns (VerifyCompanyIdResponse);
-  rpc VerifyBranchId(VerifyBranchIdRequest) returns (VerifyBranchIdResponse);
-  rpc VerifyDepartmentId(VerifyDepartmentIdRequest) returns (VerifyDepartmentIdResponse);
-  rpc VerifyRoleId(VerifyRoleIdRequest) returns (VerifyRoleIdResponse);
 
-  // Create Company
+  rpc VerifyCompanyId(VerifyCompanyIdRequest) returns (VerifyCompanyIdResponse);
+
   rpc CreateCompany(CreateCompanyRequest) returns (UtilitiesResponse);
   rpc FetchOrganizationCompanies(OrganizationIdRequest) returns (FetchCompaniesResponse);
   rpc FetchCompany(FetchCompanyRequest) returns (FetchCompanyResponse);
   rpc HandleMultiBranchCompanySetup(FetchCompanyRequest) returns (UtilitiesResponse);
   rpc UpdateCompanyDetails(UpdateCompanyDetailsRequest) returns (UtilitiesResponse);
-  // Create Branch
-  // rpc CreateBranch(CreateBranchRequest) returns (UtilitiesResponse);
+
+  rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse);
+
+  rpc GenerateEmployeeNumber(GenerateEmployeeNumberRequest) returns (GenerateEmployeeNumberResponse);
+
+  rpc CreatePartner(CreatePartnerRequest) returns (PartnerResponse);
+  rpc UpdatePartner(UpdatePartnerRequest) returns (PartnerResponse);
+  rpc GetPartner(GetPartnerRequest) returns (PartnerResponse);
+  rpc GetPartners(GetPartnersRequest) returns (GetPartnersResponse);
+  rpc DeletePartner(DeletePartnerRequest) returns (UtilitiesResponse);
+  rpc AssignPartnerRole(AssignPartnerRoleRequest) returns (UtilitiesResponse);
+  rpc RemovePartnerRole(RemovePartnerRoleRequest) returns (UtilitiesResponse);
+  rpc GetPartnerTypes(EmptyRequest) returns (GetPartnerTypesResponse);
+}
+
+/// Branch fetch + branch-level analytics / verification.
+service BranchService {
+  rpc GetBranchesAnalytics(BranchesAnalyticsRequest) returns (BranchesAnalyticsResponse);
+
   rpc FetchBranch(BranchIdRequest) returns (FetchBranchResponse);
   rpc FetchCompanyBranches(FetchCompanyRequest) returns (FetchBranchesResponse);
-  // rpc UpdateBranch(UpdateBranchRequest) returns (UtilitiesResponse);
-  // rpc DeleteBranch(BranchIdRequest) returns (UtilitiesResponse);
 
+  rpc VerifyBranchId(VerifyBranchIdRequest) returns (VerifyBranchIdResponse);
+}
 
-
-  // Utilities
-
-
+/// Company & org-wide roles (CRUD, hierarchy canvas, membership, verification).
+service CompanyRoleService {
+  rpc VerifyRoleId(VerifyRoleIdRequest) returns (VerifyRoleIdResponse);
 
   rpc FetchOrgRoles(OrganizationIdRequest) returns (FetchRolesResponse);
   rpc FetchOrgRole(OrganizationRoleIdRequest) returns (FetchRoleResponse);
@@ -51,19 +57,24 @@ service OrganizationService {
   rpc GetCompanyRoleBusinessUsers(CompanyRoleRequest) returns (GetCompanyRoleBusinessUsersResponse);
   rpc GetCompanyRolePartners(CompanyRoleRequest) returns (GetCompanyRolePartnersResponse);
 
-  // Hierarchy — for the visual org-chart / canvas editor
   rpc GetCompanyRolesHierarchy(CompanyHierarchyRequest) returns (GetRolesHierarchyResponse);
   rpc UpdateRoleHierarchy(UpdateRoleHierarchyRequest) returns (UtilitiesResponse);
   rpc DeleteCompanyRole(DeleteCompanyRoleRequest) returns (UtilitiesResponse);
 
-  // Role Levels — named grades/bands per company
   rpc GetRoleLevels(GetRoleLevelsRequest) returns (GetRoleLevelsResponse);
   rpc UpsertRoleLevels(UpsertRoleLevelsRequest) returns (GetRoleLevelsResponse);
+}
 
-  // Analytics
+/// Organization-wide dashboards (not branch-scoped).
+service OrganizationAnalyticsService {
   rpc GetOrganizationAnalytics(OrganizationAnalyticsRequest) returns (OrganizationAnalyticsResponse);
   rpc TotalOrganizations(EmptyRequest) returns (TotalOrganizationsResponse);
   rpc TopPerformingOrganizations(TopPerformingOrganizationsRequest) returns (TopPerformingOrganizationsResponse);
+}
+
+/// Department types, departments, department roles, and department ID verification.
+service DepartmentService {
+  rpc VerifyDepartmentId(VerifyDepartmentIdRequest) returns (VerifyDepartmentIdResponse);
 
   rpc CreateDepartmentType(CreateDepartmentTypeRequest) returns (DepartmentTypeResponse);
   rpc UpdateDepartmentType(UpdateDepartmentTypeRequest) returns (DepartmentTypeResponse);
@@ -71,47 +82,30 @@ service OrganizationService {
   rpc GetDepartmentType(GetDepartmentTypeRequest) returns (DepartmentTypeResponse);
   rpc DeleteDepartmentType(DeleteDepartmentTypeRequest) returns (UtilitiesResponse);
 
-  // Departments
   rpc CreateDepartment(CreateDepartmentRequest) returns (DepartmentResponse);
   rpc UpdateDepartment(UpdateDepartmentRequest) returns (DepartmentResponse);
   rpc GetDepartments(GetDepartmentsRequest) returns (GetDepartmentsResponse);
   rpc GetDepartment(GetDepartmentRequest) returns (DepartmentResponse);
 
-  // Department Roles
   rpc CreateDepartmentRole(CreateDepartmentRoleRequest) returns (DepartmentRoleResponse);
   rpc UpdateDepartmentRole(UpdateDepartmentRoleRequest) returns (DepartmentRoleResponse);
   rpc GetDepartmentRoles(GetDepartmentRolesRequest) returns (GetDepartmentRolesResponse);
   rpc GetDepartmentRole(GetDepartmentRoleRequest) returns (DepartmentRoleResponse);
   rpc GetDepartmentRoleStaff(GetDepartmentRoleRequest) returns (GetDepartmentRoleStaffResponse);
   rpc AssignStaffDepartmentRole(AssignStaffDepartmentRoleRequest) returns (UtilitiesResponse);
+}
 
-  // Entity Permissions
+/// Entity-scoped permission matrices and static permission-group catalogs.
+service EntityPermissionService {
   rpc GetDepartmentRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
   rpc GetStaffCompanyRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
   rpc GetBusinessUserRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
   rpc GetPartnerRolePermissions(GetEntityPermissionsRequest) returns (GetEntityPermissionsResponse);
 
-  // Permission Group Catalogs
   rpc GetDepartmentPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
   rpc GetStaffPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
   rpc GetBusinessUserPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
   rpc GetPartnerPermissionGroups(EmptyRequest) returns (GetPermissionGroupsResponse);
-
-  // Partners
-  rpc CreatePartner(CreatePartnerRequest) returns (PartnerResponse);
-  rpc UpdatePartner(UpdatePartnerRequest) returns (PartnerResponse);
-  rpc GetPartner(GetPartnerRequest) returns (PartnerResponse);
-  rpc GetPartners(GetPartnersRequest) returns (GetPartnersResponse);
-  rpc DeletePartner(DeletePartnerRequest) returns (UtilitiesResponse);
-  rpc AssignPartnerRole(AssignPartnerRoleRequest) returns (UtilitiesResponse);
-  rpc RemovePartnerRole(RemovePartnerRoleRequest) returns (UtilitiesResponse);
-  rpc GetPartnerTypes(EmptyRequest) returns (GetPartnerTypesResponse);
-
-  // Tables
-  rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse);
-
-  rpc GenerateEmployeeNumber(GenerateEmployeeNumberRequest) returns (GenerateEmployeeNumberResponse);
-
 }
 
 service AdminOrganizationService {
