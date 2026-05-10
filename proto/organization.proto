@@ -303,6 +303,7 @@ message CreateBusinessUserRoleRequest {
   repeated string business_user_ids = 4;
   repeated Permission permissions = 5;
   string creator_id = 6;
+  string role_level_id = 7;
 }
 enum RoleType {
   STAFF_ROLE = 0;
@@ -325,6 +326,7 @@ message CreateRoleRequest {
   RoleType role_type = 10;
   optional string branch_id = 11;
   optional PartnerType partner_type = 12;
+  string role_level_id = 13;
 }
 message UpdateRoleRequest {
   string role_id = 1;
@@ -345,6 +347,7 @@ message UpdateRoleRequest {
   optional int32 level_number = 15;
   optional string work_mode = 16;
   optional bool is_active = 17;
+  string role_level_id = 18;
 }
 
 message Permission {
@@ -432,7 +435,7 @@ message OrganizationRole {
   repeated PartnerCompanyRoleData partner_company_roles = 17;
   repeated EntityPermission entity_permissions = 18;
   // Hierarchy & categorisation fields
-  int32 level_number = 19;
+  string level_id = 19;
   optional string reports_to = 20;
   int32 staff_count = 21;
   string work_mode = 22;
@@ -440,6 +443,7 @@ message OrganizationRole {
   string role_type = 24;
   optional OrganizationRole superior = 25;
   repeated OrganizationRole subordinates = 26;
+  RoleLevel role_level = 27;
 }
 
 
