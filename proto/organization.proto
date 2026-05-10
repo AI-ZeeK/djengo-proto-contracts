@@ -677,6 +677,7 @@ message CreateDepartmentRoleRequest {
   repeated Permission permissions = 9;
   repeated string staff_ids = 10;
   string creator_id = 11;
+  string role_level_id = 12;
 }
 
 message UpdateDepartmentRoleRequest {
@@ -690,6 +691,7 @@ message UpdateDepartmentRoleRequest {
   repeated Permission permissions = 8;
   repeated string staff_ids = 9;
   optional bool is_active = 10;
+  string role_level_id = 11;
 }
 
 message GetDepartmentRolesRequest {
