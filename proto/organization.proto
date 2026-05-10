@@ -795,13 +795,13 @@ message DepartmentRoleResponse {
   bool success = 1;
   optional string error = 2;
   string message = 3;
-  optional DepartmentRoleData department_role = 4;
+  optional OrganizationRole department_role = 4;
 }
 
 message GetDepartmentRolesResponse {
   bool success = 1;
   optional string error = 2;
-  repeated DepartmentRoleData department_roles = 3;
+  repeated OrganizationRole department_roles = 3;
 }
 
 message GetDepartmentRoleStaffResponse {
@@ -1098,7 +1098,7 @@ message DepartmentWithType {
   string updated_at = 9;
   optional string deleted_at = 10;
   optional DepartmentType department_type = 11;
-  repeated DepartmentRoleData department_roles = 12;
+  repeated OrganizationRole department_roles = 12;
   optional Branch branch = 13;
 }
 
