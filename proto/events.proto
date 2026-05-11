@@ -233,6 +233,7 @@ message CreateCalendarEventRequest {
   string recurrence_rule = 15;
   bool is_recurring = 16;
   CalendarRecurrencePreset recurrence_preset = 17;
+  /// Last calendar day (yyyy-MM-dd, inclusive) the series repeats; RRULE gains UNTIL.
   optional string recurrence_series_end_date = 18;
 }
 
@@ -1236,3 +1237,142 @@ message GetLeaveAnalyticsOverviewResponse {
   repeated LeaveOverviewChart charts = 2;
   string                      period_label = 3;
 }
+
+// ─── Complaints ───────────────────────────────────────────────────────────────
+
+service ComplaintService {
+  rpc CreateComplaint        (CreateComplaintRequest)        returns (ComplaintId);
+  rpc GetComplaint           (ComplaintId)                   returns (Complaint);
+  rpc ListComplaints         (ListComplaintsRequest)         returns (ListComplaintsResponse);
+  rpc ListMyComplaints       (MyComplaintsRequest)           returns (ListComplaintsResponse);
+  rpc UpdateComplaintStatus  (UpdateComplaintStatusRequest)  returns (Complaint);
+  rpc AssignComplaint        (AssignComplaintRequest)        returns (Complaint);
+}
+
+message ComplaintId {
+  string complaint_id = 1;
+}
+
+message Complaint {
+  string complaint_id      = 1;
+  string complainant_id    = 2;
+  string organization_id   = 3;
+  string company_id        = 4;
+  string category          = 5;
+  string subject           = 6;
+  string description       = 7;
+  string status            = 8;
+  string priority          = 9;
+  repeated string attachments = 10;
+  string assigned_to       = 11;
+  string resolved_by       = 12;
+  string resolution_notes  = 13;
+  string created_at        = 14;
+  string updated_at        = 15;
+  string resolved_at       = 16;
+  string complaint_target  = 17;
+  bool   is_anonymous      = 18;
+}
+
+message CreateComplaintRequest {
+  string complainant_id   = 1;
+  string organization_id  = 2;
+  string company_id       = 3;
+  string category         = 4;
+  string subject          = 5;
+  string description      = 6;
+  string priority         = 7;
+  repeated string attachments = 8;
+  string complaint_target = 9;
+  bool   is_anonymous     = 10;
+}
+
+message ListComplaintsRequest {
+  string company_id       = 1;
+  string organization_id  = 2;
+  string status           = 3;
+  string category         = 4;
+  string priority         = 5;
+  string assigned_to      = 6;
+  int32  page             = 7;
+  int32  page_size        = 8;
+  string sort_by          = 9;
+  string sort_order       = 10;
+  string complaint_target = 11;
+}
+
+message MyComplaintsRequest {
+  string complainant_id = 1;
+  string company_id     = 2;
+  int32  page           = 3;
+  int32  page_size      = 4;
+}
+
+message ListComplaintsResponse {
+  repeated Complaint complaints = 1;
+  TableMeta          meta       = 2;
+}
+
+message UpdateComplaintStatusRequest {
+  string complaint_id     = 1;
+  string status           = 2;
+  string resolution_notes = 3;
+  string resolved_by      = 4;
+}
+
+message AssignComplaintRequest {
+  string complaint_id = 1;
+  string assigned_to  = 2;
+}
+
+// ─── Complaint Categories ─────────────────────────────────────────────────────
+
+service ComplaintCategoryService {
+  rpc ListComplaintCategories   (ListComplaintCategoriesRequest)   returns (ListComplaintCategoriesResponse);
+  rpc GetComplaintCategory      (ComplaintCategoryId)              returns (ComplaintCategoryProto);
+  rpc CreateComplaintCategory   (CreateComplaintCategoryRequest)   returns (ComplaintCategoryProto);
+  rpc UpdateComplaintCategory   (UpdateComplaintCategoryRequest)   returns (ComplaintCategoryProto);
+  rpc DeleteComplaintCategory   (ComplaintCategoryId)              returns (DeleteResponse);
+}
+
+message ComplaintCategoryId {
+  string category_id = 1;
+}
+
+message ComplaintCategoryProto {
+  string category_id = 1;
+  string name        = 2;
+  string slug        = 3;
+  string description = 4;
+  string icon        = 5;
+  bool   is_active   = 6;
+  int32  sort_order  = 7;
+  string created_at  = 8;
+  string updated_at  = 9;
+}
+
+message ListComplaintCategoriesRequest {
+  bool include_inactive = 1;
+}
+
+message ListComplaintCategoriesResponse {
+  repeated ComplaintCategoryProto categories = 1;
+}
+
+message CreateComplaintCategoryRequest {
+  string name        = 1;
+  string slug        = 2;
+  string description = 3;
+  string icon        = 4;
+  int32  sort_order  = 5;
+}
+
+message UpdateComplaintCategoryRequest {
+  string category_id = 1;
+  string name        = 2;
+  string description = 3;
+  string icon        = 4;
+  bool   is_active   = 5;
+  int32  sort_order  = 6;
+}
+z
