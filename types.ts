@@ -278,6 +278,7 @@ export interface DeleteUserRequest {
 export interface LoginRequest {
   email: string;
   password: string;
+  ip?: string;
 }
 
 export interface RefreshTokenRequest {
