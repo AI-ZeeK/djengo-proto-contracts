@@ -144,6 +144,7 @@ service FinancialsService {
   rpc RunPayroll(RunPayrollRequest) returns (Payroll);
   rpc GetPayroll(GetPayrollRequest) returns (Payroll);
   rpc ListPayrolls(ListPayrollsRequest) returns (ListPayrollsResponse);
+  rpc GetPayslipPdf(GetPayslipPdfRequest) returns (PayslipPdfResponse);
 
 
   // Payroll Analytics
@@ -303,6 +304,7 @@ message CreatePaymentDetailsRequest {
   PAYMENT_FREQUENCY_ENUM payment_frequency = 8;
   string base_salary = 9;
   string account_name = 10;
+  optional string sort_code = 11;
 }
 
 message CreatePaymentDetailsResponse {
@@ -1264,4 +1266,18 @@ message FacilityAssetRecord {
   int64 acquisition_cost_minor = 8;
   string status = 9;
   string created_at = 10;
+}
+
+// ── Payslip PDF ───────────────────────────────────────────────────────────
+message GetPayslipPdfRequest {
+  string payroll_id = 1;
+  string staff_id = 2;
+  string company_id = 3;
+}
+
+message PayslipPdfResponse {
+  bytes pdf_bytes = 1;
+  string filename = 2;
+  bool success = 3;
+  string error = 4;
 }

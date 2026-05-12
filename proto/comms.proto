@@ -23,6 +23,8 @@ service CommsService {
 
   rpc SendAdminNotification (PushSubscriptionRequest) returns (PushSubscriptionResponse);
   rpc SendUserNotification (PushSubscriptionRequest) returns (PushSubscriptionResponse);
+  rpc CreateInAppNotification (CreateInAppNotificationRequest) returns (CreateInAppNotificationResponse);
+  rpc SendBatchNotification (BatchNotificationRequest) returns (BatchNotificationResponse);
 }
 
 message NotificationData {
@@ -39,7 +41,52 @@ enum NotificationType {
   FRIEND_REQUEST = 1;
   SYSTEM_ALERT = 2;
   STAFF_INVITATION = 3;
-  // Add more types as needed
+  CHAT_CREATED = 4;
+  // HR / business event types
+  LEAVE_REQUEST = 5;
+  LEAVE_APPROVED = 6;
+  LEAVE_REJECTED = 7;
+  PAYSLIP_READY = 8;
+  CONTRACT_CREATED = 9;
+  CONTRACT_ACTIVATED = 10;
+  CONTRACT_TERMINATED = 11;
+  DISCIPLINARY_ADDED = 12;
+  TRAINING_ASSIGNED = 13;
+  PERFORMANCE_REVIEW = 14;
+  DOCUMENT_UPLOADED = 15;
+  TASK_ASSIGNED = 16;
+  BROADCAST = 17;
+}
+
+message CreateInAppNotificationRequest {
+  string recipient_user_id = 1;
+  string sender_user_id = 2;
+  NotificationType type = 3;
+  string text = 4;
+  string link_url = 5;
+}
+
+message CreateInAppNotificationResponse {
+  bool success = 1;
+  string notification_id = 2;
+  string message = 3;
+}
+
+message BatchNotificationRequest {
+  repeated string recipient_user_ids = 1;
+  string sender_user_id = 2;
+  NotificationType type = 3;
+  string text = 4;
+  string link_url = 5;
+  string title = 6;
+  string body = 7;
+  bool send_push = 8;
+}
+
+message BatchNotificationResponse {
+  bool success = 1;
+  int32 created_count = 2;
+  string message = 3;
 }
 
 // Push notification service definition

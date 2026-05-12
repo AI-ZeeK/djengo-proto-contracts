@@ -1515,3 +1515,58 @@ message VerifyDocumentRequest {
   string document_id = 1;
   string verified_by = 2;
 }
+
+// ── HR Analytics Service ─────────────────────────────────────────────────
+service HrAnalyticsService {
+  rpc GetHeadcountReport  (HrAnalyticsRequest) returns (HeadcountReport);
+  rpc GetTurnoverReport   (HrAnalyticsRequest) returns (TurnoverReport);
+  rpc GetLeaveUtilization (HrAnalyticsRequest) returns (LeaveUtilizationReport);
+}
+
+message HrAnalyticsRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string start_date      = 3; // YYYY-MM-DD
+  string end_date        = 4; // YYYY-MM-DD
+}
+
+message HeadcountByDept {
+  string department_id   = 1;
+  string department_name = 2;
+  int32  headcount       = 3;
+}
+
+message HeadcountReport {
+  int32                    total_active     = 1;
+  int32                    total_inactive   = 2;
+  int32                    new_hires        = 3;
+  repeated HeadcountByDept by_department    = 4;
+}
+
+message TurnoverEvent {
+  string staff_id       = 1;
+  string staff_name     = 2;
+  string department     = 3;
+  string termination_date = 4;
+  string reason         = 5;
+}
+
+message TurnoverReport {
+  int32                  total_terminations  = 1;
+  double                 turnover_rate_pct   = 2;
+  repeated TurnoverEvent events              = 3;
+}
+
+message LeaveUtilizationRow {
+  string department_id   = 1;
+  string department_name = 2;
+  int32  total_days_allocated = 3;
+  int32  total_days_taken     = 4;
+  double utilization_pct      = 5;
+}
+
+message LeaveUtilizationReport {
+  repeated LeaveUtilizationRow rows = 1;
+  int32  total_requests_approved    = 2;
+  int32  total_days_taken           = 3;
+}
