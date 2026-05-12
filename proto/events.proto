@@ -80,7 +80,7 @@ service LeaveRequestService {
 service ActivityLogService {
   rpc CreateActivityLog   (ActivityLog)   returns (ActivityLogId);
   rpc GetActivityLog      (ActivityLogId) returns (ActivityLog);
-  rpc ListActivityLogs    (CompanyRequest) returns (ActivityLogListResponse);
+  rpc ListActivityLogs    (GetCompanyStaffRequest) returns (GetCompanyActivityLogsResponse);
   rpc DeleteActivityLog   (ActivityLogId) returns (DeleteResponse);
 }
 
@@ -90,7 +90,7 @@ service TaskService {
   rpc UpdateTask          (Task)                    returns (Task);
   rpc UpdateTaskStatus    (UpdateTaskStatusRequest) returns (Task);
   rpc DeleteTask          (TaskId)                  returns (DeleteResponse);
-  rpc ListTasksByCompany  (CompanyRequest)           returns (TaskListResponse);
+  rpc ListTasksByCompany  (GetCompanyStaffRequest)           returns (GetCompanyTasksResponse);
   rpc ListTasksByAssignee (StaffRequest)             returns (TaskListResponse);
 }
 
@@ -99,7 +99,7 @@ service TrainingService {
   rpc GetTrainingRecord    (TrainingRecordId)           returns (TrainingRecord);
   rpc UpdateTrainingStatus (UpdateTrainingStatusRequest) returns (TrainingRecord);
   rpc ListStaffTraining    (StaffRequest)               returns (TrainingRecordList);
-  rpc ListCompanyTraining  (CompanyRequest)             returns (TrainingRecordList);
+  rpc ListCompanyTraining  (GetCompanyStaffRequest)             returns (GetCompanyTrainingResponse);
 }
 
 service CalendarEventService {
@@ -176,7 +176,7 @@ service PerformanceReviewService {
   rpc GetPerformanceReview    (PerformanceReviewId) returns (PerformanceReview);
   rpc UpdatePerformanceReview (PerformanceReview)   returns (PerformanceReview);
   rpc ListPerformanceReviews  (StaffRequest)        returns (PerformanceReviewList);
-  rpc ListCompanyReviews      (CompanyRequest)      returns (PerformanceReviewList);
+  rpc ListCompanyReviews      (GetCompanyStaffRequest)      returns (GetCompanyPerformanceReviewResponse);
 }
 
 
@@ -185,9 +185,33 @@ service DisciplinaryService {
   rpc GetDisciplinaryRecord    (DisciplinaryRecordId)      returns (DisciplinaryRecord);
   rpc UpdateDisciplinaryRecord (UpdateDisciplinaryRequest) returns (DisciplinaryRecord);
   rpc ListStaffDisciplinary    (StaffRequest)              returns (DisciplinaryRecordList);
-  rpc ListCompanyDisciplinary  (CompanyRequest)            returns (DisciplinaryRecordList);
+  rpc ListCompanyDisciplinary  (GetCompanyStaffRequest)            returns (GetCompanyDisciplinaryResponse);
 }
 
+message GetCompanyActivityLogsResponse{
+  repeated ActivityLog logs = 1;
+  TableMeta meta = 2;
+}
+
+message GetCompanyTasksResponse{
+  repeated Task tasks = 1;
+  TableMeta meta = 2;
+}
+
+message GetCompanyDisciplinaryResponse{
+  repeated DisciplinaryRecord records = 1;
+  TableMeta meta = 2;
+}
+
+message GetCompanyPerformanceReviewResponse{
+  repeated PerformanceReview reviews = 1;
+  TableMeta meta = 2;
+}
+
+message GetCompanyTrainingResponse{
+  repeated TrainingRecord records = 1;
+  TableMeta meta = 2;
+}
 
 
 message ListApprovalChainsRequest {
@@ -1382,9 +1406,14 @@ service EmploymentContractService {
   rpc CreateContract       (EmploymentContractMsg)    returns (EmploymentContractId);
   rpc GetContract          (EmploymentContractId)     returns (EmploymentContractMsg);
   rpc ListStaffContracts   (StaffRequest)             returns (EmploymentContractList);
-  rpc ListCompanyContracts (CompanyRequest)           returns (EmploymentContractList);
+  rpc ListCompanyContracts (GetCompanyStaffRequest)           returns (GetCompanyContractsResponse);
   rpc ActivateContract     (EmploymentContractId)     returns (EmploymentContractId);
   rpc TerminateContract    (TerminateContractRequest) returns (EmploymentContractId);
+}
+
+message GetCompanyContractsResponse{
+  repeated EmploymentContractMsg contracts = 1;
+  TableMeta meta = 2;
 }
 
 message EmploymentContractMsg {
@@ -1427,10 +1456,28 @@ service StaffDocumentService {
   rpc UploadDocument      (StaffDocumentMsg)     returns (StaffDocumentId);
   rpc GetDocument         (StaffDocumentId)      returns (StaffDocumentMsg);
   rpc ListStaffDocuments  (StaffRequest)         returns (StaffDocumentList);
-  rpc ListCompanyDocuments(CompanyRequest)       returns (StaffDocumentList);
+  rpc ListCompanyDocuments(GetCompanyStaffRequest)       returns (GetCompanyStaffDocumentsResponse);
   rpc VerifyDocument      (VerifyDocumentRequest) returns (StaffDocumentId);
   rpc DeleteDocument      (StaffDocumentId)      returns (DeleteResponse);
 }
+
+
+message GetCompanyStaffRequest{
+  string company_id = 1;
+  string organization_id = 2;
+  repeated string staff_ids = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+  string sort_by = 6;
+  string sort_order = 7;
+  string search = 8;
+}
+
+message GetCompanyStaffDocumentsResponse{
+  repeated StaffDocumentMsg documents = 1;
+  TableMeta meta = 2;
+}
+
 
 message StaffDocumentMsg {
   string document_id    = 1;
