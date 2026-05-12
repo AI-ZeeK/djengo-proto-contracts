@@ -1375,4 +1375,92 @@ message UpdateComplaintCategoryRequest {
   bool   is_active   = 5;
   int32  sort_order  = 6;
 }
-z
+
+// ── Employment Contracts ──────────────────────────────────────────────────────
+
+service EmploymentContractService {
+  rpc CreateContract       (EmploymentContractMsg)    returns (EmploymentContractId);
+  rpc GetContract          (EmploymentContractId)     returns (EmploymentContractMsg);
+  rpc ListStaffContracts   (StaffRequest)             returns (EmploymentContractList);
+  rpc ListCompanyContracts (CompanyRequest)           returns (EmploymentContractList);
+  rpc ActivateContract     (EmploymentContractId)     returns (EmploymentContractId);
+  rpc TerminateContract    (TerminateContractRequest) returns (EmploymentContractId);
+}
+
+message EmploymentContractMsg {
+  string contract_id        = 1;
+  string staff_id           = 2;
+  string company_id         = 3;
+  string organization_id    = 4;
+  string employment_type    = 5;
+  string job_title          = 6;
+  double salary             = 7;
+  string currency_code      = 8;
+  string start_date         = 9;
+  string end_date           = 10;
+  double hours_per_week     = 11;
+  string probation_end_date = 12;
+  string status             = 13;
+  string terms_url          = 14;
+  string notes              = 15;
+  string issued_by          = 16;
+  string created_at         = 17;
+  string updated_at         = 18;
+}
+
+message EmploymentContractId {
+  string contract_id = 1;
+}
+
+message EmploymentContractList {
+  repeated EmploymentContractMsg contracts = 1;
+}
+
+message TerminateContractRequest {
+  string contract_id = 1;
+  string reason      = 2;
+}
+
+// ── Staff Documents ───────────────────────────────────────────────────────────
+
+service StaffDocumentService {
+  rpc UploadDocument      (StaffDocumentMsg)     returns (StaffDocumentId);
+  rpc GetDocument         (StaffDocumentId)      returns (StaffDocumentMsg);
+  rpc ListStaffDocuments  (StaffRequest)         returns (StaffDocumentList);
+  rpc ListCompanyDocuments(CompanyRequest)       returns (StaffDocumentList);
+  rpc VerifyDocument      (VerifyDocumentRequest) returns (StaffDocumentId);
+  rpc DeleteDocument      (StaffDocumentId)      returns (DeleteResponse);
+}
+
+message StaffDocumentMsg {
+  string document_id    = 1;
+  string staff_id       = 2;
+  string company_id     = 3;
+  string organization_id = 4;
+  string document_type  = 5;
+  string title          = 6;
+  string file_url       = 7;
+  int64  file_size      = 8;
+  string mime_type      = 9;
+  string description    = 10;
+  string expiry_date    = 11;
+  bool   is_verified    = 12;
+  string verified_by    = 13;
+  string verified_at    = 14;
+  string uploaded_by    = 15;
+  string created_at     = 16;
+  string updated_at     = 17;
+}
+
+message StaffDocumentId {
+  string document_id = 1;
+}
+
+message StaffDocumentList {
+  repeated StaffDocumentMsg documents = 1;
+}
+
+message VerifyDocumentRequest {
+  string document_id = 1;
+  string verified_by = 2;
+}
