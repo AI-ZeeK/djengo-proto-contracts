@@ -353,7 +353,7 @@ message Task {
 }
 
 message TaskId              { string task_id = 1; }
-message TaskListResponse    { repeated Task tasks = 1; int32 total = 2; }
+message TaskListResponse    { repeated Task tasks = 1; int32 total = 2;string message = 3; }
 message UpdateTaskStatusRequest { string task_id = 1; string status = 2; }
 
 // ─── CalendarEvent ───────────────────────────────────────────────────────────
@@ -640,7 +640,7 @@ message StaffPositionHistory {
 }
 
 message PositionHistoryId       { string position_history_id = 1; }
-message PositionHistoryList     { repeated StaffPositionHistory entries = 1; }
+message PositionHistoryList     { repeated StaffPositionHistory entries = 1; string message = 2; }
 
 
 // ─── HR: Leave Policy ────────────────────────────────────────────────────────
@@ -881,7 +881,7 @@ message PerformanceReview {
 }
 
 message PerformanceReviewId     { string review_id = 1; }
-message PerformanceReviewList   { repeated PerformanceReview reviews = 1; }
+message PerformanceReviewList   { repeated PerformanceReview reviews = 1; string message = 2; }
 
 
 
@@ -907,7 +907,7 @@ message DisciplinaryRecord {
 }
 
 message DisciplinaryRecordId    { string record_id = 1; }
-message DisciplinaryRecordList  { repeated DisciplinaryRecord records = 1; }
+message DisciplinaryRecordList  { repeated DisciplinaryRecord records = 1; string message = 2; }
 message UpdateDisciplinaryRequest {
   string record_id    = 1;
   string outcome      = 2;
@@ -939,7 +939,7 @@ message TrainingRecord {
 }
 
 message TrainingRecordId    { string training_id = 1; }
-message TrainingRecordList  { repeated TrainingRecord records = 1; }
+message TrainingRecordList  { repeated TrainingRecord records = 1; string message = 2; }
 message UpdateTrainingStatusRequest {
   string training_id    = 1;
   string status         = 2;
@@ -1335,6 +1335,7 @@ message MyComplaintsRequest {
 message ListComplaintsResponse {
   repeated Complaint complaints = 1;
   TableMeta          meta       = 2;
+  string message = 3;
 }
 
 message UpdateComplaintStatusRequest {
@@ -1443,6 +1444,7 @@ message EmploymentContractId {
 
 message EmploymentContractList {
   repeated EmploymentContractMsg contracts = 1;
+  string message = 2;
 }
 
 message TerminateContractRequest {
@@ -1460,6 +1462,7 @@ service StaffDocumentService {
   rpc VerifyDocument      (VerifyDocumentRequest) returns (StaffDocumentId);
   rpc DeleteDocument      (StaffDocumentId)      returns (DeleteResponse);
 }
+
 
 
 message GetCompanyStaffRequest{
@@ -1505,6 +1508,7 @@ message StaffDocumentId {
 
 message StaffDocumentList {
   repeated StaffDocumentMsg documents = 1;
+  string message = 2;
 }
 
 message VerifyDocumentRequest {
