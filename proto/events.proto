@@ -643,7 +643,7 @@ message StaffShiftAssignment {
 }
 
 message ShiftAssignmentId    { string assignment_id = 1; }
-message StaffShiftRequest    { string assignment_id = 1; string company_id = 2; }
+message StaffShiftRequest    { string assignment_id = 1; string company_id = 2; string organization_id = 3;   }
 message StaffShiftListResponse { repeated StaffShiftAssignment assignments = 1; int32 total = 2; }
 
 // ─── DailyEvent ──────────────────────────────────────────────────────────────
