@@ -622,11 +622,10 @@ message AssignShiftTemplateRequest {
 message UpdateAssignShiftTemplateRequest {
   string company_id        = 1;
   string organization_id   = 2;
-  string staff_id          = 3;
-  string shift_template_id = 4;
-  string effective_from    = 5;   // "YYYY-MM-DD"
-  string effective_to      = 6;   // "YYYY-MM-DD" or empty
-  string assignment_id     = 7;
+  string shift_template_id = 3;
+  string effective_from    = 4;   // "YYYY-MM-DD"
+  string effective_to      = 5;   // "YYYY-MM-DD" or empty
+  string assignment_id     = 6;
 }
 
 message StaffShiftAssignment {
