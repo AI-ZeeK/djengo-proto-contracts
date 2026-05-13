@@ -572,6 +572,7 @@ message CreateShiftTemplateRequest {
   bool   is_overnight      = 7;
   repeated DayOfWeek days_of_week = 8;  
   string color             = 9;
+  bool   is_active         = 10;
 }
 
 message UpdateShiftTemplateRequest {
@@ -585,6 +586,7 @@ message UpdateShiftTemplateRequest {
   repeated DayOfWeek days_of_week = 8;  
   string color             = 9;
   string shift_template_id = 10;
+  bool   is_active         = 11;
 }
 
 message ShiftTemplate {
