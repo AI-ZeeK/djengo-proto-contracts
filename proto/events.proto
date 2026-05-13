@@ -600,6 +600,7 @@ message ShiftTemplate {
   string color             = 10;
   string created_at        = 11;
   string updated_at        = 12;
+  string description       = 13;
 }
 
 message ShiftTemplateId            { string shift_template_id = 1; string company_id = 2; string organization_id = 3; }
