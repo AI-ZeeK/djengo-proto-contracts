@@ -639,6 +639,7 @@ message StaffShiftAssignment {
   string created_at        = 8;
   string updated_at        = 9;
   ShiftTemplate shift_template = 10;
+  Staff staff = 11;
 }
 
 message ShiftAssignmentId    { string assignment_id = 1; }
