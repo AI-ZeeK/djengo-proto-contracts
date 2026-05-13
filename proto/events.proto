@@ -141,9 +141,10 @@ service BusinessHoursService {
 
 
 service ShiftTemplateService {
-  rpc CreateShiftTemplate   (ShiftTemplate)         returns (ShiftTemplateId);
-  rpc UpdateShiftTemplate   (ShiftTemplate)         returns (ShiftTemplate);
+  rpc CreateShiftTemplate   (CreateShiftTemplateRequest)         returns (ShiftTemplateId);
+  rpc UpdateShiftTemplate   (UpdateShiftTemplateRequest)         returns (ShiftTemplate);
   rpc DeleteShiftTemplate   (ShiftTemplateId)       returns (DeleteResponse);
+  rpc GetShiftTemplate      (ShiftTemplateSlug)       returns (ShiftTemplate);
   rpc ListShiftTemplates    (CompanyRequest)         returns (ShiftTemplateListResponse);
   rpc AssignStaffShift      (StaffShiftAssignment)  returns (ShiftAssignmentId);
   rpc UpdateStaffShift      (StaffShiftAssignment)  returns (StaffShiftAssignment);
@@ -551,22 +552,58 @@ message BusinessHoursId { string hours_id = 1; }
 
 // ─── Shift Templates ──────────────────────────────────────────────────────────
 
+enum DayOfWeek {
+  DAY_OF_WEEK_MONDAY = 0;
+  DAY_OF_WEEK_TUESDAY = 1;
+  DAY_OF_WEEK_WEDNESDAY = 2;
+  DAY_OF_WEEK_THURSDAY = 3;
+  DAY_OF_WEEK_FRIDAY = 4;
+  DAY_OF_WEEK_SATURDAY = 5;
+  DAY_OF_WEEK_SUNDAY = 6;
+}
+
+message CreateShiftTemplateRequest {
+  string company_id        = 1;
+  string organization_id   = 2;
+  string name              = 3;
+  string description       = 4;
+  string start_time        = 5;
+  string end_time          = 6;
+  bool   is_overnight      = 7;
+  repeated DayOfWeek days_of_week = 8;  
+  string color             = 9;
+}
+
+message UpdateShiftTemplateRequest {
+  string company_id        = 1;
+  string organization_id   = 2;
+  string name              = 3;
+  string description       = 4;
+  string start_time        = 5;
+  string end_time          = 6;
+  bool   is_overnight      = 7;
+  repeated DayOfWeek days_of_week = 8;  
+  string color             = 9;
+  string shift_template_id = 10;
+}
+
 message ShiftTemplate {
   string shift_template_id = 1;
   string company_id        = 2;
   string organization_id   = 3;
   string name              = 4;
-  string start_time        = 5;   // "HH:mm"
-  string end_time          = 6;   // "HH:mm"
-  bool   is_overnight      = 7;
-  string days_of_week      = 8;   // JSON array "[1,2,3,4,5]"
-  string color             = 9;
-  bool   is_active         = 10;
+  string slug              = 5;
+  string start_time        = 6;   // "HH:mm"
+  string end_time          = 7;   // "HH:mm"
+  bool   is_overnight      = 8;
+  repeated DayOfWeek days_of_week      = 9;   // JSON array "[1,2,3,4,5]"
+  string color             = 10;
   string created_at        = 11;
   string updated_at        = 12;
 }
 
-message ShiftTemplateId            { string shift_template_id = 1; }
+message ShiftTemplateId            { string shift_template_id = 1; string company_id = 2; string organization_id = 3; }
+message ShiftTemplateSlug          { string slug = 1; string company_id = 2; string organization_id = 3; }
 message ShiftTemplateListResponse  { repeated ShiftTemplate templates = 1; int32 total = 2; }
 
 message StaffShiftAssignment {
