@@ -617,6 +617,8 @@ message AssignShiftTemplateRequest {
   string shift_template_id = 4;
   string effective_from    = 5;   // "YYYY-MM-DD"
   string effective_to      = 6;   // "YYYY-MM-DD" or empty
+  string assigned_by       = 7;
+
 }
 
 message UpdateAssignShiftTemplateRequest {
@@ -626,6 +628,7 @@ message UpdateAssignShiftTemplateRequest {
   string effective_from    = 4;   // "YYYY-MM-DD"
   string effective_to      = 5;   // "YYYY-MM-DD" or empty
   string assignment_id     = 6;
+  string assigned_by       = 7;
 }
 
 message StaffShiftAssignment {
