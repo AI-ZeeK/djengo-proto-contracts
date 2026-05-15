@@ -437,6 +437,7 @@ message StaffEvent {
   string updated_at  = 18;
   string deleted_at  = 19;
   string organization_id  = 20;
+  Staff staff = 21;
 }
 
 message StaffEventId                { string event_id = 1; }
@@ -480,13 +481,14 @@ message GetAttendanceRequest {
   string organization_id = 3;
   string from            = 4;
   string to              = 5;
+  string date            = 6;
 }
 
 message GetAttendanceByCompanyRequest {
   string company_id      = 1;
   string organization_id = 2;
-  string from            = 3;
-  string to              = 4;
+  optional string staff_id = 3;
+  string date            = 4;
   string search          = 5;
   string sort_by         = 6;
   string sort_order      = 7;
