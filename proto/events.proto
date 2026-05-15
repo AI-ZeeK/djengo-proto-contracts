@@ -459,6 +459,8 @@ message ClockInRequest {
 message ClockOutRequest {
   string event_id        = 1;
   string notes           = 2;
+  string staff_id        = 3;
+  string company_id      = 4;
 }
 
 message StartBreakRequest {
@@ -485,6 +487,11 @@ message GetAttendanceByCompanyRequest {
   string organization_id = 2;
   string from            = 3;
   string to              = 4;
+  string search          = 5;
+  string sort_by         = 6;
+  string sort_order      = 7;
+  int32 page             = 8;
+  int32 page_size        = 9;
 }
 
 message AttendanceDayRecord {
@@ -495,7 +502,7 @@ message AttendanceDayRecord {
 
 message AttendanceListResponse {
   repeated AttendanceDayRecord days = 1;
-  int32 total                       = 2;
+  TableMeta meta                    = 2;
 }
 
 message AttendanceSummary {
@@ -1732,8 +1739,6 @@ message VerifyAttendanceCodeRequest {
   string company_id       = 2;
   string organization_id  = 3;
   string code             = 4;
-  string scheduled_start  = 5;
-  string scheduled_end    = 6;
   string notes            = 7;
 }
 
