@@ -1714,3 +1714,37 @@ service EventsAnalyticsService {
   rpc GetShiftAnalytics             (GetShiftAnalyticsRequest)             returns (EventsAnalyticsResponse);
   rpc GetCompanyShiftAnalytics      (GetCompanyShiftAnalyticsRequest)      returns (EventsAnalyticsResponse);
 }
+
+// ─── Attendance Code Service (TOTP-style daily clock-in codes) ───────────────
+
+message GetAttendanceCodeRequest {
+  string company_id = 1;
+}
+
+message AttendanceCodeResponse {
+  string code        = 1;  // 6-digit numeric code
+  int32  expires_in  = 2;  // seconds until next rotation
+  string qr_payload  = 3;  // "djengo-clockin:{company_id}:{code}"
+}
+
+message VerifyAttendanceCodeRequest {
+  string staff_id         = 1;
+  string company_id       = 2;
+  string organization_id  = 3;
+  string code             = 4;
+  string scheduled_start  = 5;
+  string scheduled_end    = 6;
+  string notes            = 7;
+}
+
+message VerifyAttendanceCodeResponse {
+  bool   valid           = 1;
+  string staff_event_id  = 2;
+  string message         = 3;
+}
+
+service AttendanceCodeService {
+  rpc GetCode          (GetAttendanceCodeRequest)    returns (AttendanceCodeResponse);
+  rpc VerifyAndClockIn (VerifyAttendanceCodeRequest) returns (VerifyAttendanceCodeResponse);
+  rpc RegenerateSecret (GetAttendanceCodeRequest)    returns (AttendanceCodeResponse);
+}
