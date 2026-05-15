@@ -481,7 +481,7 @@ message GetAttendanceRequest {
   string organization_id = 3;
   string from            = 4;
   string to              = 5;
-  string date            = 6;
+  optional string date            = 6;
 }
 
 message GetAttendanceByCompanyRequest {
