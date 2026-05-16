@@ -462,6 +462,8 @@ message ClockOutRequest {
   string notes           = 2;
   string staff_id        = 3;
   string company_id      = 4;
+  string actual_end      = 5;
+
 }
 
 message StartBreakRequest {
