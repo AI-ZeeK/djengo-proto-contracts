@@ -11,6 +11,7 @@ package profile;
 service ProfileService {
     // Get all available staff documents for a staff member (exclude missing ones)
   rpc GetStaff(GetStaffRequest) returns (Staff);
+  rpc GetStaffDepartments(GetStaffDepartmentsRequest) returns (GetStaffDepartmentsResponse);
   rpc GetStaffDocuments(GetStaffDocumentsRequest) returns (GetStaffDocumentsResponse);
 
   // Payroll: Get staff for payroll with base salary and adjustments
@@ -44,6 +45,7 @@ service ProfileService {
   rpc GetUserCountForOrganization(GetUserCountForOrganizationRequest) returns (GetUserCountForOrganizationResponse);
   
   rpc GetLoginHistory(GetLoginHistoryRequest) returns (LoginHistoryResponse);
+  rpc RevokeSession(RevokeSessionRequest) returns (RevokeSessionResponse);
   
   // BUSINESS ROLES
   rpc CreateOrUpdateBusinessUserRole(CreateOrUpdateBusinessUserRoleRequest) returns (CreateOrUpdateBusinessUserRoleResponse);
@@ -97,6 +99,20 @@ service AdminProfileService {
 
 message GetStaffRequest {
   string user_id = 1;
+}
+
+message GetStaffDepartmentsRequest {
+  string staff_id = 1;
+}
+
+message StaffDepartmentLink {
+  string staff_id = 1;
+  string department_id = 2;
+  bool is_active = 3;
+}
+
+message GetStaffDepartmentsResponse {
+  repeated StaffDepartmentLink departments = 1;
 }
 
 
@@ -415,6 +431,16 @@ message GetLoginHistoryRequest {
   string user_id = 1;
   optional int32 page = 2;
   optional int32 page_size = 3;
+}
+
+message RevokeSessionRequest {
+  string user_id = 1;
+  string session_id = 2;
+}
+
+message RevokeSessionResponse {
+  bool success = 1;
+  string message = 2;
 }
 
 enum Timeline {
