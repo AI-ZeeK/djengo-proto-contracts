@@ -188,6 +188,9 @@ service FinancialsService {
 
   // ── Financial Audit Log (admin) ───────────────────────────────────────────
   rpc ListFinancialAuditLogs (ListFinancialAuditLogsRequest) returns (ListFinancialAuditLogsResponse);
+
+  // ── Budget Variance Report ────────────────────────────────────────────────
+  rpc GetBudgetVarianceReport (GetBudgetVarianceReportRequest) returns (BudgetVarianceReport);
 }
 
   // --- Bulk Export Payroll Schedules ---
@@ -1179,15 +1182,19 @@ message ListFinancialPeriodsResponse {
 // Budget Approval messages
 
 message ApproveBudgetRequest {
-  string budget_id         = 1;
-  string approver_staff_id = 2;
-  string comment           = 3;
+  string budget_id          = 1;
+  string approver_staff_id  = 2;
+  string comment            = 3;
+  string approver_role_id   = 4;
+  string approver_role_type = 5;
 }
 
 message RejectBudgetRequest {
-  string budget_id         = 1;
-  string approver_staff_id = 2;
-  string comment           = 3;
+  string budget_id          = 1;
+  string approver_staff_id  = 2;
+  string comment            = 3;
+  string approver_role_id   = 4;
+  string approver_role_type = 5;
 }
 
 // ── Financial Audit Log messages ──────────────────────────────────────────
@@ -1228,8 +1235,10 @@ message ListFinancialAuditLogsResponse {
 // ── Module 6: Facility & asset management (scaffold) ──────────────────────
 
 service FacilityAssetService {
-  rpc ListAssets (ListFacilityAssetsRequest) returns (ListFacilityAssetsResponse);
-  rpc RegisterAsset (RegisterFacilityAssetRequest) returns (FacilityAssetRecord);
+  rpc ListAssets             (ListFacilityAssetsRequest)       returns (ListFacilityAssetsResponse);
+  rpc RegisterAsset          (RegisterFacilityAssetRequest)    returns (FacilityAssetRecord);
+  rpc UpdateAsset            (UpdateFacilityAssetRequest)      returns (FacilityAssetRecord);
+  rpc GetDepreciationSchedule(GetDepreciationScheduleRequest)  returns (AssetDepreciationSchedule);
 }
 
 message ListFacilityAssetsRequest {
@@ -1266,6 +1275,80 @@ message FacilityAssetRecord {
   int64 acquisition_cost_minor = 8;
   string status = 9;
   string created_at = 10;
+  // Depreciation fields
+  optional int32  useful_life_months             = 11;
+  optional int64  salvage_value_minor            = 12;
+  optional string depreciation_method            = 13; // STRAIGHT_LINE | DECLINING_BALANCE
+  int64           accumulated_depreciation_minor = 14;
+  int64           net_book_value_minor           = 15;
+  optional string last_depreciation_at           = 16;
+}
+
+message UpdateFacilityAssetRequest {
+  string          asset_id             = 1;
+  string          company_id           = 2;
+  optional int32  useful_life_months   = 3;
+  optional int64  salvage_value_minor  = 4;
+  optional string depreciation_method  = 5; // STRAIGHT_LINE | DECLINING_BALANCE
+}
+
+message GetDepreciationScheduleRequest {
+  string asset_id      = 1;
+  string company_id    = 2;
+  int32  months_ahead  = 3; // how many future months to project (default 12)
+}
+
+message DepreciationLine {
+  string period                          = 1; // "2026-05"
+  int64  depreciation_amount_minor       = 2;
+  int64  accumulated_depreciation_minor  = 3;
+  int64  net_book_value_minor            = 4;
+}
+
+message AssetDepreciationSchedule {
+  string asset_id                        = 1;
+  string name                            = 2;
+  int64  acquisition_cost_minor          = 3;
+  int64  salvage_value_minor             = 4;
+  int32  useful_life_months              = 5;
+  string depreciation_method             = 6;
+  int64  accumulated_depreciation_minor  = 7;
+  int64  net_book_value_minor            = 8;
+  repeated DepreciationLine schedule     = 9;
+}
+
+// ── Budget Variance Report ────────────────────────────────────────────────
+message GetBudgetVarianceReportRequest {
+  string          company_id      = 1;
+  string          organization_id = 2;
+  int32           month           = 3;
+  int32           year            = 4;
+  optional string branch_id       = 5;
+}
+
+message BudgetVarianceLine {
+  string allocation_id     = 1;
+  string name              = 2;
+  string budget_type       = 3;
+  double budgeted_amount   = 4;
+  double actual_spend      = 5;
+  double variance          = 6;
+  double variance_percent  = 7;
+  string status            = 8; // UNDER_BUDGET | OVER_BUDGET | ON_TRACK
+}
+
+message BudgetVarianceReport {
+  string  budget_id              = 1;
+  string  company_id             = 2;
+  int32   month                  = 3;
+  int32   year                   = 4;
+  double  total_budgeted         = 5;
+  double  total_actual_spend     = 6;
+  double  total_variance         = 7;
+  double  total_variance_percent = 8;
+  repeated BudgetVarianceLine lines = 9;
+  string  generated_at           = 10;
+  bool    budget_found           = 11;
 }
 
 // ── Payslip PDF ───────────────────────────────────────────────────────────

@@ -497,8 +497,8 @@ message GetAttendanceByCompanyRequest {
 }
 
 message AttendanceDayRecord {
-  string date              = 1;
-  StaffEvent attendance    = 2;
+  string date                = 1;
+  StaffEvent attendance      = 2;
   repeated StaffEvent breaks = 3;
 }
 
