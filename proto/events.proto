@@ -462,8 +462,8 @@ message ClockOutRequest {
   string notes           = 2;
   string staff_id        = 3;
   string company_id      = 4;
+  /// Optional ISO-8601 UTC time; when omitted, server uses now with shift rules / forgotten-clock-out fallback.
   string actual_end      = 5;
-
 }
 
 message StartBreakRequest {
@@ -499,8 +499,8 @@ message GetAttendanceByCompanyRequest {
 }
 
 message AttendanceDayRecord {
-  string date                = 1;
-  StaffEvent attendance      = 2;
+  string date              = 1;
+  StaffEvent attendance    = 2;
   repeated StaffEvent breaks = 3;
 }
 
@@ -1739,11 +1739,13 @@ message AttendanceCodeResponse {
 }
 
 message VerifyAttendanceCodeRequest {
-  string staff_id         = 1;
-  string company_id       = 2;
-  string organization_id  = 3;
-  string code             = 4;
-  string notes            = 7;
+  string staff_id              = 1;
+  string company_id            = 2;
+  string organization_id       = 3;
+  string code                  = 4;
+  string notes                 = 7;
+  string event_id              = 8;  // attendance event id (clock-out)
+  string attendance_event_id   = 9;  // linked attendance (start break)
 }
 
 message VerifyAttendanceCodeResponse {
@@ -1753,7 +1755,9 @@ message VerifyAttendanceCodeResponse {
 }
 
 service AttendanceCodeService {
-  rpc GetCode          (GetAttendanceCodeRequest)    returns (AttendanceCodeResponse);
-  rpc VerifyAndClockIn (VerifyAttendanceCodeRequest) returns (VerifyAttendanceCodeResponse);
-  rpc RegenerateSecret (GetAttendanceCodeRequest)    returns (AttendanceCodeResponse);
+  rpc GetCode             (GetAttendanceCodeRequest)    returns (AttendanceCodeResponse);
+  rpc VerifyAndClockIn    (VerifyAttendanceCodeRequest) returns (VerifyAttendanceCodeResponse);
+  rpc VerifyAndClockOut   (VerifyAttendanceCodeRequest) returns (VerifyAttendanceCodeResponse);
+  rpc VerifyAndStartBreak (VerifyAttendanceCodeRequest) returns (VerifyAttendanceCodeResponse);
+  rpc RegenerateSecret    (GetAttendanceCodeRequest)    returns (AttendanceCodeResponse);
 }

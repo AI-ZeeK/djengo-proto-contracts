@@ -466,3 +466,220 @@ message RestaurantTable {
   optional string description = 2;
   optional int32 location_id = 3;
 }
+
+// ── Orders ─────────────────────────────────────────────────────────────────
+
+service OrderService {
+  rpc PlaceOrder          (PlaceOrderRequest)          returns (OrderProto);
+  rpc GetOrder            (GetOrderRequest)            returns (OrderProto);
+  rpc ListOrders          (ListOrdersRequest)          returns (ListOrdersResponse);
+  rpc UpdateOrderStatus   (UpdateOrderStatusRequest)   returns (OrderProto);
+  rpc CancelOrder         (CancelOrderRequest)         returns (OrderProto);
+}
+
+message OrderItemProto {
+  string order_item_id     = 1;
+  string order_id          = 2;
+  string catalog_item_id   = 3;
+  string name_snapshot     = 4;
+  int32  quantity          = 5;
+  int64  unit_price_minor  = 6;
+  int64  total_minor       = 7;
+  optional string special_instructions = 8;
+}
+
+message OrderProto {
+  string order_id           = 1;
+  string company_id         = 2;
+  string organization_id    = 3;
+  string source_id          = 4;
+  string source_type        = 5; // RESTAURANT | HOTEL | SPA | GYM | BAR | ROOM_SERVICE | OTHER
+  optional string destination_ref = 6;
+  optional string guest_id  = 7;
+  string order_number       = 8;
+  string order_type         = 9; // DINE_IN | TAKEAWAY | ROOM_SERVICE | DELIVERY
+  string status             = 10; // PENDING | CONFIRMED | PREPARING | READY | SERVED | CANCELLED | REFUNDED
+  int64  subtotal_minor     = 11;
+  int64  tax_minor          = 12;
+  int64  discount_minor     = 13;
+  int64  total_minor        = 14;
+  string currency_code      = 15;
+  optional string special_instructions = 16;
+  string placed_by          = 17;
+  string placed_at          = 18;
+  optional string confirmed_at = 19;
+  optional string served_at = 20;
+  repeated OrderItemProto items = 21;
+  string created_at         = 22;
+  string updated_at         = 23;
+}
+
+message PlaceOrderRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  string source_id          = 3;
+  string source_type        = 4;
+  optional string destination_ref = 5;
+  optional string guest_id  = 6;
+  string order_type         = 7;
+  string currency_code      = 8;
+  optional string special_instructions = 9;
+  string placed_by          = 10;
+  repeated OrderItemProto items = 11;
+}
+
+message GetOrderRequest           { string order_id = 1; }
+message CancelOrderRequest        { string order_id = 1; string cancelled_by = 2; optional string reason = 3; }
+
+message UpdateOrderStatusRequest {
+  string order_id    = 1;
+  string status      = 2;
+  string updated_by  = 3;
+}
+
+message ListOrdersRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  optional string source_id = 3;
+  optional string source_type = 4;
+  optional string status    = 5;
+  optional string guest_id  = 6;
+  optional string search    = 7;
+  optional int32  page      = 8;
+  optional int32  page_size = 9;
+}
+
+message ListOrdersResponse {
+  repeated OrderProto orders = 1;
+  TableMeta meta             = 2;
+}
+
+// ── Kitchen Tickets ────────────────────────────────────────────────────────
+
+service KitchenService {
+  rpc ListKitchenTickets          (ListKitchenTicketsRequest)         returns (ListKitchenTicketsResponse);
+  rpc GetKitchenTicket            (GetKitchenTicketRequest)           returns (KitchenTicketProto);
+  rpc UpdateKitchenTicketStatus   (UpdateKitchenTicketStatusRequest)  returns (KitchenTicketProto);
+  rpc AssignKitchenTicket         (AssignKitchenTicketRequest)        returns (KitchenTicketProto);
+}
+
+message KitchenTicketProto {
+  string ticket_id       = 1;
+  string order_id        = 2;
+  string company_id      = 3;
+  string organization_id = 4;
+  string station         = 5; // MAIN | BAR | PASTRY | GRILL | COLD | OTHER
+  string status          = 6; // QUEUED | IN_PROGRESS | READY | DELIVERED | CANCELLED
+  optional string assigned_to = 7;
+  int32  priority        = 8;
+  optional string started_at   = 9;
+  optional string ready_at     = 10;
+  optional string delivered_at = 11;
+  optional string notes  = 12;
+  string created_at      = 13;
+  string updated_at      = 14;
+}
+
+message GetKitchenTicketRequest { string ticket_id = 1; }
+
+message UpdateKitchenTicketStatusRequest {
+  string ticket_id   = 1;
+  string status      = 2;
+  string updated_by  = 3;
+}
+
+message AssignKitchenTicketRequest {
+  string ticket_id   = 1;
+  string assigned_to = 2;
+}
+
+message ListKitchenTicketsRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  optional string station   = 3;
+  optional string status    = 4;
+  optional string order_id  = 5;
+  optional int32  page      = 6;
+  optional int32  page_size = 7;
+}
+
+message ListKitchenTicketsResponse {
+  repeated KitchenTicketProto tickets = 1;
+  TableMeta meta                      = 2;
+}
+
+// ── Guest Feedback ─────────────────────────────────────────────────────────
+
+service GuestFeedbackService {
+  rpc SubmitFeedback  (SubmitFeedbackRequest)  returns (GuestFeedbackProto);
+  rpc GetFeedback     (GetFeedbackRequest)     returns (GuestFeedbackProto);
+  rpc ListFeedback    (ListFeedbackRequest)    returns (ListFeedbackResponse);
+  rpc RespondToFeedback (RespondToFeedbackRequest) returns (GuestFeedbackProto);
+}
+
+message GuestFeedbackProto {
+  string feedback_id      = 1;
+  optional string guest_id = 2;
+  string company_id       = 3;
+  string organization_id  = 4;
+  optional string reservation_id = 5;
+  optional string order_id = 6;
+  int32  overall_rating   = 7;
+  optional int32 service_rating    = 8;
+  optional int32 cleanliness_rating = 9;
+  optional int32 value_rating      = 10;
+  optional string comment = 11;
+  string category         = 12; // GENERAL | ROOM | FOOD | SERVICE | CLEANLINESS | FACILITIES | VALUE | COMPLAINT
+  bool   is_public        = 13;
+  optional string response = 14;
+  optional string responded_by = 15;
+  optional string responded_at = 16;
+  string created_at       = 17;
+  string updated_at       = 18;
+}
+
+message SubmitFeedbackRequest {
+  optional string guest_id = 1;
+  string company_id        = 2;
+  string organization_id   = 3;
+  optional string reservation_id = 4;
+  optional string order_id = 5;
+  int32  overall_rating    = 6;
+  optional int32 service_rating    = 7;
+  optional int32 cleanliness_rating = 8;
+  optional int32 value_rating      = 9;
+  optional string comment  = 10;
+  string category          = 11;
+  bool   is_public         = 12;
+}
+
+message GetFeedbackRequest { string feedback_id = 1; }
+
+message RespondToFeedbackRequest {
+  string feedback_id   = 1;
+  string response      = 2;
+  string responded_by  = 3;
+}
+
+message ListFeedbackRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  optional string guest_id  = 3;
+  optional string category  = 4;
+  optional int32  page      = 5;
+  optional int32  page_size = 6;
+}
+
+message ListFeedbackResponse {
+  repeated GuestFeedbackProto feedback = 1;
+  TableMeta meta                       = 2;
+}
+
+message TableMeta {
+  int32 total       = 1;
+  int32 current_page = 2;
+  int32 page_size   = 3;
+  int32 total_pages = 4;
+  int32 next_page   = 5;
+  int32 prev_page   = 6;
+}

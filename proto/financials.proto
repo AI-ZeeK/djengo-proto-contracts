@@ -1364,3 +1364,413 @@ message PayslipPdfResponse {
   bool success = 3;
   string error = 4;
 }
+
+// ── Procurement ────────────────────────────────────────────────────────────
+
+service ProcurementService {
+  // Vendors
+  rpc CreateVendor          (CreateVendorRequest)          returns (VendorProto);
+  rpc GetVendor             (GetVendorRequest)             returns (VendorProto);
+  rpc ListVendors           (ListVendorsRequest)           returns (ListVendorsResponse);
+  rpc UpdateVendor          (UpdateVendorRequest)          returns (VendorProto);
+  rpc ApproveVendor         (ApproveVendorRequest)         returns (VendorProto);
+  rpc SuspendVendor         (SuspendVendorRequest)         returns (VendorProto);
+
+  // Purchase Requests
+  rpc CreatePurchaseRequest  (CreatePurchaseRequestRequest)  returns (PurchaseRequestProto);
+  rpc GetPurchaseRequest     (GetPurchaseRequestRequest)     returns (PurchaseRequestProto);
+  rpc ListPurchaseRequests   (ListPurchaseRequestsRequest)   returns (ListPurchaseRequestsResponse);
+  rpc ApprovePurchaseRequest (ApprovePurchaseRequestRequest) returns (PurchaseRequestProto);
+  rpc RejectPurchaseRequest  (RejectPurchaseRequestRequest)  returns (PurchaseRequestProto);
+
+  // Purchase Orders
+  rpc CreatePurchaseOrder  (CreatePurchaseOrderRequest)  returns (PurchaseOrderProto);
+  rpc GetPurchaseOrder     (GetPurchaseOrderRequest)     returns (PurchaseOrderProto);
+  rpc ListPurchaseOrders   (ListPurchaseOrdersRequest)   returns (ListPurchaseOrdersResponse);
+  rpc IssuePurchaseOrder   (IssuePurchaseOrderRequest)   returns (PurchaseOrderProto);
+  rpc CancelPurchaseOrder  (CancelPurchaseOrderRequest)  returns (PurchaseOrderProto);
+
+  // Goods Receipt Notes
+  rpc CreateGoodsReceiptNote  (CreateGoodsReceiptNoteRequest)  returns (GoodsReceiptNoteProto);
+  rpc GetGoodsReceiptNote     (GetGoodsReceiptNoteRequest)     returns (GoodsReceiptNoteProto);
+  rpc ListGoodsReceiptNotes   (ListGoodsReceiptNotesRequest)   returns (ListGoodsReceiptNotesResponse);
+  rpc CompleteGoodsReceipt    (CompleteGoodsReceiptRequest)    returns (GoodsReceiptNoteProto);
+}
+
+// --- Vendor ---
+
+message VendorProto {
+  string vendor_id          = 1;
+  string organization_id    = 2;
+  string company_id         = 3;
+  string name               = 4;
+  optional string contact_person = 5;
+  optional string email     = 6;
+  optional string phone_number = 7;
+  optional string address   = 8;
+  optional string tax_id    = 9;
+  optional string bank_name = 10;
+  optional string bank_account_number = 11;
+  string currency_code      = 12;
+  int32  payment_terms_days = 13;
+  string status             = 14; // PENDING | APPROVED | SUSPENDED | BLACKLISTED
+  optional string approved_by = 15;
+  optional string approved_at = 16;
+  string created_at         = 17;
+  string updated_at         = 18;
+}
+
+message CreateVendorRequest {
+  string organization_id    = 1;
+  string company_id         = 2;
+  string name               = 3;
+  optional string contact_person = 4;
+  optional string email     = 5;
+  optional string phone_number = 6;
+  optional string address   = 7;
+  optional string tax_id    = 8;
+  optional string bank_name = 9;
+  optional string bank_account_number = 10;
+  string currency_code      = 11;
+  optional int32 payment_terms_days = 12;
+  optional string notes     = 13;
+}
+
+message GetVendorRequest    { string vendor_id = 1; string company_id = 2; }
+message ApproveVendorRequest { string vendor_id = 1; string approved_by = 2; }
+message SuspendVendorRequest { string vendor_id = 1; string reason = 2; }
+
+message UpdateVendorRequest {
+  string vendor_id          = 1;
+  string company_id         = 2;
+  optional string contact_person = 3;
+  optional string email     = 4;
+  optional string phone_number = 5;
+  optional string address   = 6;
+  optional string bank_name = 7;
+  optional string bank_account_number = 8;
+  optional int32 payment_terms_days = 9;
+  optional string notes     = 10;
+}
+
+message ListVendorsRequest {
+  string organization_id   = 1;
+  string company_id        = 2;
+  optional string status   = 3;
+  optional string search   = 4;
+  optional int32 page      = 5;
+  optional int32 page_size = 6;
+}
+
+message ListVendorsResponse {
+  repeated VendorProto vendors = 1;
+  TableMeta meta               = 2;
+}
+
+// --- Purchase Request ---
+
+message PurchaseRequestItemProto {
+  string pr_item_id              = 1;
+  string pr_id                   = 2;
+  optional string inventory_item_id = 3;
+  string description             = 4;
+  double quantity                = 5;
+  optional string unit           = 6;
+  int64  estimated_unit_cost_minor = 7;
+}
+
+message PurchaseRequestProto {
+  string pr_id           = 1;
+  string organization_id = 2;
+  string company_id      = 3;
+  optional string branch_id = 4;
+  string pr_number       = 5;
+  string requested_by    = 6;
+  optional string department_id = 7;
+  string status          = 8;
+  string priority        = 9;
+  optional string required_by  = 10;
+  optional string justification = 11;
+  optional string approved_by  = 12;
+  optional string approved_at  = 13;
+  optional string rejection_reason = 14;
+  repeated PurchaseRequestItemProto items = 15;
+  string created_at      = 16;
+  string updated_at      = 17;
+}
+
+message CreatePurchaseRequestRequest {
+  string organization_id = 1;
+  string company_id      = 2;
+  optional string branch_id = 3;
+  string requested_by    = 4;
+  optional string department_id = 5;
+  string priority        = 6;
+  optional string required_by  = 7;
+  optional string justification = 8;
+  repeated PurchaseRequestItemProto items = 9;
+}
+
+message GetPurchaseRequestRequest  { string pr_id = 1; }
+message ApprovePurchaseRequestRequest { string pr_id = 1; string approved_by = 2; optional string comment = 3; }
+message RejectPurchaseRequestRequest  { string pr_id = 1; string rejected_by = 2; string reason = 3; }
+
+message ListPurchaseRequestsRequest {
+  string company_id        = 1;
+  string organization_id   = 2;
+  optional string status   = 3;
+  optional string search   = 4;
+  optional int32 page      = 5;
+  optional int32 page_size = 6;
+}
+
+message ListPurchaseRequestsResponse {
+  repeated PurchaseRequestProto requests = 1;
+  TableMeta meta                         = 2;
+}
+
+// --- Purchase Order ---
+
+message PurchaseOrderItemProto {
+  string po_item_id              = 1;
+  string po_id                   = 2;
+  optional string inventory_item_id = 3;
+  string description             = 4;
+  double quantity_ordered        = 5;
+  double quantity_received       = 6;
+  optional string unit           = 7;
+  int64  unit_price_minor        = 8;
+  int64  total_minor             = 9;
+}
+
+message PurchaseOrderProto {
+  string po_id              = 1;
+  string organization_id    = 2;
+  string company_id         = 3;
+  string vendor_id          = 4;
+  optional string pr_id     = 5;
+  string po_number          = 6;
+  string status             = 7;
+  string currency_code      = 8;
+  int64  subtotal_minor     = 9;
+  int64  tax_minor          = 10;
+  int64  total_minor        = 11;
+  int32  payment_terms_days = 12;
+  optional string expected_delivery = 13;
+  optional string delivery_address  = 14;
+  optional string notes     = 15;
+  optional string issued_by = 16;
+  optional string issued_at = 17;
+  repeated PurchaseOrderItemProto items = 18;
+  string created_at         = 19;
+  string updated_at         = 20;
+}
+
+message CreatePurchaseOrderRequest {
+  string organization_id    = 1;
+  string company_id         = 2;
+  string vendor_id          = 3;
+  optional string pr_id     = 4;
+  string currency_code      = 5;
+  optional int32 payment_terms_days = 6;
+  optional string expected_delivery = 7;
+  optional string delivery_address  = 8;
+  optional string notes     = 9;
+  repeated PurchaseOrderItemProto items = 10;
+}
+
+message GetPurchaseOrderRequest    { string po_id = 1; }
+message IssuePurchaseOrderRequest  { string po_id = 1; string issued_by = 2; }
+message CancelPurchaseOrderRequest { string po_id = 1; string reason = 2; }
+
+message ListPurchaseOrdersRequest {
+  string company_id        = 1;
+  string organization_id   = 2;
+  optional string status   = 3;
+  optional string vendor_id = 4;
+  optional string search   = 5;
+  optional int32 page      = 6;
+  optional int32 page_size = 7;
+}
+
+message ListPurchaseOrdersResponse {
+  repeated PurchaseOrderProto orders = 1;
+  TableMeta meta                     = 2;
+}
+
+// --- Goods Receipt Note ---
+
+message GoodsReceiptNoteItemProto {
+  string grn_item_id       = 1;
+  string grn_id            = 2;
+  string po_item_id        = 3;
+  string description       = 4;
+  double quantity_received = 5;
+  double quantity_rejected = 6;
+  optional string rejection_reason = 7;
+  optional string unit     = 8;
+}
+
+message GoodsReceiptNoteProto {
+  string grn_id             = 1;
+  string po_id              = 2;
+  string organization_id    = 3;
+  string company_id         = 4;
+  string grn_number         = 5;
+  string status             = 6;
+  string received_by        = 7;
+  string received_at        = 8;
+  optional string delivery_note_ref = 9;
+  optional string notes     = 10;
+  repeated GoodsReceiptNoteItemProto items = 11;
+  string created_at         = 12;
+  string updated_at         = 13;
+}
+
+message CreateGoodsReceiptNoteRequest {
+  string po_id              = 1;
+  string organization_id    = 2;
+  string company_id         = 3;
+  string received_by        = 4;
+  optional string delivery_note_ref = 5;
+  optional string notes     = 6;
+  repeated GoodsReceiptNoteItemProto items = 7;
+}
+
+message GetGoodsReceiptNoteRequest    { string grn_id = 1; }
+message CompleteGoodsReceiptRequest   { string grn_id = 1; string completed_by = 2; }
+
+message ListGoodsReceiptNotesRequest {
+  string company_id        = 1;
+  string organization_id   = 2;
+  optional string po_id    = 3;
+  optional string status   = 4;
+  optional int32 page      = 5;
+  optional int32 page_size = 6;
+}
+
+message ListGoodsReceiptNotesResponse {
+  repeated GoodsReceiptNoteProto notes = 1;
+  TableMeta meta                       = 2;
+}
+
+// ── Guest Billing (CRM) ────────────────────────────────────────────────────
+
+service GuestBillingService {
+  rpc CreateGuestInvoice  (CreateGuestInvoiceRequest)  returns (GuestInvoiceProto);
+  rpc GetGuestInvoice     (GetGuestInvoiceRequest)     returns (GuestInvoiceProto);
+  rpc ListGuestInvoices   (ListGuestInvoicesRequest)   returns (ListGuestInvoicesResponse);
+  rpc IssueGuestInvoice   (IssueGuestInvoiceRequest)   returns (GuestInvoiceProto);
+  rpc VoidGuestInvoice    (VoidGuestInvoiceRequest)    returns (GuestInvoiceProto);
+  rpc RecordGuestPayment  (RecordGuestPaymentRequest)  returns (GuestPaymentProto);
+  rpc ListGuestPayments   (ListGuestPaymentsRequest)   returns (ListGuestPaymentsResponse);
+}
+
+message GuestInvoiceLineItemProto {
+  string line_item_id    = 1;
+  string invoice_id      = 2;
+  string description     = 3;
+  int32  quantity        = 4;
+  int64  unit_price_minor = 5;
+  int64  total_minor     = 6;
+}
+
+message GuestInvoiceProto {
+  string invoice_id       = 1;
+  string guest_id         = 2;
+  string company_id       = 3;
+  string organization_id  = 4;
+  optional string reservation_id = 5;
+  optional string order_id = 6;
+  string invoice_number   = 7;
+  int64  subtotal_minor   = 8;
+  int64  discount_minor   = 9;
+  int64  tax_minor        = 10;
+  int64  total_minor      = 11;
+  int64  amount_paid_minor = 12;
+  string currency_code    = 13;
+  string status           = 14;
+  optional string due_date = 15;
+  optional string issued_at = 16;
+  optional string notes   = 17;
+  repeated GuestInvoiceLineItemProto line_items = 18;
+  string created_at       = 19;
+  string updated_at       = 20;
+}
+
+message CreateGuestInvoiceRequest {
+  string guest_id         = 1;
+  string company_id       = 2;
+  string organization_id  = 3;
+  optional string reservation_id = 4;
+  optional string order_id = 5;
+  int64  subtotal_minor   = 6;
+  int64  discount_minor   = 7;
+  int64  tax_minor        = 8;
+  string currency_code    = 9;
+  optional string due_date = 10;
+  optional string notes   = 11;
+  repeated GuestInvoiceLineItemProto line_items = 12;
+}
+
+message GetGuestInvoiceRequest    { string invoice_id = 1; }
+message IssueGuestInvoiceRequest  { string invoice_id = 1; string issued_by = 2; }
+message VoidGuestInvoiceRequest   { string invoice_id = 1; string voided_by = 2; string reason = 3; }
+
+message ListGuestInvoicesRequest {
+  string company_id        = 1;
+  string organization_id   = 2;
+  optional string guest_id = 3;
+  optional string status   = 4;
+  optional int32 page      = 5;
+  optional int32 page_size = 6;
+}
+
+message ListGuestInvoicesResponse {
+  repeated GuestInvoiceProto invoices = 1;
+  TableMeta meta                      = 2;
+}
+
+message GuestPaymentProto {
+  string payment_id      = 1;
+  string invoice_id      = 2;
+  string guest_id        = 3;
+  string company_id      = 4;
+  string organization_id = 5;
+  int64  amount_minor    = 6;
+  string currency_code   = 7;
+  string payment_method  = 8;
+  optional string reference = 9;
+  string status          = 10;
+  optional string paid_at = 11;
+  optional string recorded_by = 12;
+  optional string notes  = 13;
+  string created_at      = 14;
+}
+
+message RecordGuestPaymentRequest {
+  string invoice_id      = 1;
+  string guest_id        = 2;
+  string company_id      = 3;
+  string organization_id = 4;
+  int64  amount_minor    = 5;
+  string currency_code   = 6;
+  string payment_method  = 7;
+  optional string reference = 8;
+  string recorded_by     = 9;
+  optional string notes  = 10;
+}
+
+message ListGuestPaymentsRequest {
+  string company_id        = 1;
+  string organization_id   = 2;
+  optional string guest_id = 3;
+  optional string invoice_id = 4;
+  optional int32 page      = 5;
+  optional int32 page_size = 6;
+}
+
+message ListGuestPaymentsResponse {
+  repeated GuestPaymentProto payments = 1;
+  TableMeta meta                      = 2;
+}
