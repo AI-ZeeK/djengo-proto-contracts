@@ -13,6 +13,7 @@ service OrganizationService {
   rpc CreateCompany(CreateCompanyRequest) returns (UtilitiesResponse);
   rpc FetchOrganizationCompanies(OrganizationIdRequest) returns (FetchCompaniesResponse);
   rpc FetchCompany(FetchCompanyRequest) returns (FetchCompanyResponse);
+  rpc FetchCompanyMeta(FetchCompanyRequest) returns (FetchCompanyMetaResponse);
   rpc HandleMultiBranchCompanySetup(FetchCompanyRequest) returns (UtilitiesResponse);
   rpc UpdateCompanyDetails(UpdateCompanyDetailsRequest) returns (UtilitiesResponse);
 
@@ -308,6 +309,13 @@ message FetchCompanyResponse {
   bool success = 1;
   optional string error = 2;
   Company company = 3;
+  string message = 4;
+}
+
+message FetchCompanyMetaResponse {
+  bool success = 1;
+  optional string error = 2;
+  CompanyMetaData company_meta_data = 3;
   string message = 4;
 }
 message FetchBranchResponse {    
@@ -933,6 +941,8 @@ message CompanyMetaData {
   bool require_cost_center_on_budget_lines = 9;
   bool require_payroll_dimensions_on_run = 10;
   optional int64 petty_cash_approval_threshold_minor = 11;
+  string country_code = 12;
+  string base_currency = 13;
 }
 
 message Branch {
