@@ -1234,11 +1234,33 @@ message ListFinancialAuditLogsResponse {
 
 // ── Module 6: Facility & asset management (scaffold) ──────────────────────
 
+enum FacilityCategoryCode {
+  FACILITY_CATEGORY_UNSPECIFIED = 0;
+  FURNITURE   = 1;
+  EQUIPMENT   = 2;
+  VEHICLE     = 3;
+  TECHNOLOGY  = 4;
+  LAND        = 5;
+  BUILDING    = 6;
+  OTHER       = 7;
+}
+
+message FacilityCategoryCodeInfo {
+  string               slug         = 1; // e.g. "FURNITURE"
+  string               display_name = 2; // e.g. "Furniture"
+  FacilityCategoryCode type         = 3;
+}
+
+message ListFacilityCategoryCodesResponse {
+  repeated FacilityCategoryCodeInfo types = 1;
+}
+
 service FacilityAssetService {
-  rpc ListAssets             (ListFacilityAssetsRequest)       returns (ListFacilityAssetsResponse);
-  rpc RegisterAsset          (RegisterFacilityAssetRequest)    returns (FacilityAssetRecord);
-  rpc UpdateAsset            (UpdateFacilityAssetRequest)      returns (FacilityAssetRecord);
-  rpc GetDepreciationSchedule(GetDepreciationScheduleRequest)  returns (AssetDepreciationSchedule);
+  rpc ListFacilityCategoryCodes (EmptyRequest)                    returns (ListFacilityCategoryCodesResponse);
+  rpc ListAssets                  (ListFacilityAssetsRequest)       returns (ListFacilityAssetsResponse);
+  rpc RegisterAsset               (RegisterFacilityAssetRequest)    returns (FacilityAssetRecord);
+  rpc UpdateAsset                 (UpdateFacilityAssetRequest)      returns (FacilityAssetRecord);
+  rpc GetDepreciationSchedule     (GetDepreciationScheduleRequest)  returns (AssetDepreciationSchedule);
 }
 
 message ListFacilityAssetsRequest {
