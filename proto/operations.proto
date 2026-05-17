@@ -675,6 +675,71 @@ message ListFeedbackResponse {
   TableMeta meta                       = 2;
 }
 
+// ── Incidents ─────────────────────────────────────────────────────────────
+
+enum IncidentStatus {
+  INCIDENT_STATUS_UNSPECIFIED = 0;
+  REPORTED   = 1;
+  ASSIGNED   = 2;
+  IN_PROGRESS = 3;
+  RESOLVED   = 4;
+  CLOSED     = 5;
+}
+
+message Incident {
+  string incident_id     = 1;
+  string company_id      = 2;
+  string organization_id = 3;
+  string title           = 4;
+  string description     = 5;
+  IncidentStatus status  = 6;
+  string created_at      = 7;
+  string updated_at      = 8;
+  string resolved_at     = 9;
+  string assigned_to     = 10;
+  string sla_due         = 11;
+  string sla_deadline    = 12;
+}
+
+message CreateIncidentRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string title           = 3;
+  string description     = 4;
+  optional string assigned_to = 5;
+  optional string sla_due       = 6;
+}
+
+message GetIncidentRequest {
+  string incident_id = 1;
+}
+
+message ListIncidentsRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+}
+
+message UpdateIncidentStatusRequest {
+  string incident_id    = 1;
+  IncidentStatus status = 2;
+}
+
+message IncidentResponse {
+  optional Incident incident = 1;
+  string error               = 2;
+}
+
+message ListIncidentsResponse {
+  repeated Incident incidents = 1;
+}
+
+service IncidentService {
+  rpc CreateIncident       (CreateIncidentRequest)       returns (IncidentResponse);
+  rpc GetIncident          (GetIncidentRequest)          returns (IncidentResponse);
+  rpc ListIncidents        (ListIncidentsRequest)        returns (ListIncidentsResponse);
+  rpc UpdateIncidentStatus (UpdateIncidentStatusRequest) returns (IncidentResponse);
+}
+
 message TableMeta {
   int32 total       = 1;
   int32 current_page = 2;
