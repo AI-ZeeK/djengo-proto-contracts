@@ -132,6 +132,7 @@ service AttendanceService {
   rpc GetAttendanceByStaff  (GetAttendanceRequest)             returns (AttendanceListResponse);
   rpc GetAttendanceSummary  (GetAttendanceRequest)             returns (AttendanceSummary);
   rpc GetAttendanceByCompany (GetAttendanceByCompanyRequest)   returns (AttendanceListResponse);
+  rpc GetAttendanceShiftCard (GetAttendanceShiftCardRequest)    returns (AttendanceShiftCardResponse);
 }
 
 service BusinessHoursService {
@@ -504,9 +505,62 @@ message AttendanceDayRecord {
   repeated StaffEvent breaks = 3;
 }
 
+message GetAttendanceShiftCardRequest {
+  string staff_id        = 1;
+  string company_id      = 2;
+  string organization_id = 3;
+  optional string date   = 4;
+}
+
+message AttendanceShiftCardResponse {
+  string date = 1;
+  AttendanceSessionStatus session = 2;
+}
+
+message AttendanceShiftWindow {
+  string shift_name = 1;
+  string scheduled_start = 2;
+  string scheduled_end = 3;
+  bool is_completed = 4;
+  bool is_current = 5;
+  bool is_next = 6;
+  string shift_template_id = 7;
+  // upcoming | open | in_progress | completed | early_leave
+  string phase = 8;
+  bool can_clock_in = 9;
+  bool shift_timeline_active = 10;
+  string clock_in_opens_at = 11;
+  string actual_start = 12;
+  string actual_end = 13;
+  int32 minutes_until_start = 14;
+  int32 minutes_until_end = 15;
+  bool left_early = 16;
+}
+
+message AttendanceSessionStatus {
+  bool is_clocked_in = 1;
+  bool on_break = 2;
+  bool can_clock_in = 3;
+  bool can_clock_out = 4;
+  bool shift_work_complete = 5;
+  string message = 6;
+  string next_clock_in_at = 7;
+  string current_shift_end_at = 8;
+  string current_shift_name = 9;
+  string current_shift_start_at = 10;
+  repeated AttendanceShiftWindow today_shifts = 11;
+  string last_shift_ended_at = 12;
+  string last_shift_name = 13;
+  double hours_until_next_shift = 14;
+  int32 minutes_until_next_shift = 15;
+  bool can_return_to_shift = 16;
+  string last_completed_shift_end_at = 17;
+}
+
 message AttendanceListResponse {
   repeated AttendanceDayRecord days = 1;
   TableMeta meta                    = 2;
+  AttendanceSessionStatus session_status = 3;
 }
 
 message AttendanceSummary {
