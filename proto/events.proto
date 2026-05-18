@@ -1102,6 +1102,10 @@ enum ApprovalEntityType {
   PAYROLL = 1;
   BUDGET  = 2;
   LEAVE   = 3;
+  VENDOR = 4;
+  PURCHASE_REQUEST = 5;
+  PURCHASE_ORDER = 6;
+  GOODS_RECEIPT = 7;
 }
 
 message TableMeta {

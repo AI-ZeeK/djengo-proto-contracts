@@ -1410,6 +1410,8 @@ service ProcurementService {
   rpc GetPurchaseOrder     (GetPurchaseOrderRequest)     returns (PurchaseOrderProto);
   rpc ListPurchaseOrders   (ListPurchaseOrdersRequest)   returns (ListPurchaseOrdersResponse);
   rpc IssuePurchaseOrder   (IssuePurchaseOrderRequest)   returns (PurchaseOrderProto);
+  rpc ApprovePurchaseOrder (ApprovePurchaseOrderRequest) returns (PurchaseOrderProto);
+  rpc RejectPurchaseOrder  (RejectPurchaseOrderRequest)  returns (PurchaseOrderProto);
   rpc CancelPurchaseOrder  (CancelPurchaseOrderRequest)  returns (PurchaseOrderProto);
 
   // Goods Receipt Notes
@@ -1440,6 +1442,8 @@ message VendorProto {
   optional string approved_at = 16;
   string created_at         = 17;
   string updated_at         = 18;
+  optional string notes     = 19;
+  optional string approval_instance_id = 20;
 }
 
 message CreateVendorRequest {
@@ -1459,7 +1463,13 @@ message CreateVendorRequest {
 }
 
 message GetVendorRequest    { string vendor_id = 1; string company_id = 2; }
-message ApproveVendorRequest { string vendor_id = 1; string approved_by = 2; }
+message ApproveVendorRequest {
+  string vendor_id = 1;
+  string approved_by = 2;
+  optional string comment = 3;
+  optional string approver_role_id = 4;
+  optional string approver_role_type = 5;
+}
 message SuspendVendorRequest { string vendor_id = 1; string reason = 2; }
 
 message UpdateVendorRequest {
@@ -1519,6 +1529,8 @@ message PurchaseRequestProto {
   repeated PurchaseRequestItemProto items = 15;
   string created_at      = 16;
   string updated_at      = 17;
+  int64  total_estimated_minor = 18;
+  optional string approval_instance_id = 19;
 }
 
 message CreatePurchaseRequestRequest {
@@ -1534,8 +1546,20 @@ message CreatePurchaseRequestRequest {
 }
 
 message GetPurchaseRequestRequest  { string pr_id = 1; }
-message ApprovePurchaseRequestRequest { string pr_id = 1; string approved_by = 2; optional string comment = 3; }
-message RejectPurchaseRequestRequest  { string pr_id = 1; string rejected_by = 2; string reason = 3; }
+message ApprovePurchaseRequestRequest {
+  string pr_id = 1;
+  string approved_by = 2;
+  optional string comment = 3;
+  optional string approver_role_id = 4;
+  optional string approver_role_type = 5;
+}
+message RejectPurchaseRequestRequest {
+  string pr_id = 1;
+  string rejected_by = 2;
+  string reason = 3;
+  optional string approver_role_id = 4;
+  optional string approver_role_type = 5;
+}
 
 message ListPurchaseRequestsRequest {
   string company_id        = 1;
@@ -1586,6 +1610,7 @@ message PurchaseOrderProto {
   repeated PurchaseOrderItemProto items = 18;
   string created_at         = 19;
   string updated_at         = 20;
+  optional string approval_instance_id = 21;
 }
 
 message CreatePurchaseOrderRequest {
@@ -1603,6 +1628,20 @@ message CreatePurchaseOrderRequest {
 
 message GetPurchaseOrderRequest    { string po_id = 1; }
 message IssuePurchaseOrderRequest  { string po_id = 1; string issued_by = 2; }
+message ApprovePurchaseOrderRequest {
+  string po_id = 1;
+  string approved_by = 2;
+  optional string comment = 3;
+  optional string approver_role_id = 4;
+  optional string approver_role_type = 5;
+}
+message RejectPurchaseOrderRequest {
+  string po_id = 1;
+  string rejected_by = 2;
+  string reason = 3;
+  optional string approver_role_id = 4;
+  optional string approver_role_type = 5;
+}
 message CancelPurchaseOrderRequest { string po_id = 1; string reason = 2; }
 
 message ListPurchaseOrdersRequest {
@@ -1795,4 +1834,57 @@ message ListGuestPaymentsRequest {
 message ListGuestPaymentsResponse {
   repeated GuestPaymentProto payments = 1;
   TableMeta meta                      = 2;
+}
+
+// ── Statutory Remittances ─────────────────────────────────────────────────
+
+message StatutoryRemittanceProto {
+  string remittance_id              = 1;
+  string organization_id            = 2;
+  string company_id                 = 3;
+  optional string payroll_id        = 4;
+  string remittance_type            = 5;
+  int32  period_year                = 6;
+  int32  period_month               = 7;
+  int64  amount_due_minor           = 8;
+  int64  amount_paid_minor          = 9;
+  string currency_code              = 10;
+  string status                     = 11;
+  optional string due_date          = 12;
+  optional string paid_at           = 13;
+  optional string payment_reference = 14;
+  optional string confirmed_by      = 15;
+  optional string notes             = 16;
+  string created_at                 = 17;
+  string updated_at                 = 18;
+}
+
+message ListStatutoryRemittancesRequest {
+  string company_id                    = 1;
+  string organization_id               = 2;
+  optional string status               = 3;
+  optional string remittance_type      = 4;
+  optional int32  year                 = 5;
+  optional int32  month                = 6;
+  optional int32  page                 = 7;
+  optional int32  page_size            = 8;
+}
+
+message ListStatutoryRemittancesResponse {
+  repeated StatutoryRemittanceProto remittances = 1;
+  TableMeta meta                                = 2;
+}
+
+message MarkRemittancePaidRequest {
+  string remittance_id     = 1;
+  string company_id        = 2;
+  int64  amount_paid_minor = 3;
+  string payment_reference = 4;
+  string confirmed_by      = 5;
+  optional string notes    = 6;
+}
+
+service StatutoryRemittanceService {
+  rpc ListStatutoryRemittances (ListStatutoryRemittancesRequest) returns (ListStatutoryRemittancesResponse);
+  rpc MarkRemittancePaid       (MarkRemittancePaidRequest)       returns (StatutoryRemittanceProto);
 }
