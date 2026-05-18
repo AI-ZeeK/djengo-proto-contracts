@@ -510,6 +510,9 @@ message AttendanceDayRecord {
   string date              = 1;
   StaffEvent attendance    = 2;
   repeated StaffEvent breaks = 3;
+  int32  overtime_minutes  = 4;
+  bool   has_overtime      = 5;
+  repeated StaffEvent overtime_entries = 6;
 }
 
 message GetAttendanceShiftCardRequest {
