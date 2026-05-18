@@ -42,6 +42,7 @@ service ApprovalService {
   rpc ApproveStep         (ApproveApprovalStepRequest)  returns (ApproveApprovalStepResponse);
   rpc RejectStep          (RejectApprovalStepRequest)   returns (RejectApprovalStepResponse);
   rpc ListApprovalSteps   (ListApprovalStepsRequest)    returns (ListApprovalStepsResponse);
+  rpc ListPendingApprovalsForUser (ListPendingApprovalsForUserRequest) returns (ListPendingApprovalsForUserResponse);
 }
 
 service LeavePolicyService {
@@ -133,6 +134,10 @@ service AttendanceService {
   rpc GetAttendanceSummary  (GetAttendanceRequest)             returns (AttendanceSummary);
   rpc GetAttendanceByCompany (GetAttendanceByCompanyRequest)   returns (AttendanceListResponse);
   rpc GetAttendanceShiftCard (GetAttendanceShiftCardRequest)    returns (AttendanceShiftCardResponse);
+  rpc StartOvertime           (StartOvertimeRequest)             returns (StaffEventId);
+  rpc EndOvertime             (EndOvertimeRequest)               returns (StaffEvent);
+  rpc GetAttendancePolicy     (GetAttendancePolicyRequest)       returns (CompanyAttendancePolicyProto);
+  rpc UpsertAttendancePolicy  (UpsertAttendancePolicyRequest)    returns (CompanyAttendancePolicyProto);
 }
 
 service BusinessHoursService {
@@ -555,6 +560,47 @@ message AttendanceSessionStatus {
   int32 minutes_until_next_shift = 15;
   bool can_return_to_shift = 16;
   string last_completed_shift_end_at = 17;
+  bool is_overtime_active = 18;
+  bool can_start_overtime = 19;
+  bool can_end_overtime = 20;
+  int32 overtime_minutes_used_today = 21;
+  int32 max_overtime_minutes_per_day = 22;
+  int32 minutes_until_next_shift_start = 23;
+  string next_shift_starts_at = 24;
+  string overtime_message = 25;
+}
+
+message CompanyAttendancePolicyProto {
+  string company_id = 1;
+  string organization_id = 2;
+  int32 max_overtime_minutes_per_day = 3;
+  int32 min_minutes_before_next_shift_to_start_overtime = 4;
+  int32 min_minutes_before_next_shift_during_overtime = 5;
+  int32 overtime_threshold_minutes = 6;
+}
+
+message GetAttendancePolicyRequest {
+  string company_id = 1;
+  string organization_id = 2;
+}
+
+message UpsertAttendancePolicyRequest {
+  CompanyAttendancePolicyProto policy = 1;
+}
+
+message StartOvertimeRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string notes = 4;
+}
+
+message EndOvertimeRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string event_id = 4;
+  string notes = 5;
 }
 
 message AttendanceListResponse {
@@ -1324,6 +1370,7 @@ message ApproveApprovalStepRequest {
   string approver_role_id   = 3;
   string approver_role_type = 4;
   string comment            = 5;
+  string company_id         = 6;
 }
 
 message ApproveApprovalStepResponse {
@@ -1338,6 +1385,38 @@ message RejectApprovalStepRequest {
   string approver_role_id   = 3;
   string approver_role_type = 4;
   string comment            = 5;
+  string company_id         = 6;
+}
+
+message ListPendingApprovalsForUserRequest {
+  string user_id          = 1;
+  string company_id       = 2;
+  string organization_id  = 3;
+  /// When true, only items where it is this user's turn to act.
+  bool   my_turn_only     = 4;
+  int32  page             = 5;
+  int32  page_size        = 6;
+}
+
+message PendingApprovalItem {
+  string approval_id           = 1;
+  ApprovalEntityType entity_type = 2;
+  string entity_type_slug      = 3;
+  string entity_id             = 4;
+  int32  current_step_order    = 5;
+  int32  total_steps           = 6;
+  bool   is_my_turn            = 7;
+  string expected_role_id      = 8;
+  string expected_role_type    = 9;
+  string status                = 10;
+  string created_at            = 11;
+  string display_title         = 12;
+  string initiator_user_id     = 13;
+}
+
+message ListPendingApprovalsForUserResponse {
+  repeated PendingApprovalItem items = 1;
+  TableMeta meta = 2;
 }
 
 message RejectApprovalStepResponse {
