@@ -32,9 +32,9 @@ message NotificationData {
   string sender_id = 2;
   string sender_name = 3;
   string sender_avatar = 4;
-  NotificationType entity_type = 5; // optional, if you may add more later
+  NotificationType entity_type = 5;
+  string message_id = 6;
 }
-
 
 enum NotificationType {
   NEW_MESSAGE = 0;
@@ -42,7 +42,6 @@ enum NotificationType {
   SYSTEM_ALERT = 2;
   STAFF_INVITATION = 3;
   CHAT_CREATED = 4;
-  // HR / business event types
   LEAVE_REQUEST = 5;
   LEAVE_APPROVED = 6;
   LEAVE_REJECTED = 7;
@@ -57,6 +56,61 @@ enum NotificationType {
   TASK_ASSIGNED = 16;
   BROADCAST = 17;
   SHIFT_ASSIGNMENT = 18;
+  APPROVAL_PENDING = 19;
+  APPROVAL_YOUR_TURN = 20;
+  APPROVAL_COMPLETED = 21;
+  APPROVAL_REJECTED = 22;
+}
+
+enum NotificationCategory {
+  NOTIFICATION_CATEGORY_GENERAL = 0;
+  NOTIFICATION_CATEGORY_CHAT = 1;
+  NOTIFICATION_CATEGORY_APPROVALS = 2;
+  NOTIFICATION_CATEGORY_HR = 3;
+  NOTIFICATION_CATEGORY_SYSTEM = 4;
+  NOTIFICATION_CATEGORY_TEAM = 5;
+}
+
+enum NotificationPresentation {
+  NOTIFICATION_PRESENTATION_STANDARD = 0;
+  NOTIFICATION_PRESENTATION_MENTION = 1;
+  NOTIFICATION_PRESENTATION_TAGS = 2;
+  NOTIFICATION_PRESENTATION_REQUEST = 3;
+  NOTIFICATION_PRESENTATION_ATTACHMENT = 4;
+  NOTIFICATION_PRESENTATION_ARTICLE = 5;
+}
+
+message NotificationTag {
+  string label = 1;
+  string color = 2;
+}
+
+message NotificationAttachment {
+  string kind = 1;
+  string name = 2;
+  string size_label = 3;
+  string icon_url = 4;
+  string href = 5;
+  string meta = 6;
+}
+
+message NotificationAction {
+  string id = 1;
+  string label = 2;
+  string style = 3;
+  string href = 4;
+  string api_action = 5;
+}
+
+message NotificationRichPayload {
+  string headline = 1;
+  string quote = 2;
+  string context_label = 3;
+  string context_href = 4;
+  repeated NotificationTag tags = 5;
+  repeated NotificationAttachment attachments = 6;
+  repeated NotificationAction actions = 7;
+  bool allow_reply = 8;
 }
 
 message CreateInAppNotificationRequest {
@@ -65,6 +119,10 @@ message CreateInAppNotificationRequest {
   NotificationType type = 3;
   string text = 4;
   string link_url = 5;
+  string title = 6;
+  NotificationCategory category = 7;
+  NotificationPresentation presentation = 8;
+  NotificationRichPayload payload = 9;
 }
 
 message CreateInAppNotificationResponse {
@@ -82,6 +140,9 @@ message BatchNotificationRequest {
   string title = 6;
   string body = 7;
   bool send_push = 8;
+  NotificationCategory category = 9;
+  NotificationPresentation presentation = 10;
+  NotificationRichPayload payload = 11;
 }
 
 message BatchNotificationResponse {
