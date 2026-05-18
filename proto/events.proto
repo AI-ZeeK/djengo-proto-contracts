@@ -43,6 +43,7 @@ service ApprovalService {
   rpc RejectStep          (RejectApprovalStepRequest)   returns (RejectApprovalStepResponse);
   rpc ListApprovalSteps   (ListApprovalStepsRequest)    returns (ListApprovalStepsResponse);
   rpc ListPendingApprovalsForUser (ListPendingApprovalsForUserRequest) returns (ListPendingApprovalsForUserResponse);
+  rpc GetApprovalDetail         (GetApprovalDetailRequest)         returns (GetApprovalDetailResponse);
 }
 
 service LeavePolicyService {
@@ -1417,6 +1418,24 @@ message PendingApprovalItem {
 message ListPendingApprovalsForUserResponse {
   repeated PendingApprovalItem items = 1;
   TableMeta meta = 2;
+}
+
+message GetApprovalDetailRequest {
+  string approval_id      = 1;
+  string user_id          = 2;
+  string company_id       = 3;
+  string organization_id  = 4;
+}
+
+/// Full approval instance for inbox detail (approval + ordered steps + viewer context).
+message GetApprovalDetailResponse {
+  Approval              approval            = 1;
+  string                entity_type_slug    = 2;
+  string                display_title       = 3;
+  repeated ApprovalStep steps               = 4;
+  bool                  is_my_turn          = 5;
+  string                expected_role_id    = 6;
+  string                expected_role_type  = 7;
 }
 
 message RejectApprovalStepResponse {
