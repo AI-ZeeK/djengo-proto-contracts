@@ -139,6 +139,7 @@ service AttendanceService {
   rpc EndOvertime             (EndOvertimeRequest)               returns (StaffEvent);
   rpc GetAttendancePolicy     (GetAttendancePolicyRequest)       returns (CompanyAttendancePolicyProto);
   rpc UpsertAttendancePolicy  (UpsertAttendancePolicyRequest)    returns (CompanyAttendancePolicyProto);
+  rpc GetStaffTimeManagement  (GetStaffTimeManagementRequest)    returns (GetStaffTimeManagementResponse);
 }
 
 service BusinessHoursService {
@@ -620,6 +621,90 @@ message AttendanceSummary {
   int32  late_days             = 7;
   int32  early_days            = 8;
   int32  attendance_days       = 9;
+}
+
+// ─── Staff time management (Staff Review) ────────────────────────────────────
+
+message GetStaffTimeManagementRequest {
+  string staff_id        = 1;
+  string company_id      = 2;
+  string organization_id = 3;
+  int32  max_days        = 4; // default 7, cap 7
+}
+
+message TimeManagementTimelineBlock {
+  string block_type = 1; // early | late | shift | break | overtime
+  string start_at   = 2; // ISO-8601
+  string end_at     = 3;
+}
+
+message TimeManagementBreak {
+  string event_id         = 1;
+  string actual_start     = 2;
+  string actual_end       = 3;
+  string status           = 4;
+  bool   in_progress      = 5;
+  int32  duration_minutes = 6;
+}
+
+message TimeManagementShiftInfo {
+  string shift_template_id = 1;
+  string shift_name        = 2;
+  string scheduled_start   = 3;
+  string scheduled_end     = 4;
+  bool   is_overnight      = 5;
+  string start_time_label  = 6;
+  string end_time_label    = 7;
+  repeated int32 days_of_week = 8; // ISO 1=Mon … 7=Sun
+}
+
+message TimeManagementEvent {
+  string event_type = 1; // clock_in | clock_out | break_start | break_end
+  string label      = 2;
+  string at         = 3;
+  string end_at     = 4;
+}
+
+message TimeManagementDay {
+  string date                    = 1;
+  string day_name                = 2;
+  bool   is_today                = 3;
+  bool   has_shift               = 4;
+  bool   has_attendance          = 5;
+  bool   on_break                = 6;
+  bool   is_overnight_shift      = 7;
+  TimeManagementShiftInfo shift  = 8;
+  string clock_in_at             = 9;
+  string clock_out_at            = 10;
+  bool   clock_in_active         = 11;
+  string attendance_status       = 12;
+  string attendance_event_id     = 13;
+  int32  worked_minutes          = 14;
+  int32  break_minutes           = 15;
+  int32  early_clock_in_minutes  = 16;
+  int32  late_clock_in_minutes   = 17;
+  int32  early_clock_out_minutes = 18;
+  int32  overtime_minutes        = 19;
+  string timeline_start_at       = 20;
+  string timeline_end_at         = 21;
+  repeated TimeManagementTimelineBlock blocks = 22;
+  repeated TimeManagementBreak breaks = 23;
+  repeated TimeManagementEvent events = 24;
+}
+
+message StaffTimeManagementSummary {
+  int32 total_worked_minutes   = 1;
+  int32 overtime_minutes       = 2;
+  int32 break_minutes          = 3;
+  int32 late_days              = 4;
+  int32 early_check_in_days    = 5;
+  int32 attendance_days        = 6;
+  int32 early_leave_days       = 7;
+}
+
+message GetStaffTimeManagementResponse {
+  StaffTimeManagementSummary summary = 1;
+  repeated TimeManagementDay days    = 2;
 }
 
 // ─── Business Hours ──────────────────────────────────────────────────────────
