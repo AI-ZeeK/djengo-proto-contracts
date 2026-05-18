@@ -662,7 +662,7 @@ message TimeManagementShiftInfo {
 }
 
 message TimeManagementEvent {
-  string event_type = 1; // clock_in | clock_out | break_start | break_end
+  string event_type = 1; // clock_in | clock_out | break_start | break_end | overtime_start | overtime_end
   string label      = 2;
   string at         = 3;
   string end_at     = 4;
@@ -693,6 +693,7 @@ message TimeManagementDay {
   repeated TimeManagementTimelineBlock blocks = 22;
   repeated TimeManagementBreak breaks = 23;
   repeated TimeManagementEvent events = 24;
+  bool has_overtime = 25;
 }
 
 message StaffTimeManagementSummary {
