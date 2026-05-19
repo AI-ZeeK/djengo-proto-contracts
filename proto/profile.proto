@@ -594,6 +594,7 @@ message Staff {
   string staff_id = 1;
   string company_id = 2;
   string user_id = 3;
+  // Home branch (main branch when company is single-site). Set on invite accept and registration.
   optional string branch_id = 4;
   string email = 5;
   optional string designation = 6;
@@ -636,6 +637,7 @@ message ManyStaffDetailsResponse {
 message StaffInvitationItem {
   string email = 1;
   string role_id = 2;
+  // When omitted, profile-service assigns the company main branch (single-site default).
   optional string branch_id = 4;
   optional string department_id = 6;
   InvitationType type = 7;

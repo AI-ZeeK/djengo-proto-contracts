@@ -99,10 +99,23 @@ service TaskService {
 service TaskBoardService {
   rpc GetOrCreateDefaultBoard (GetOrCreateTaskBoardRequest) returns (TaskBoardProto);
   rpc GetBoard                (TaskBoardId)                 returns (TaskBoardProto);
+  rpc ListMyAssignedTasks     (ListMyAssignedTasksRequest)  returns (MyAssignedTasksResponse);
   rpc CreateBoardTask         (CreateTaskBoardItemRequest)  returns (TaskBoardItemProto);
   rpc MoveBoardTask           (MoveTaskBoardItemRequest)    returns (TaskBoardItemProto);
   rpc AddBoardTaskComment     (AddTaskBoardCommentRequest)  returns (TaskBoardCommentProto);
   rpc DeleteBoardTask         (TaskBoardItemId)             returns (DeleteResponse);
+}
+
+message ListMyAssignedTasksRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string branch_id       = 3;
+  string assignee_user_id = 4;
+}
+
+message MyAssignedTasksResponse {
+  repeated TaskBoardItemProto tasks = 1;
+  repeated TaskBoardColumnProto columns = 2;
 }
 
 message GetOrCreateTaskBoardRequest {
