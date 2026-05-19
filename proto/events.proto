@@ -87,13 +87,104 @@ service ActivityLogService {
 }
 
 service TaskService {
-  rpc CreateTask          (Task)                    returns (TaskId);
+  rpc CreateTask          (Task)                    returns (Task);
   rpc GetTask             (TaskId)                  returns (Task);
   rpc UpdateTask          (Task)                    returns (Task);
   rpc UpdateTaskStatus    (UpdateTaskStatusRequest) returns (Task);
   rpc DeleteTask          (TaskId)                  returns (DeleteResponse);
   rpc ListTasksByCompany  (GetCompanyStaffRequest)           returns (GetCompanyTasksResponse);
   rpc ListTasksByAssignee (StaffRequest)             returns (TaskListResponse);
+}
+
+service TaskBoardService {
+  rpc GetOrCreateDefaultBoard (GetOrCreateTaskBoardRequest) returns (TaskBoardProto);
+  rpc GetBoard                (TaskBoardId)                 returns (TaskBoardProto);
+  rpc CreateBoardTask         (CreateTaskBoardItemRequest)  returns (TaskBoardItemProto);
+  rpc MoveBoardTask           (MoveTaskBoardItemRequest)    returns (TaskBoardItemProto);
+  rpc AddBoardTaskComment     (AddTaskBoardCommentRequest)  returns (TaskBoardCommentProto);
+  rpc DeleteBoardTask         (TaskBoardItemId)             returns (DeleteResponse);
+}
+
+message GetOrCreateTaskBoardRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string branch_id       = 3;
+  string owner_id        = 4;
+}
+
+message TaskBoardId { string board_id = 1; }
+message TaskBoardItemId { string task_id = 1; }
+
+message TaskBoardProto {
+  string board_id       = 1;
+  string name           = 2;
+  string description    = 3;
+  string company_id     = 4;
+  string organization_id = 5;
+  string branch_id      = 6;
+  string owner_id       = 7;
+  bool   is_default     = 8;
+  string created_at     = 9;
+  string updated_at     = 10;
+  repeated TaskBoardColumnProto columns = 11;
+}
+
+message TaskBoardColumnProto {
+  string column_id = 1;
+  string name      = 2;
+  int32  position  = 3;
+  string board_id  = 4;
+  repeated TaskBoardItemProto tasks = 5;
+}
+
+message TaskBoardItemProto {
+  string task_id     = 1;
+  string name        = 2;
+  string description = 3;
+  string priority    = 4;
+  string status      = 5;
+  string column_id   = 6;
+  int32  task_order  = 7;
+  string author_id   = 8;
+  string assignee_id = 9;
+  string board_id    = 10;
+  string company_id  = 11;
+  string organization_id = 12;
+  string branch_id   = 13;
+  string created_at  = 14;
+  string updated_at  = 15;
+  repeated TaskBoardCommentProto comments = 16;
+}
+
+message CreateTaskBoardItemRequest {
+  string board_id     = 1;
+  string column_id    = 2;
+  string name         = 3;
+  string description  = 4;
+  string priority     = 5;
+  string author_id    = 6;
+  string assignee_id  = 7;
+}
+
+message MoveTaskBoardItemRequest {
+  string task_id    = 1;
+  string column_id  = 2;
+  int32  task_order = 3;
+}
+
+message AddTaskBoardCommentRequest {
+  string task_id   = 1;
+  string author_id = 2;
+  string content   = 3;
+}
+
+message TaskBoardCommentProto {
+  string comment_id = 1;
+  string content    = 2;
+  string task_id    = 3;
+  string author_id  = 4;
+  string created_at = 5;
+  string updated_at = 6;
 }
 
 service TrainingService {
