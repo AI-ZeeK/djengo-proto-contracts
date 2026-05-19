@@ -2068,11 +2068,22 @@ message GetCompanyShiftAnalyticsRequest {
   string staff_id        = 5;  // optional
 }
 
+// Personal: tasks assigned to the current user (Kanban board).
+message GetMyAssignedTasksAnalyticsRequest {
+  string company_id       = 1;
+  string organization_id  = 2;
+  string branch_id        = 3;
+  string assignee_user_id = 4;
+  string from             = 5;  // YYYY-MM-DD
+  string to               = 6;  // YYYY-MM-DD
+}
+
 service EventsAnalyticsService {
   rpc GetAttendanceAnalytics        (GetAttendanceAnalyticsRequest)        returns (EventsAnalyticsResponse);
   rpc GetCompanyAttendanceAnalytics (GetCompanyAttendanceAnalyticsRequest) returns (EventsAnalyticsResponse);
   rpc GetShiftAnalytics             (GetShiftAnalyticsRequest)             returns (EventsAnalyticsResponse);
   rpc GetCompanyShiftAnalytics      (GetCompanyShiftAnalyticsRequest)      returns (EventsAnalyticsResponse);
+  rpc GetMyAssignedTasksAnalytics   (GetMyAssignedTasksAnalyticsRequest)   returns (EventsAnalyticsResponse);
 }
 
 // ─── Attendance Code Service (TOTP-style daily clock-in codes) ───────────────
