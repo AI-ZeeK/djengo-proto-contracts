@@ -87,7 +87,7 @@ service ActivityLogService {
 }
 
 service TaskService {
-  rpc CreateTask          (Task)                    returns (Task);
+  rpc CreateTask          (Task)                    returns (TaskId);
   rpc GetTask             (TaskId)                  returns (Task);
   rpc UpdateTask          (Task)                    returns (Task);
   rpc UpdateTaskStatus    (UpdateTaskStatusRequest) returns (Task);
@@ -96,21 +96,34 @@ service TaskService {
   rpc ListTasksByAssignee (StaffRequest)             returns (TaskListResponse);
 }
 
+// Kanban boards (company / branch scoped)
 service TaskBoardService {
   rpc GetOrCreateDefaultBoard (GetOrCreateTaskBoardRequest) returns (TaskBoardProto);
   rpc GetBoard                (TaskBoardId)                 returns (TaskBoardProto);
+  rpc UpdateBoard             (UpdateTaskBoardRequest)      returns (TaskBoardProto);
+  rpc UpdateBoardColumn       (UpdateTaskBoardColumnRequest) returns (TaskBoardColumnProto);
+  rpc DeleteBoardColumn       (TaskBoardColumnId)           returns (DeleteResponse);
   rpc ListMyAssignedTasks     (ListMyAssignedTasksRequest)  returns (MyAssignedTasksResponse);
   rpc CreateBoardTask         (CreateTaskBoardItemRequest)  returns (TaskBoardItemProto);
+  rpc UpdateBoardTask         (UpdateTaskBoardItemRequest)  returns (TaskBoardItemProto);
+  rpc UpdateBoardTaskAssignees (UpdateTaskBoardAssigneesRequest) returns (TaskBoardItemProto);
   rpc MoveBoardTask           (MoveTaskBoardItemRequest)    returns (TaskBoardItemProto);
   rpc AddBoardTaskComment     (AddTaskBoardCommentRequest)  returns (TaskBoardCommentProto);
   rpc DeleteBoardTask         (TaskBoardItemId)             returns (DeleteResponse);
 }
 
+message TaskBoardAssigneeProto {
+  string staff_id           = 1;
+  string user_id            = 2;
+  string staff_display_name = 3;
+}
+
 message ListMyAssignedTasksRequest {
-  string company_id      = 1;
-  string organization_id = 2;
-  string branch_id       = 3;
-  string assignee_user_id = 4;
+  string company_id       = 1;
+  string organization_id  = 2;
+  string branch_id        = 3;
+  string assignee_user_id = 4; // legacy
+  string assignee_staff_id = 5;
 }
 
 message MyAssignedTasksResponse {
@@ -121,12 +134,31 @@ message MyAssignedTasksResponse {
 message GetOrCreateTaskBoardRequest {
   string company_id      = 1;
   string organization_id = 2;
-  string branch_id       = 3;
-  string owner_id        = 4;
+  string branch_id       = 3; // main branch when single-site
+  string owner_id        = 4; // user_id
 }
 
 message TaskBoardId { string board_id = 1; }
+message TaskBoardColumnId { string column_id = 1; }
 message TaskBoardItemId { string task_id = 1; }
+
+message TaskBoardColumnInputProto {
+  string column_id = 1; // empty = new column
+  string name      = 2;
+  int32  position  = 3;
+}
+
+message UpdateTaskBoardRequest {
+  string board_id    = 1;
+  string name        = 2;
+  string description = 3;
+  repeated TaskBoardColumnInputProto columns = 4;
+}
+
+message UpdateTaskBoardColumnRequest {
+  string column_id = 1;
+  string name      = 2;
+}
 
 message TaskBoardProto {
   string board_id       = 1;
@@ -167,6 +199,7 @@ message TaskBoardItemProto {
   string created_at  = 14;
   string updated_at  = 15;
   repeated TaskBoardCommentProto comments = 16;
+  repeated TaskBoardAssigneeProto assignees = 17;
 }
 
 message CreateTaskBoardItemRequest {
@@ -176,7 +209,21 @@ message CreateTaskBoardItemRequest {
   string description  = 4;
   string priority     = 5;
   string author_id    = 6;
-  string assignee_id  = 7;
+  string assignee_id  = 7; // legacy primary assignee user_id
+  repeated TaskBoardAssigneeProto assignees = 8;
+}
+
+message UpdateTaskBoardAssigneesRequest {
+  string task_id = 1;
+  repeated TaskBoardAssigneeProto assignees = 2;
+}
+
+message UpdateTaskBoardItemRequest {
+  string task_id     = 1;
+  string name        = 2;
+  string description = 3;
+  string priority    = 4;
+  string column_id   = 5;
 }
 
 message MoveTaskBoardItemRequest {
