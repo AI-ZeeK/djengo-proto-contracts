@@ -1,6 +1,6 @@
 {
   "name": "@djengo/proto-contracts",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Shared gRPC proto definitions for DJENGO microservices",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,6 +9,7 @@
     "djengo-proto-build": "./scripts/build-all.js"
   },
   "scripts": {
+    "sync:services": "bash scripts/sync-protos-to-services.sh",
     "build": "tsc",
     "build:proto": "ts-node scripts/build-proto.ts",
     "build:all": "npm run build:proto && npm run build",

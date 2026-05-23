@@ -80,10 +80,15 @@ service LeaveRequestService {
 // ─── Services ────────────────────────────────────────────────────────────────
 
 service ActivityLogService {
-  rpc CreateActivityLog   (ActivityLog)   returns (ActivityLogId);
-  rpc GetActivityLog      (ActivityLogId) returns (ActivityLog);
-  rpc ListActivityLogs    (GetCompanyStaffRequest) returns (GetCompanyActivityLogsResponse);
-  rpc DeleteActivityLog   (ActivityLogId) returns (DeleteResponse);
+  rpc CreateActivityLog   (ActivityLog)               returns (ActivityLogId);
+  rpc GetActivityLog      (ActivityLogId)             returns (ActivityLog);
+  rpc ListActivityLogs    (GetCompanyStaffRequest)    returns (GetCompanyActivityLogsResponse);
+  rpc DeleteActivityLog   (ActivityLogId)             returns (DeleteResponse);
+  rpc GetMyActivityFeed   (GetMyActivityFeedRequest)  returns (GetCompanyActivityLogsResponse);
+  rpc MarkActivityRead    (ActivityLogId)             returns (ActivityLog);
+  rpc MarkAllRead         (MarkAllReadRequest)        returns (DeleteResponse);
+  rpc GetUnreadCount      (GetMyActivityFeedRequest)  returns (UnreadCountResponse);
+  rpc GetCompanyActivityAnalytics (GetCompanyActivityAnalyticsRequest) returns (GetCompanyActivityAnalyticsResponse);
 }
 
 service TaskService {
@@ -478,10 +483,45 @@ message ActivityLog {
   string updated_at = 29;
   string deleted_at = 30;
   string organization_id  = 31;
+  string title               = 32;
+  string target_entity_id    = 33;
+  string target_entity_type  = 34;
+  string read_at             = 35;
+  // Enriched at query time from profiles service — read-only
+  string performed_by_name   = 36;
+  string performed_by_avatar = 37;
+  string target_entity_name  = 38;
 }
 
 message ActivityLogId           { string activity_id = 1; }
 message ActivityLogListResponse { repeated ActivityLog logs = 1; int32 total = 2; }
+
+message GetMyActivityFeedRequest {
+  string staff_id             = 1;
+  string company_id           = 2;
+  string organization_id      = 3;
+  string category             = 4;
+  string status               = 5;
+  bool   requires_action_only = 6;
+  bool   unread_only          = 7;
+  string from_date            = 8;
+  string to_date              = 9;
+  int32  page                 = 10;
+  int32  page_size            = 11;
+  // Optionally filter by a specific entity (e.g. branch_id + "BRANCH")
+  string target_entity_id     = 12;
+  string target_entity_type   = 13;
+}
+
+message MarkAllReadRequest {
+  string staff_id        = 1;
+  string company_id      = 2;
+  string organization_id = 3;
+}
+
+message UnreadCountResponse {
+  int32 count = 1;
+}
 
 // ─── Task ────────────────────────────────────────────────────────────────────
 
@@ -2131,6 +2171,41 @@ service EventsAnalyticsService {
   rpc GetShiftAnalytics             (GetShiftAnalyticsRequest)             returns (EventsAnalyticsResponse);
   rpc GetCompanyShiftAnalytics      (GetCompanyShiftAnalyticsRequest)      returns (EventsAnalyticsResponse);
   rpc GetMyAssignedTasksAnalytics   (GetMyAssignedTasksAnalyticsRequest)   returns (EventsAnalyticsResponse);
+}
+
+// Aggregated HR / leave / attendance / activity metrics for dashboard overview.
+service EventsOverviewService {
+  rpc GetCompanyEventsOverview (GetCompanyEventsOverviewRequest) returns (GetCompanyEventsOverviewResponse);
+}
+
+message GetCompanyEventsOverviewRequest {
+  string        company_id      = 1;
+  string        organization_id = 2;
+  string        start_date      = 3;
+  string        end_date        = 4;
+  LeaveTimeline leave_timeline    = 5;
+  string        branch_id       = 6;
+  string        department_id   = 7;
+}
+
+message GetCompanyEventsOverviewResponse {
+  repeated EventsAnalyticsCard  cards        = 1;
+  repeated EventsAnalyticsChart charts       = 2;
+  string                        period_label = 3;
+}
+
+message GetCompanyActivityAnalyticsRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string start_date      = 3;
+  string end_date        = 4;
+}
+
+message GetCompanyActivityAnalyticsResponse {
+  int32 total_logs          = 1;
+  int32 requires_action     = 2;
+  int32 last_24h            = 3;
+  repeated EventsChartData activity_by_day = 4;
 }
 
 // ─── Attendance Code Service (TOTP-style daily clock-in codes) ───────────────

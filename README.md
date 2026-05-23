@@ -66,8 +66,19 @@ npm link @djengo/proto-contracts
 
 ## Adding/Updating Protos
 
-- Place `.proto` files in the `proto/` directory.
-- Update and rebuild as needed.
+**Always edit files in `proto/` here first** — not in individual service folders. Service copies are overwritten by `proto:setup` (NestJS) or the sync script (C#).
+
+1. Change `.proto` files under `proto/`
+2. Document changes in `PROTO_CHANGELOG.md`
+3. Sync into the monorepo:
+   ```bash
+   cd backend/djengo-proto-contracts
+   npm run sync:services
+   ```
+4. Commit and push this repo (`AI-ZeeK/djengo-proto-contracts`) so `npm run proto:setup` in other clones pulls the same contracts
+5. Regenerate stubs per service (NestJS: `proto:generate` + `proto:patch`; C#: `dotnet build`)
+
+See `PROTO_CHANGELOG.md` for analytics/activity-feed additions in v1.2.0.
 
 ## Requirements
 

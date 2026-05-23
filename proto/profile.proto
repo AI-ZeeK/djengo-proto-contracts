@@ -23,6 +23,7 @@ service ProfileService {
 
 
   rpc GetOverviewAnalytics(OverviewAnalyticsRequest) returns (OverviewAnalyticsResponse);
+  rpc GetMyAnalytics(MyAnalyticsRequest) returns (OverviewAnalyticsResponse);
   rpc GetStaffAnalytics(StaffAnalyticsRequest) returns (StaffAnalyticsResponse);
   // user services
   rpc ValidateAccount(ValidateAccountRequest) returns (ValidateAccountResponse);
@@ -291,6 +292,15 @@ message LoginHistoryResponse {
   repeated LoginHistory login_history = 1;
 }
 
+enum AnalyticsScopeLevel {
+  ANALYTICS_SCOPE_UNSPECIFIED = 0;
+  ANALYTICS_SCOPE_SELF = 1;
+  ANALYTICS_SCOPE_DEPARTMENT = 2;
+  ANALYTICS_SCOPE_BRANCH = 3;
+  ANALYTICS_SCOPE_COMPANY = 4;
+  ANALYTICS_SCOPE_ORGANIZATION = 5;
+}
+
 message OverviewAnalyticsRequest {
   string user_id = 1;
   string organization_id = 2;
@@ -298,6 +308,23 @@ message OverviewAnalyticsRequest {
   Timeline timeline = 4;
   string start_date = 5;
   string end_date = 6;
+  string branch_id = 7;
+  string department_id = 8;
+}
+
+message MyAnalyticsRequest {
+  string user_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  Timeline timeline = 4;
+  string start_date = 5;
+  string end_date = 6;
+}
+
+message OverviewAnalyticsMeta {
+  AnalyticsScopeLevel effective_scope = 1;
+  string scope_label = 2;
+  repeated string visible_domains = 3;
 }
 
 // Analytics block for cards
@@ -324,6 +351,7 @@ message ChartBlock {
 message OverviewAnalyticsResponse {
   repeated AnalyticsBlock cards = 1;
   repeated ChartBlock charts = 2;
+  OverviewAnalyticsMeta meta = 3;
 }
 
 // Staff Analytics
