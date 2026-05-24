@@ -1607,6 +1607,7 @@ message ApprovalStep {
   string         comment          = 9;
   string         created_at       = 10;
   string         updated_at       = 11;
+  OrganizationRole role             = 12;
 }
 
 // ─── Approval requests ────────────────────────────────────────────────────
