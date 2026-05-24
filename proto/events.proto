@@ -131,9 +131,25 @@ message ListMyAssignedTasksRequest {
   string assignee_staff_id = 5;
 }
 
+message MyAssignedTasksFilterOption {
+  string key   = 1; // all | open | completed
+  string label = 2;
+}
+
+message TaskBoardSummaryProto {
+  string board_id  = 1;
+  string name      = 2;
+  string branch_id = 3;
+  repeated TaskBoardColumnProto columns = 4;
+}
+
 message MyAssignedTasksResponse {
   repeated TaskBoardItemProto tasks = 1;
-  repeated TaskBoardColumnProto columns = 2;
+  repeated TaskBoardColumnProto columns = 2; // union of columns across boards (legacy grouping)
+  repeated TaskBoardSummaryProto boards = 3;
+  repeated MyAssignedTasksFilterOption filter_options = 4;
+  repeated string open_column_ids = 5;
+  repeated string done_column_ids = 6;
 }
 
 message GetOrCreateTaskBoardRequest {
@@ -185,6 +201,8 @@ message TaskBoardColumnProto {
   int32  position  = 3;
   string board_id  = 4;
   repeated TaskBoardItemProto tasks = 5;
+  bool   is_done_column = 6;
+  string board_name = 7;
 }
 
 message TaskBoardItemProto {
@@ -205,6 +223,8 @@ message TaskBoardItemProto {
   string updated_at  = 15;
   repeated TaskBoardCommentProto comments = 16;
   repeated TaskBoardAssigneeProto assignees = 17;
+  string board_name = 18;
+  string current_column_name = 19;
 }
 
 message CreateTaskBoardItemRequest {
