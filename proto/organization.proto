@@ -129,6 +129,8 @@ service StaffSelfService {
 
 message GetMyStaffByUserRequest {
   string user_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
 }
 
 message StaffSelfSummary {
