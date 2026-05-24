@@ -1275,6 +1275,7 @@ message LeaveRequest {
   string created_at   = 15;
   string updated_at   = 16;
   Staff staff = 17; // populated on list/get, links to the StaffEvent for this leave request
+  Approval approval = 18; // live approval workflow; status on this message reflects approval when present
 }
 
 message LeaveRequestId          { string leave_request_id = 1; }
