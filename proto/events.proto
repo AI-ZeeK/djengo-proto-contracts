@@ -1715,7 +1715,9 @@ message PendingApprovalItem {
   string created_at            = 11;
   string display_title         = 12;
   string initiator_user_id     = 13;
-  Approval approval            = 14;
+  repeated ApprovalStep steps  = 14;
+  string expected_role_name    = 15;
+  string expected_role_slug    = 16;
 }
 
 message ListPendingApprovalsForUserResponse {
