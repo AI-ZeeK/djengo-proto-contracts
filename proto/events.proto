@@ -1592,6 +1592,7 @@ message Approval {
   string                 closed_at          = 14;
   string                 closed_by_user_id  = 15;
   string                 closed_comment     = 16;
+  repeated ApprovalStep   steps              = 17;
 }
 
 /// Live step — tracks an actual approve/reject decision.
@@ -1714,6 +1715,7 @@ message PendingApprovalItem {
   string created_at            = 11;
   string display_title         = 12;
   string initiator_user_id     = 13;
+
 }
 
 message ListPendingApprovalsForUserResponse {
