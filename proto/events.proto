@@ -1715,7 +1715,7 @@ message PendingApprovalItem {
   string created_at            = 11;
   string display_title         = 12;
   string initiator_user_id     = 13;
-
+  Approval approval            = 14;
 }
 
 message ListPendingApprovalsForUserResponse {
