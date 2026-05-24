@@ -1741,6 +1741,7 @@ message GetApprovalDetailResponse {
   bool                  is_my_turn          = 5;
   string                expected_role_id    = 6;
   string                expected_role_type  = 7;
+  repeated string my_roles        = 8;
 }
 
 message RejectApprovalStepResponse {
