@@ -1275,7 +1275,6 @@ message LeaveRequest {
   string created_at   = 15;
   string updated_at   = 16;
   Staff staff = 17; // populated on list/get, links to the StaffEvent for this leave request
-  Approval approval = 18; // live approval workflow; status on this message reflects approval when present
 }
 
 message LeaveRequestId          { string leave_request_id = 1; }
@@ -1579,11 +1578,11 @@ message GetApprovalChainRequest {
 message Approval {
   string                 approval_id        = 1;
   string                 approval_chain_id  = 2;
-  ApprovalEntityType     entity_type        = 3;
+  string                 entity_type        = 3; // PAYROLL, BUDGET, LEAVE, ...
   string                 entity_id          = 4;
   string                 organization_id    = 5;
   string                 company_id         = 6;
-  ApprovalInstanceStatus status             = 7;
+  string                 status             = 7; // PENDING, IN_PROGRESS, APPROVED, REJECTED, CLOSED
   int32                  current_step_order = 8;
   int32                  total_steps        = 9;
   string                 initiator_user_id  = 10;
@@ -1604,7 +1603,7 @@ message ApprovalStep {
   string         role_id          = 4;
   string         role_type        = 5;
   string         approver_user_id = 6;
-  ApprovalStatus status           = 7;
+  string         status           = 7; // PENDING, IN_PROGRESS, APPROVED, REJECTED
   string         approved_at      = 8;
   string         comment          = 9;
   string         created_at       = 10;
@@ -1704,7 +1703,7 @@ message ListPendingApprovalsForUserRequest {
 
 message PendingApprovalItem {
   string approval_id           = 1;
-  ApprovalEntityType entity_type = 2;
+  string entity_type           = 2; // PAYROLL, BUDGET, LEAVE, ...
   string entity_type_slug      = 3;
   string entity_id             = 4;
   int32  current_step_order    = 5;
