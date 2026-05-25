@@ -637,6 +637,7 @@ message Staff {
   repeated StaffProbationHistory probation_history = 16;
   repeated StaffCompanyRole staff_company_roles = 17;
   optional Company company = 18;
+  optional string employee_number = 19;
 }
 
 

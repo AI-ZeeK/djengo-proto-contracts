@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+option csharp_namespace = "Facility.Grpc";
+
+package facility;
+
+service FacilityService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+
+  rpc GetCompanyFacilityProfile(GetCompanyFacilityProfileRequest) returns (CompanyFacilityProfileResponse);
+  rpc UpsertCompanyFacilityProfile(UpsertCompanyFacilityProfileRequest) returns (CompanyFacilityProfileResponse);
+
+  rpc GetFacilityTree(GetFacilityTreeRequest) returns (GetFacilityTreeResponse);
+  rpc GetFacilityNode(GetFacilityNodeRequest) returns (FacilityNodeResponse);
+  rpc CreateFacilityNode(CreateFacilityNodeRequest) returns (FacilityNodeResponse);
+  rpc UpdateFacilityNode(UpdateFacilityNodeRequest) returns (FacilityNodeResponse);
+  rpc DeactivateFacilityNode(DeactivateFacilityNodeRequest) returns (FacilityNodeResponse);
+  rpc GetAllowedChildNodeTypes(GetAllowedChildNodeTypesRequest) returns (GetAllowedChildNodeTypesResponse);
+}
+
+enum FacilityMode {
+  FACILITY_MODE_UNSPECIFIED = 0;
+  GENERAL = 1;
+  HOSPITAL = 2;
+  ESTATE = 3;
+  HOSPITALITY = 4;
+}
+
+enum FacilityNodeType {
+  FACILITY_NODE_TYPE_UNSPECIFIED = 0;
+  BLOCK = 1;
+  BUILDING = 2;
+  WARD = 3;
+  UNIT = 4;
+  ROOM = 5;
+  BED = 6;
+}
+
+message HealthCheckRequest {}
+message HealthCheckResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message CompanyFacilityProfileMessage {
+  string company_id = 1;
+  string organization_id = 2;
+  FacilityMode facility_mode = 3;
+}
+
+message GetCompanyFacilityProfileRequest {
+  string company_id = 1;
+  string organization_id = 2;
+}
+
+message UpsertCompanyFacilityProfileRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  FacilityMode facility_mode = 3;
+}
+
+message CompanyFacilityProfileResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional CompanyFacilityProfileMessage profile = 3;
+}
+
+message FacilityNodeMessage {
+  string facility_node_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string branch_id = 4;
+  optional string parent_facility_node_id = 5;
+  FacilityNodeType node_type = 6;
+  optional string code = 7;
+  string name = 8;
+  bool is_active = 9;
+  optional string metadata_json = 10;
+  repeated FacilityNodeMessage children = 11;
+}
+
+message GetFacilityTreeRequest {
+  string branch_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  bool include_inactive = 4;
+}
+
+message GetFacilityTreeResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated FacilityNodeMessage nodes = 3;
+}
+
+message GetFacilityNodeRequest {
+  string facility_node_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+}
+
+message CreateFacilityNodeRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string branch_id = 3;
+  optional string parent_facility_node_id = 4;
+  FacilityNodeType node_type = 5;
+  optional string code = 6;
+  string name = 7;
+  optional string metadata_json = 8;
+}
+
+message UpdateFacilityNodeRequest {
+  string facility_node_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  optional string code = 4;
+  optional string name = 5;
+  optional string metadata_json = 6;
+  optional bool is_active = 7;
+}
+
+message DeactivateFacilityNodeRequest {
+  string facility_node_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+}
+
+message FacilityNodeResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional FacilityNodeMessage node = 3;
+}
+
+message GetAllowedChildNodeTypesRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional FacilityNodeType parent_node_type = 3;
+}
+
+message GetAllowedChildNodeTypesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated FacilityNodeType node_types = 3;
+}
