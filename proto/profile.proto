@@ -31,6 +31,7 @@ service ProfileService {
   rpc Login(LoginRequest) returns (AuthInitialResponse);
   rpc SendOtp(SendOtpRequest) returns (SendOtpResponse);
   rpc VerifyOtp(VerifyOtpRequest) returns (VerifyOtpResponse);
+  rpc GetOtpExpiry(GetOtpExpiryRequest) returns (GetOtpExpiryResponse);
   rpc Logout(LogoutRequest) returns (SendOtpResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
   
@@ -901,6 +902,17 @@ message SendOtpResponse {
   bool success = 1;
   optional string error = 2;
   optional string message = 3;
+}
+
+message GetOtpExpiryRequest {
+  string token = 1;
+  SendOtpType type = 2;
+}
+
+message GetOtpExpiryResponse {
+  bool has_valid_otp = 1;
+  int32 seconds_remaining = 2;
+  optional string expires_at = 3;
 }
 
 message RefreshTokenResponse {
