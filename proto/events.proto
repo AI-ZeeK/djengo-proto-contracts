@@ -411,7 +411,12 @@ message ListApprovalChainsResponse {
 
 // ─── Shared ──────────────────────────────────────────────────────────────────
 
-message CompanyRequest      { string company_id = 1; string organization_id = 2; }
+message CompanyRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string branch_id = 3;
+  optional string department_id = 4;
+}
 message StaffRequest        { string staff_id = 1; string company_id = 2; string organization_id = 3; }
 message CustomerRequest     { string customer_id = 1; string company_id = 2; string organization_id = 3; }
 message DeleteResponse      { bool success = 1; string message = 2; }
@@ -570,6 +575,7 @@ message Task {
   string parent_task_id   = 22;
   repeated string tags    = 23;
   string organization_id  = 24;
+  string branch_id        = 25;
 }
 
 message TaskId              { string task_id = 1; }
@@ -756,6 +762,7 @@ message AttendanceShiftWindow {
   int32 minutes_until_start = 14;
   int32 minutes_until_end = 15;
   bool left_early = 16;
+  string work_date = 17; // YYYY-MM-DD for this shift occurrence
 }
 
 message AttendanceSessionStatus {
@@ -784,6 +791,9 @@ message AttendanceSessionStatus {
   int32 minutes_until_next_shift_start = 23;
   string next_shift_starts_at = 24;
   string overtime_message = 25;
+  bool has_shift_today = 26;
+  string current_shift_work_date = 27; // YYYY-MM-DD
+  string next_shift_work_date = 28;    // YYYY-MM-DD
 }
 
 message CompanyAttendancePolicyProto {
@@ -985,6 +995,8 @@ message CreateShiftTemplateRequest {
   repeated DayOfWeek days_of_week = 8;  
   string color             = 9;
   bool   is_active         = 10;
+  optional string branch_id = 11;
+  optional string department_id = 12;
 }
 
 message UpdateShiftTemplateRequest {
@@ -999,6 +1011,8 @@ message UpdateShiftTemplateRequest {
   string color             = 9;
   string shift_template_id = 10;
   bool   is_active         = 11;
+  optional string branch_id = 12;
+  optional string department_id = 13;
 }
 
 message ShiftTemplate {
@@ -1016,6 +1030,8 @@ message ShiftTemplate {
   string updated_at        = 12;
   string description       = 13;
   bool   is_active         = 14;
+  string branch_id       = 15;
+  string department_id   = 16;
 }
 
 message ShiftTemplateId            { string shift_template_id = 1; string company_id = 2; string organization_id = 3; }
@@ -1030,7 +1046,8 @@ message AssignShiftTemplateRequest {
   string effective_from    = 5;   // "YYYY-MM-DD"
   string effective_to      = 6;   // "YYYY-MM-DD" or empty
   string assigned_by       = 7;
-
+  optional string branch_id = 8;
+  optional string department_id = 9;
 }
 
 message UpdateAssignShiftTemplateRequest {
@@ -1041,6 +1058,8 @@ message UpdateAssignShiftTemplateRequest {
   string effective_to      = 5;   // "YYYY-MM-DD" or empty
   string assignment_id     = 6;
   string assigned_by       = 7;
+  optional string branch_id = 8;
+  optional string department_id = 9;
 }
 
 message StaffShiftAssignment {
@@ -1055,6 +1074,8 @@ message StaffShiftAssignment {
   string updated_at        = 9;
   ShiftTemplate shift_template = 10;
   Staff staff = 11;
+  string branch_id = 12;
+  string department_id = 13;
 }
 
 message ShiftAssignmentId    { string assignment_id = 1; }
