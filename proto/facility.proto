@@ -16,6 +16,7 @@ service FacilityService {
   rpc UpdateFacilityNode(UpdateFacilityNodeRequest) returns (FacilityNodeResponse);
   rpc DeactivateFacilityNode(DeactivateFacilityNodeRequest) returns (FacilityNodeResponse);
   rpc GetAllowedChildNodeTypes(GetAllowedChildNodeTypesRequest) returns (GetAllowedChildNodeTypesResponse);
+  rpc HasAnyFacilityNodes(HasAnyFacilityNodesRequest) returns (HasAnyFacilityNodesResponse);
 }
 
 enum FacilityMode {
@@ -141,4 +142,16 @@ message GetAllowedChildNodeTypesResponse {
   bool success = 1;
   optional string error = 2;
   repeated FacilityNodeType node_types = 3;
+}
+
+message HasAnyFacilityNodesRequest {
+  string company_id = 1;
+  string organization_id = 2;
+}
+
+message HasAnyFacilityNodesResponse {
+  bool success = 1;
+  optional string error = 2;
+  bool has_any_nodes = 3;
+  int32 node_count = 4;
 }

@@ -307,6 +307,7 @@ message UpdateCompanyDetailsRequest {
   optional bool require_cost_center_on_budget_lines = 16;
   optional bool require_payroll_dimensions_on_run = 17;
   optional int64 petty_cash_approval_threshold_minor = 18;
+  optional int32 primary_business_type_id = 19;
 }
 
 message OrganizationRoleIdRequest {
@@ -959,6 +960,7 @@ message CompanyMetaData {
   optional int64 petty_cash_approval_threshold_minor = 11;
   string country_code = 12;
   string base_currency = 13;
+  optional int32 primary_business_type_id = 14;
 }
 
 message Branch {
