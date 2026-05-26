@@ -56,10 +56,21 @@ enum SendOtpType {
   STAFF_INVITATION = 5;
 }
 
+enum InvitationMailKind {
+  INVITATION_MAIL_STAFF = 0;
+  INVITATION_MAIL_PARTNER = 1;
+}
+
 message SendStaffInvitationMailRequest {
   string email = 1;
   string invitation_url = 2;
   string company_name = 3;
+  optional string role_name = 4;
+  optional string branch_name = 5;
+  optional string department_name = 6;
+  optional string partner_type_label = 7;
+  InvitationMailKind kind = 8;
+  optional string expires_at = 9;
 }
 
 message SendStaffInvitationMailResponse {
