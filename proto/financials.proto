@@ -1149,6 +1149,8 @@ message OpenFinancialPeriodRequest {
   string company_id      = 2;
   int32  year            = 3;
   int32  month           = 4;
+  /** Required when reopening a LOCKED period (LOCKED → OPEN). */
+  string reopened_by_staff_id = 5;
 }
 
 message LockFinancialPeriodRequest {
