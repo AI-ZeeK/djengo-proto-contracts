@@ -46,7 +46,7 @@ message HealthCheckResponse {
 message CompanyFacilityProfileMessage {
   string company_id = 1;
   string organization_id = 2;
-  FacilityMode facility_mode = 3;
+  string facility_mode = 3;
 }
 
 message GetCompanyFacilityProfileRequest {
