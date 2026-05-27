@@ -631,7 +631,7 @@ message Staff {
   string created_at = 10;
   string updated_at = 11;
   optional User user = 12;
-  string role_id = 13;
+  reserved 13;
   optional OrganizationRole role = 14;
   optional StaffMeta meta_data = 15;
   repeated StaffProbationHistory probation_history = 16;
