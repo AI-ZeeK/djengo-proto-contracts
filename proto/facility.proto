@@ -243,13 +243,14 @@ message FacilityNodeResponse {
 message GetAllowedChildNodeTypesRequest {
   string company_id = 1;
   string organization_id = 2;
-  optional FacilityNodeType parent_node_type = 3;
+  // Empty / omitted = root level (lowest level_number).
+  optional string parent_node_level_id = 3;
 }
 
 message GetAllowedChildNodeTypesResponse {
   bool success = 1;
   optional string error = 2;
-  repeated FacilityNodeType node_types = 3;
+  repeated FacilityNodeLevelMessage levels = 3;
 }
 
 message HasAnyFacilityNodesRequest {
