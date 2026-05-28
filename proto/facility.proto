@@ -25,6 +25,9 @@ service FacilityService {
   rpc DeleteFacilityNodeLevels(GetFacilityNodeLevelsRequest) returns (DeleteFacilityNodeLevelsResponse);
 
   rpc ListFacilityNodeTypes(google.protobuf.Empty) returns (ListFacilityNodeTypesResponse);
+
+  rpc ListFacilityBulkTemplates(ListFacilityBulkTemplatesRequest) returns (ListFacilityBulkTemplatesResponse);
+  rpc StartFacilityBulkCreate(StartFacilityBulkCreateRequest) returns (StartFacilityBulkCreateResponse);
 }
 
 
@@ -259,4 +262,46 @@ message HasAnyFacilityNodesResponse {
   optional string error = 2;
   bool has_any_nodes = 3;
   int32 node_count = 4;
+}
+
+message ListFacilityBulkTemplatesRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+}
+
+message FacilityBulkTemplateLevelMessage {
+  string facility_node_level_id = 1;
+  string node_type = 2;
+  string level_name = 3;
+  int32 count_per_parent = 4;
+}
+
+message FacilityBulkTemplateMessage {
+  string template_id = 1;
+  string name = 2;
+  string description = 3;
+  int32 estimated_total_nodes = 4;
+  repeated FacilityBulkTemplateLevelMessage levels = 5;
+}
+
+message ListFacilityBulkTemplatesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated FacilityBulkTemplateMessage templates = 3;
+}
+
+message StartFacilityBulkCreateRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  string template_id = 4;
+  string user_id = 5;
+}
+
+message StartFacilityBulkCreateResponse {
+  bool success = 1;
+  optional string error = 2;
+  string job_id = 3;
+  int32 total = 4;
 }
