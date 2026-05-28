@@ -171,14 +171,15 @@ message FacilityNodeMessage {
   string company_id = 3;
   string branch_id = 4;
   optional string parent_facility_node_id = 5;
-  FacilityNodeType node_type = 6;
-  optional string code = 7;
-  string name = 8;
-  bool is_active = 9;
-  optional string metadata_json = 10;
-  repeated FacilityNodeMessage children = 11;
-  int32 child_count = 12;
-  optional FacilityStatus status = 13;
+  optional string code = 6;
+  string name = 7;
+  bool is_active = 8;
+  optional string metadata_json = 9;
+  repeated FacilityNodeMessage children = 10;
+  int32 child_count = 11;
+  optional FacilityStatus status = 12;
+  optional string node_level_id = 13;
+  optional FacilityNodeLevelMessage node_level = 14;
 }
 
 message GetFacilityTreeRequest {
