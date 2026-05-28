@@ -17,7 +17,15 @@ service FacilityService {
   rpc DeactivateFacilityNode(DeactivateFacilityNodeRequest) returns (FacilityNodeResponse);
   rpc GetAllowedChildNodeTypes(GetAllowedChildNodeTypesRequest) returns (GetAllowedChildNodeTypesResponse);
   rpc HasAnyFacilityNodes(HasAnyFacilityNodesRequest) returns (HasAnyFacilityNodesResponse);
+
+  rpc GetFacilityNodeLevels(GetFacilityNodeLevelsRequest) returns (GetFacilityNodeLevelsResponse);
+  rpc UpsertFacilityNodeLevels(UpsertFacilityNodeLevelsRequest) returns (UpsertFacilityNodeLevelsResponse);
+  rpc DeleteFacilityNodeLevels(DeleteFacilityNodeLevelsRequest) returns (DeleteFacilityNodeLevelsResponse);
+
+  rpc ListFacilityNodeTypes(google.protobuf.Empty) returns (ListFacilityNodeTypesResponse);
 }
+
+
 
 enum FacilityMode {
   FACILITY_MODE_UNSPECIFIED = 0;
@@ -35,9 +43,44 @@ enum FacilityNodeType {
   UNIT = 4;
   ROOM = 5;
   BED = 6;
+  FLOOR = 7;
+}
+
+enum FacilityStatus {
+  FACILITY_STATUS_UNSPECIFIED = 0;
+  AVAILABLE = 1;
+  MAINTENANCE = 2;
+  TEMPORARILY_OUT_OF_COMMISSION = 3;
+  OUT_OF_SERVICE = 4;
+  RESERVED = 5;
+}
+
+message FacilityNodeTypeMessage {
+  string             slug         = 1; // e.g. "annual"
+  string             display_name = 2; // e.g. "Annual Leave"
+  FacilityNodeType          type         = 3;
+}
+
+message  ListFacilityNodeTypesResponse {
+  repeated FacilityNodeTypeMessage node_types = 1;
+
+}
+
+message GetFacilityNodeLevelsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+
+}
+
+message GetFacilityNodeLevelsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated FacilityNodeLevelMessage levels = 3;
 }
 
 message HealthCheckRequest {}
+
 message HealthCheckResponse {
   bool success = 1;
   string message = 2;
@@ -47,6 +90,7 @@ message CompanyFacilityProfileMessage {
   string company_id = 1;
   string organization_id = 2;
   string facility_mode = 3;
+  optional string metadata_json = 4;
 }
 
 message GetCompanyFacilityProfileRequest {
@@ -58,12 +102,64 @@ message UpsertCompanyFacilityProfileRequest {
   string company_id = 1;
   string organization_id = 2;
   FacilityMode facility_mode = 3;
+  optional string metadata_json = 4;
 }
 
 message CompanyFacilityProfileResponse {
   bool success = 1;
   optional string error = 2;
   optional CompanyFacilityProfileMessage profile = 3;
+}
+
+message FacilityNodeLevelUpsertMessage {
+  FacilityNodeType node_type = 1;
+  int32 level_number = 2;
+  string name = 3;
+  optional string description = 4;
+  optional string color = 5;
+  bool is_active = 6;
+}
+
+message FacilityNodeLevelMessage {
+  string facility_node_level_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string branch_id = 4;
+  FacilityNodeType node_type = 5;
+  string name = 6;
+  optional string description = 7;
+  int32 level_number = 8;
+  optional string color = 9;
+  bool is_active = 10;
+  string created_at = 11;
+  string updated_at = 12;
+  optional string deleted_at = 13;
+}
+
+message UpsertFacilityNodeLevelsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  repeated FacilityNodeLevelUpsertMessage levels = 4;
+}
+
+message UpsertFacilityNodeLevelsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated FacilityNodeLevelMessage levels = 3;
+}
+
+message DeleteFacilityNodeLevelsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  repeated FacilityNodeType node_types = 4;
+}
+
+message DeleteFacilityNodeLevelsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated FacilityNodeLevelMessage levels = 3;
 }
 
 message FacilityNodeMessage {
@@ -78,6 +174,8 @@ message FacilityNodeMessage {
   bool is_active = 9;
   optional string metadata_json = 10;
   repeated FacilityNodeMessage children = 11;
+  int32 child_count = 12;
+  optional FacilityStatus status = 13;
 }
 
 message GetFacilityTreeRequest {
@@ -85,6 +183,8 @@ message GetFacilityTreeRequest {
   string company_id = 2;
   string organization_id = 3;
   bool include_inactive = 4;
+  bool shallow = 5;
+  optional string parent_facility_node_id = 6;
 }
 
 message GetFacilityTreeResponse {
@@ -108,6 +208,7 @@ message CreateFacilityNodeRequest {
   optional string code = 6;
   string name = 7;
   optional string metadata_json = 8;
+  optional FacilityStatus status = 9;
 }
 
 message UpdateFacilityNodeRequest {
@@ -118,6 +219,7 @@ message UpdateFacilityNodeRequest {
   optional string name = 5;
   optional string metadata_json = 6;
   optional bool is_active = 7;
+  optional FacilityStatus status = 8;
 }
 
 message DeactivateFacilityNodeRequest {
