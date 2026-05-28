@@ -208,11 +208,10 @@ message CreateFacilityNodeRequest {
   string company_id = 2;
   string branch_id = 3;
   optional string parent_facility_node_id = 4;
-  FacilityNodeType node_type = 5;
-  optional string code = 6;
-  string name = 7;
-  optional string metadata_json = 8;
-  optional FacilityStatus status = 9;
+  string name = 6;
+  optional string metadata_json = 9;
+  optional FacilityStatus status = 10;
+  optional string node_level_id = 11;
 }
 
 message UpdateFacilityNodeRequest {
