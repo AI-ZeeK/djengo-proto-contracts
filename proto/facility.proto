@@ -71,7 +71,7 @@ message  ListFacilityNodeTypesResponse {
 message GetFacilityNodeLevelsRequest {
   string company_id = 1;
   string organization_id = 2;
-  string branch_id = 3;
+
 
 }
 
@@ -136,6 +136,7 @@ message FacilityNodeLevelMessage {
   string created_at = 11;
   string updated_at = 12;
   optional string deleted_at = 13;
+
 }
 
 message UpsertFacilityNodeLevelsRequest {
