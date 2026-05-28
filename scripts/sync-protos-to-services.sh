@@ -32,6 +32,7 @@ DESTS=(
   "$ROOT/address-service/src/shared/proto"
   "$ROOT/communications-service/src/shared/proto"
   "$ROOT/financials/protos"
+  "$ROOT/facility/protos"
   "$ROOT/events/protos"
   "$ROOT/operations/protos"
   "$ROOT/comms/proto"

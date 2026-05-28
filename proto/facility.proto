@@ -4,6 +4,8 @@ option csharp_namespace = "Facility.Grpc";
 
 package facility;
 
+import "google/protobuf/empty.proto";
+
 service FacilityService {
   rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
 
