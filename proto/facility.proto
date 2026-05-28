@@ -22,7 +22,7 @@ service FacilityService {
 
   rpc GetFacilityNodeLevels(GetFacilityNodeLevelsRequest) returns (GetFacilityNodeLevelsResponse);
   rpc UpsertFacilityNodeLevels(UpsertFacilityNodeLevelsRequest) returns (UpsertFacilityNodeLevelsResponse);
-  rpc DeleteFacilityNodeLevels(DeleteFacilityNodeLevelsRequest) returns (DeleteFacilityNodeLevelsResponse);
+  rpc DeleteFacilityNodeLevels(GetFacilityNodeLevelsRequest) returns (DeleteFacilityNodeLevelsResponse);
 
   rpc ListFacilityNodeTypes(google.protobuf.Empty) returns (ListFacilityNodeTypesResponse);
 }
