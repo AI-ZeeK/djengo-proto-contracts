@@ -62,7 +62,7 @@ message FacilityNodeTypeMessage {
   string             display_name = 2; // e.g. "Annual Leave"
   FacilityNodeType          type         = 3;
 }
-
+  
 message  ListFacilityNodeTypesResponse {
   repeated FacilityNodeTypeMessage node_types = 1;
 
@@ -127,7 +127,7 @@ message FacilityNodeLevelMessage {
   string organization_id = 2;
   string company_id = 3;
   string branch_id = 4;
-  FacilityNodeType node_type = 5;
+  string node_type = 5;
   string name = 6;
   optional string description = 7;
   int32 level_number = 8;
