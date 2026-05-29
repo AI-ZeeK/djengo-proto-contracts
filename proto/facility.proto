@@ -49,6 +49,29 @@ enum FacilityNodeType {
   ROOM = 5;
   BED = 6;
   FLOOR = 7;
+  WING = 8;
+  HOUSE = 9;
+  TABLE = 10;
+  ZONE = 11;
+  SECTION = 12;
+  SITE = 13;
+}
+
+enum SpatialOrientation {
+  SPATIAL_ORIENTATION_UNSPECIFIED = 0;
+  NORTH = 1;
+  EAST = 2;
+  SOUTH = 3;
+  WEST = 4;
+}
+
+enum FacilityAssetKind {
+  FACILITY_ASSET_KIND_UNSPECIFIED = 0;
+  ASSET_KIND_BED = 1;
+  ASSET_KIND_ROOM = 2;
+  ASSET_KIND_TABLE = 3;
+  ASSET_KIND_HOUSE = 4;
+  ASSET_KIND_UNIT = 5;
 }
 
 enum FacilityStatus {
@@ -96,6 +119,7 @@ message CompanyFacilityProfileMessage {
   string organization_id = 2;
   string facility_mode = 3;
   optional string metadata_json = 4;
+  optional string layout_settings_json = 5;
 }
 
 message GetCompanyFacilityProfileRequest {
@@ -183,6 +207,18 @@ message FacilityNodeMessage {
   optional FacilityStatus status = 12;
   optional string node_level_id = 13;
   optional FacilityNodeLevelMessage node_level = 14;
+  optional string description = 15;
+  optional SpatialOrientation orientation = 16;
+  optional string spatial_position_json = 17;
+  int32 sort_order = 18;
+  optional FacilityNodeAssetMessage asset = 19;
+}
+
+message FacilityNodeAssetMessage {
+  string facility_node_id = 1;
+  FacilityAssetKind asset_kind = 2;
+  int32 capacity_max = 3;
+  optional string metadata_json = 4;
 }
 
 message GetFacilityTreeRequest {
@@ -212,9 +248,13 @@ message CreateFacilityNodeRequest {
   string branch_id = 3;
   optional string parent_facility_node_id = 4;
   string name = 6;
+  optional string description = 7;
   optional string metadata_json = 9;
   optional FacilityStatus status = 10;
   optional string node_level_id = 11;
+  optional SpatialOrientation orientation = 12;
+  optional string spatial_position_json = 13;
+  optional int32 sort_order = 14;
 }
 
 message UpdateFacilityNodeRequest {
@@ -226,6 +266,10 @@ message UpdateFacilityNodeRequest {
   optional string metadata_json = 6;
   optional bool is_active = 7;
   optional FacilityStatus status = 8;
+  optional string description = 9;
+  optional SpatialOrientation orientation = 10;
+  optional string spatial_position_json = 11;
+  optional int32 sort_order = 12;
 }
 
 message DeactivateFacilityNodeRequest {
