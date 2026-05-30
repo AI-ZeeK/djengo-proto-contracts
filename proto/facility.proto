@@ -97,8 +97,7 @@ message  ListFacilityNodeTypesResponse {
 message GetFacilityNodeLevelsRequest {
   string company_id = 1;
   string organization_id = 2;
-
-
+  string branch_id = 3;
 }
 
 message GetFacilityNodeLevelsResponse {
@@ -120,11 +119,13 @@ message CompanyFacilityProfileMessage {
   string facility_mode = 3;
   optional string metadata_json = 4;
   optional string layout_settings_json = 5;
+  string branch_id = 6;
 }
 
 message GetCompanyFacilityProfileRequest {
   string company_id = 1;
   string organization_id = 2;
+  string branch_id = 3;
 }
 
 message UpsertCompanyFacilityProfileRequest {
@@ -132,6 +133,7 @@ message UpsertCompanyFacilityProfileRequest {
   string organization_id = 2;
   FacilityMode facility_mode = 3;
   optional string metadata_json = 4;
+  string branch_id = 5;
 }
 
 message CompanyFacilityProfileResponse {
@@ -143,8 +145,7 @@ message CompanyFacilityProfileResponse {
 message FacilityNodeLevelUpsertMessage {
   FacilityNodeType node_type = 1;
   int32 level_number = 2;
-  string name = 3;
-  optional string description = 4;
+  reserved 3, 4; // removed: name, description (labels come from node_type)
   optional string color = 5;
   bool is_active = 6;
 }
@@ -155,15 +156,13 @@ message FacilityNodeLevelMessage {
   string company_id = 3;
   string branch_id = 4;
   string node_type = 5;
-  string name = 6;
-  optional string description = 7;
+  reserved 6, 7; // removed: name, description
   int32 level_number = 8;
   optional string color = 9;
   bool is_active = 10;
   string created_at = 11;
   string updated_at = 12;
   optional string deleted_at = 13;
-
 }
 
 message UpsertFacilityNodeLevelsRequest {
@@ -201,6 +200,7 @@ message FacilityNodeMessage {
   optional string code = 6;
   string name = 7;
   bool is_active = 8;
+  // Extensible JSON: description, space { area_sq_m, length_m, width_m, height_m, ... } (metres).
   optional string metadata_json = 9;
   repeated FacilityNodeMessage children = 10;
   int32 child_count = 11;
@@ -249,6 +249,7 @@ message CreateFacilityNodeRequest {
   optional string parent_facility_node_id = 4;
   string name = 6;
   optional string description = 7;
+  // Extensible JSON: description, space { area_sq_m, length_m, width_m, height_m, ... } (metres).
   optional string metadata_json = 9;
   optional FacilityStatus status = 10;
   optional string node_level_id = 11;
@@ -289,6 +290,7 @@ message GetAllowedChildNodeTypesRequest {
   string organization_id = 2;
   // Empty / omitted = root level (lowest level_number).
   optional string parent_node_level_id = 3;
+  string branch_id = 4;
 }
 
 message GetAllowedChildNodeTypesResponse {
