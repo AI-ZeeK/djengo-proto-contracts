@@ -1254,6 +1254,7 @@ message PartnerData {
   string partner_id = 1;
   string organization_id = 2;
   optional string company_id = 3;
+  optional string branch_id = 16;
   optional string profile_id = 4;   // Linked user in the Profile Service (optional)
   string first_name = 5;
   string last_name = 6;
@@ -1271,6 +1272,7 @@ message PartnerData {
 message CreatePartnerRequest {
   string organization_id = 1;
   optional string company_id = 2;
+  optional string branch_id = 10;
   optional string profile_id = 3;   // Optionally tie to an existing user profile
   string first_name = 4;
   string last_name = 5;
@@ -1284,6 +1286,7 @@ message UpdatePartnerRequest {
   string partner_id = 1;
   string organization_id = 2;
   optional string company_id = 3;
+  optional string branch_id = 11;
   optional string profile_id = 4;
   optional string first_name = 5;
   optional string last_name = 6;
@@ -1306,6 +1309,7 @@ message GetPartnersRequest {
   optional string search = 5;
   optional int32 page = 6;
   optional int32 page_size = 7;
+  optional string branch_id = 8;
 }
 
 message DeletePartnerRequest {
