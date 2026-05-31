@@ -13,6 +13,7 @@ service FacilityService {
   rpc UpsertCompanyFacilityProfile(UpsertCompanyFacilityProfileRequest) returns (CompanyFacilityProfileResponse);
 
   rpc GetFacilityTree(GetFacilityTreeRequest) returns (GetFacilityTreeResponse);
+  rpc SearchFacilityNodesByCode(SearchFacilityNodesByCodeRequest) returns (SearchFacilityNodesByCodeResponse);
   rpc GetFacilityNode(GetFacilityNodeRequest) returns (FacilityNodeResponse);
   rpc CreateFacilityNode(CreateFacilityNodeRequest) returns (FacilityNodeResponse);
   rpc UpdateFacilityNode(UpdateFacilityNodeRequest) returns (FacilityNodeResponse);
@@ -234,6 +235,33 @@ message GetFacilityTreeResponse {
   bool success = 1;
   optional string error = 2;
   repeated FacilityNodeMessage nodes = 3;
+}
+
+message FacilityNodePathSegment {
+  string facility_node_id = 1;
+  string name = 2;
+  string code = 3;
+  optional string node_type = 4;
+}
+
+message FacilityNodeSearchMatch {
+  FacilityNodeMessage node = 1;
+  repeated FacilityNodePathSegment ancestors = 2;
+}
+
+message SearchFacilityNodesByCodeRequest {
+  string branch_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string code = 4;
+  bool include_inactive = 5;
+  int32 limit = 6;
+}
+
+message SearchFacilityNodesByCodeResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated FacilityNodeSearchMatch matches = 3;
 }
 
 message GetFacilityNodeRequest {
