@@ -73,6 +73,7 @@ enum FacilityAssetKind {
   ASSET_KIND_TABLE = 3;
   ASSET_KIND_HOUSE = 4;
   ASSET_KIND_UNIT = 5;
+  ASSET_KIND_SECTION = 6;
 }
 
 enum FacilityStatus {
@@ -222,6 +223,15 @@ message FacilityNodeAssetMessage {
   optional string metadata_json = 4;
 }
 
+// Occupancy profile when creating/updating occupiable nodes (bed, room, table, …).
+message FacilityNodeAssetSetupMessage {
+  // Override inferred kind from node_type; omit to infer from level.
+  optional FacilityAssetKind asset_kind = 1;
+  // Max occupants (tenants, patients, seats). 0 = use branch/mode defaults.
+  int32 capacity_max = 2;
+  optional string metadata_json = 3;
+}
+
 message GetFacilityTreeRequest {
   string branch_id = 1;
   string company_id = 2;
@@ -284,6 +294,7 @@ message CreateFacilityNodeRequest {
   optional SpatialOrientation orientation = 12;
   optional string spatial_position_json = 13;
   optional int32 sort_order = 14;
+  optional FacilityNodeAssetSetupMessage asset_setup = 15;
 }
 
 message UpdateFacilityNodeRequest {
@@ -299,6 +310,7 @@ message UpdateFacilityNodeRequest {
   optional SpatialOrientation orientation = 10;
   optional string spatial_position_json = 11;
   optional int32 sort_order = 12;
+  optional FacilityNodeAssetSetupMessage asset_setup = 13;
 }
 
 message DeactivateFacilityNodeRequest {
