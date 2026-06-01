@@ -675,6 +675,84 @@ message ListFeedbackResponse {
   TableMeta meta                       = 2;
 }
 
+// ── Reservations (facility nodes + guests + orders) ─────────────────────────
+
+service ReservationService {
+  rpc CreateReservation (CreateReservationRequest) returns (ReservationProto);
+  rpc GetReservation    (GetReservationRequest)    returns (ReservationProto);
+  rpc ListReservations  (ListReservationsRequest)  returns (ListReservationsResponse);
+  rpc UpdateReservation (UpdateReservationRequest) returns (ReservationProto);
+  rpc CancelReservation (CancelReservationRequest) returns (ReservationProto);
+}
+
+message ReservationProto {
+  string reservation_id      = 1;
+  string company_id          = 2;
+  string organization_id     = 3;
+  optional string guest_id   = 4;
+  optional string facility_node_id = 5;
+  optional string order_id   = 6;
+  optional string room_id    = 7;
+  optional string table_id   = 8;
+  string start_time          = 9;
+  string end_time            = 10;
+  string status              = 11; // PENDING | CONFIRMED | CANCELLED | COMPLETED
+  optional string notes      = 12;
+  string created_by          = 13;
+  string created_at          = 14;
+  string updated_at          = 15;
+}
+
+message CreateReservationRequest {
+  string company_id          = 1;
+  string organization_id     = 2;
+  optional string guest_id   = 3;
+  optional string facility_node_id = 4;
+  optional string order_id   = 5;
+  optional string room_id    = 6;
+  optional string table_id   = 7;
+  string start_time          = 8;
+  string end_time            = 9;
+  optional string notes      = 10;
+  string created_by          = 11;
+}
+
+message GetReservationRequest { string reservation_id = 1; }
+
+message UpdateReservationRequest {
+  string reservation_id      = 1;
+  optional string guest_id   = 2;
+  optional string facility_node_id = 3;
+  optional string order_id   = 4;
+  optional string start_time = 5;
+  optional string end_time   = 6;
+  optional string status       = 7;
+  optional string notes      = 8;
+}
+
+message CancelReservationRequest {
+  string reservation_id = 1;
+  string cancelled_by   = 2;
+  optional string reason = 3;
+}
+
+message ListReservationsRequest {
+  string company_id              = 1;
+  string organization_id         = 2;
+  optional string guest_id       = 3;
+  optional string facility_node_id = 4;
+  optional string status           = 5;
+  optional string from_time        = 6;
+  optional string to_time          = 7;
+  optional int32  page             = 8;
+  optional int32  page_size        = 9;
+}
+
+message ListReservationsResponse {
+  repeated ReservationProto reservations = 1;
+  TableMeta meta                         = 2;
+}
+
 // ── Incidents ─────────────────────────────────────────────────────────────
 
 enum IncidentStatus {
