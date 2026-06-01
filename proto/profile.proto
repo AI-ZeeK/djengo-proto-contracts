@@ -976,11 +976,13 @@ message GetUserByEmailRequest {
 }
 
 // company_id / organization_id are set by the gateway from OrgAuthGuard (x-company-id + token), not from the client.
+// dial_code = calling code digits only (e.g. 254). phone_number = national subscriber number without dial code.
 message LookupPhoneNumberRequest {
-  string phone = 1;
-  string requester_user_id = 2;
-  optional string company_id = 3;
-  optional string organization_id = 4;
+  string dial_code = 1;
+  string phone_number = 2;
+  string requester_user_id = 3;
+  optional string company_id = 4;
+  optional string organization_id = 5;
 }
 
 message PhoneMatchPreview {
@@ -997,8 +999,9 @@ message LookupPhoneNumberResponse {
   string status = 3;
   bool can_save = 4;
   optional string message = 5;
-  optional string normalized_phone = 6;
-  optional PhoneMatchPreview match = 7;
+  optional string normalized_phone_number = 6;
+  optional string normalized_dial_code = 7;
+  optional PhoneMatchPreview match = 8;
 }
 
 message UpdateUserStatusRequest {
@@ -1020,6 +1023,8 @@ message UpdateUserRequest {
   optional string avatar_url = 6;
   optional Address address = 7;
   optional string country_code = 8;
+  /** Calling code digits only (e.g. 254), separate from ISO country_code. */
+  optional string phone_dial_code = 9;
 }
 
 // 📤 RESPONSE MESSAGES
