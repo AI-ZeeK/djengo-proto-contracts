@@ -41,6 +41,8 @@ service ProfileService {
   rpc GetUser(GetUserRequest) returns (UserResponse);
   rpc GetBusinessUser(GetUserRequest) returns (BusinessUserResponse);
   rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse);
+  rpc LookupPhoneNumber(LookupPhoneNumberRequest) returns (LookupPhoneNumberResponse);
+  rpc LookupEmail(LookupEmailRequest) returns (LookupEmailResponse);
   rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse);
   rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
@@ -84,6 +86,13 @@ service ProfileService {
   rpc StaffProbationHistory(StaffProbationHistoryRequest) returns (StaffProbationHistoryResponse);
   // ── HR: Termination ───────────────────────────────────────────────────────
   rpc TerminateStaff(TerminateStaffRequest) returns (TerminateStaffResponse);
+
+  // ── Guest CRM ─────────────────────────────────────────────────────────────
+  rpc CreateGuest(CreateGuestRequest) returns (GuestProto);
+  rpc GetGuest(GetGuestRequest) returns (GuestProto);
+  rpc UpdateGuest(UpdateGuestRequest) returns (GuestProto);
+  rpc DeleteGuest(DeleteGuestRequest) returns (DeleteGuestResponse);
+  rpc ListGuests(ListGuestsRequest) returns (ListGuestsResponse);
   
 }
 
@@ -255,6 +264,7 @@ message ResolveCompanyUsersByIdsRequest {
   string organization_id = 3;
 }
 
+/** Minimal staff identity for company-scoped UIs (no full User graph). */
 message CompanyStaffUserPreview {
   string user_id   = 1;
   string staff_id  = 2;
@@ -993,6 +1003,62 @@ message GetUserByEmailRequest {
   string email = 1;
 }
 
+// company_id / organization_id are set by the gateway from OrgAuthGuard (x-company-id + token), not from the client.
+// dial_code = calling code digits only (e.g. 254). phone_number = national subscriber number without dial code.
+message LookupPhoneNumberRequest {
+  string dial_code = 1;
+  string phone_number = 2;
+  string requester_user_id = 3;
+  optional string company_id = 4;
+  optional string organization_id = 5;
+}
+
+message PhoneMatchPreview {
+  string user_id = 1;
+  optional string staff_id = 2;
+  optional string partner_id = 3;
+  string display_name = 4;
+}
+
+message LookupPhoneNumberResponse {
+  bool success = 1;
+  optional string error = 2;
+  /** available | own | company | blocked */
+  string status = 3;
+  bool can_save = 4;
+  optional string message = 5;
+  optional string normalized_phone_number = 6;
+  optional string normalized_dial_code = 7;
+  optional PhoneMatchPreview match = 8;
+}
+
+// scope: registration | my_account | company (default company when company_id is set)
+message LookupEmailRequest {
+  string email = 1;
+  string requester_user_id = 2;
+  optional string company_id = 3;
+  optional string organization_id = 4;
+  optional string scope = 5;
+}
+
+message EmailMatchPreview {
+  string user_id = 1;
+  optional string staff_id = 2;
+  optional string partner_id = 3;
+  string display_name = 4;
+}
+
+message LookupEmailResponse {
+  bool success = 1;
+  optional string error = 2;
+  /** available | own | company | blocked */
+  string status = 3;
+  bool can_save = 4;
+  optional string message = 5;
+  optional string normalized_email = 6;
+  optional EmailMatchPreview match = 7;
+}
+
 message UpdateUserStatusRequest {
   string user_id = 1;
   string last_seen = 2;
@@ -1012,6 +1078,8 @@ message UpdateUserRequest {
   optional string avatar_url = 6;
   optional Address address = 7;
   optional string country_code = 8;
+  /** Calling code digits only (e.g. 254), separate from ISO country_code. */
+  optional string phone_dial_code = 9;
 }
 
 // 📤 RESPONSE MESSAGES
@@ -1393,5 +1461,87 @@ message LiftSecurityRestrictionResponse {
   bool success = 1;
   optional string error = 2;
   optional string message = 3;
+}
+
+// ── Guest CRM ────────────────────────────────────────────────────────────────
+
+message GuestProto {
+  string guest_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string first_name = 4;
+  string last_name = 5;
+  optional string email = 6;
+  optional string phone_number = 7;
+  optional string nationality = 8;
+  optional string id_type = 9;
+  optional string id_number = 10;
+  optional string date_of_birth = 11;
+  optional string gender = 12;
+  optional string address = 13;
+  string loyalty_tier = 14;
+  int32 loyalty_points = 15;
+  int32 total_visits = 16;
+  int64 total_spent_minor = 17;
+  string currency_code = 18;
+  bool is_blacklisted = 19;
+  optional string blacklist_reason = 20;
+  optional string notes = 21;
+  string created_at = 22;
+  string updated_at = 23;
+}
+
+message CreateGuestRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string first_name = 3;
+  string last_name = 4;
+  optional string email = 5;
+  optional string phone_number = 6;
+  optional string nationality = 7;
+  optional string notes = 8;
+}
+
+message GetGuestRequest {
+  string guest_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+}
+
+message UpdateGuestRequest {
+  string guest_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  optional string email = 6;
+  optional string phone_number = 7;
+  optional string notes = 8;
+  optional bool is_blacklisted = 9;
+  optional string blacklist_reason = 10;
+}
+
+message DeleteGuestRequest {
+  string guest_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+}
+
+message DeleteGuestResponse {
+  bool success = 1;
+  optional string message = 2;
+}
+
+message ListGuestsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string search = 3;
+  optional int32 page = 4;
+  optional int32 page_size = 5;
+}
+
+message ListGuestsResponse {
+  repeated GuestProto guests = 1;
+  int32 total = 2;
 }
 
