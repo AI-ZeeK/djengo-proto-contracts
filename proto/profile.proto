@@ -41,6 +41,7 @@ service ProfileService {
   rpc GetUser(GetUserRequest) returns (UserResponse);
   rpc GetBusinessUser(GetUserRequest) returns (BusinessUserResponse);
   rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse);
+  rpc LookupPhoneNumber(LookupPhoneNumberRequest) returns (LookupPhoneNumberResponse);
   rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse);
   rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
@@ -972,6 +973,32 @@ message GetUserRequest {
 
 message GetUserByEmailRequest {
   string email = 1;
+}
+
+// company_id / organization_id are set by the gateway from OrgAuthGuard (x-company-id + token), not from the client.
+message LookupPhoneNumberRequest {
+  string phone = 1;
+  string requester_user_id = 2;
+  optional string company_id = 3;
+  optional string organization_id = 4;
+}
+
+message PhoneMatchPreview {
+  string user_id = 1;
+  optional string staff_id = 2;
+  optional string partner_id = 3;
+  string display_name = 4;
+}
+
+message LookupPhoneNumberResponse {
+  bool success = 1;
+  optional string error = 2;
+  /** available | own | company | blocked */
+  string status = 3;
+  bool can_save = 4;
+  optional string message = 5;
+  optional string normalized_phone = 6;
+  optional PhoneMatchPreview match = 7;
 }
 
 message UpdateUserStatusRequest {
