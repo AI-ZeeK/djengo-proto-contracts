@@ -135,6 +135,7 @@ service FinancialsService {
   rpc UpdateMonthlyBudget(UpdateMonthlyBudgetRequest) returns (MonthlyBudget);
   rpc ListMonthlyBudgets(ListMonthlyBudgetsRequest) returns (ListMonthlyBudgetsResponse);
   rpc CreateBudgetAllocation(CreateBudgetAllocationRequest) returns (BudgetAllocation);
+  rpc TransferBudgetAllocation(TransferBudgetAllocationRequest) returns (TransferBudgetAllocationResponse);
   rpc ListBudgetAllocations(ListBudgetAllocationsRequest) returns (ListBudgetAllocationsResponse);
   rpc GetBudgetAnalytics (GetBudgetAnalyticsRequest) returns (GetBudgetAnalyticsResponse);
   /** Single payload for monthly budget create UI: payroll totals + settlement (authoritative). */
@@ -142,9 +143,12 @@ service FinancialsService {
   // Payroll
   rpc CreatePayroll(CreatePayrollRequest) returns (Payroll);
   rpc RunPayroll(RunPayrollRequest) returns (Payroll);
+  rpc MarkPayrollPaid(MarkPayrollPaidRequest) returns (Payroll);
   rpc GetPayroll(GetPayrollRequest) returns (Payroll);
   rpc ListPayrolls(ListPayrollsRequest) returns (ListPayrollsResponse);
   rpc GetPayslipPdf(GetPayslipPdfRequest) returns (PayslipPdfResponse);
+  rpc ExportPayrollBankFile(ExportPayrollBankFileRequest) returns (ExportPayrollBankFileResponse);
+  rpc GetPayrollYtdReport(GetPayrollYtdReportRequest) returns (GetPayrollYtdReportResponse);
 
 
   // Payroll Analytics
@@ -610,6 +614,23 @@ message CreateBudgetAllocationRequest {
   string parent = 1;
   BudgetAllocation budget_allocation = 2;
 }
+
+message TransferBudgetAllocationRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string source_allocation_id = 3;
+  string destination_allocation_id = 4;
+  double amount = 5;
+  optional string reason = 6;
+}
+
+message TransferBudgetAllocationResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional BudgetAllocation source_allocation = 3;
+  optional BudgetAllocation destination_allocation = 4;
+}
+
 message ListBudgetAllocationsRequest {
   string parent = 1;
   int32 page_size = 2;
@@ -653,6 +674,54 @@ message RunPayrollRequest {
   // When set, overrides schedule branch only for linkage + budget-scope resolution.
   optional string branch_id = 2;
 }
+
+message MarkPayrollPaidRequest {
+  string payroll_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  optional string payment_reference = 4;
+}
+
+message ExportPayrollBankFileRequest {
+  string payroll_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  optional string user_id = 4;
+}
+
+message ExportPayrollBankFileResponse {
+  bool success = 1;
+  optional string error = 2;
+  bytes file_content = 3;
+  string file_name = 4;
+}
+
+message GetPayrollYtdReportRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  int32 year = 3;
+  optional string staff_id = 4;
+  optional string export_format = 5; // "json" | "csv"
+}
+
+message PayrollYtdStaffRow {
+  string staff_id = 1;
+  string staff_email = 2;
+  int64 gross_minor = 3;
+  int64 net_minor = 4;
+  int64 adjustment_minor = 5;
+  int32 periods_paid = 6;
+}
+
+message GetPayrollYtdReportResponse {
+  bool success = 1;
+  optional string error = 2;
+  int32 year = 3;
+  repeated PayrollYtdStaffRow rows = 4;
+  optional bytes file_content = 5;
+  optional string file_name = 6;
+}
+
 message GetPayrollRequest {
   string name = 1;
 }
@@ -691,6 +760,7 @@ enum PayrollState {
   PAYROLL_RUNNING = 2;
   PAYROLL_COMPLETED = 3;
   PAYROLL_FAILED = 4;
+  PAYROLL_PAID = 5;
 }
 
 // --- Payroll Analytics ---
@@ -1201,6 +1271,15 @@ message RejectBudgetRequest {
 
 // ── Financial Audit Log messages ──────────────────────────────────────────
 
+/** Staff actor tied to the company (populated server-side; no cross-company user leak). */
+message FinancialAuditActor {
+  string user_id    = 1;
+  string staff_id   = 2;
+  string first_name = 3;
+  string last_name  = 4;
+  string email      = 5;
+}
+
 message FinancialAuditLogEntry {
   string audit_id         = 1;
   string entity_type      = 2;
@@ -1216,6 +1295,9 @@ message FinancialAuditLogEntry {
   string ip_address       = 12;
   string source           = 13;
   string timestamp        = 14;
+  optional FinancialAuditActor actor = 15;
+  optional string prev_hash = 16;
+  optional string entry_hash = 17;
 }
 
 message ListFinancialAuditLogsRequest {

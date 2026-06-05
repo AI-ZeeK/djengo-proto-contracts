@@ -125,12 +125,41 @@ service StaffSelfService {
   rpc GetMyStaff(GetMyStaffByUserRequest) returns (GetMyStaffByUserResponse);
   rpc GetMyDepartments(GetMyStaffByUserRequest) returns (GetMyStaffDepartmentsResponse);
   rpc GetMyRoles(GetMyStaffByUserRequest) returns (GetStaffCompanyRolesResponse);
+  rpc GetStaffEffectiveBranches(GetMyStaffByUserRequest) returns (GetStaffEffectiveBranchesResponse);
+  rpc ValidateStaffBranchAccess(ValidateStaffBranchAccessRequest) returns (ValidateStaffBranchAccessResponse);
 }
 
 message GetMyStaffByUserRequest {
   string user_id = 1;
   string company_id = 2;
   string organization_id = 3;
+  /// Active property context — filters scoped roles (null/company-wide roles always included).
+  optional string branch_id = 4;
+}
+
+message StaffBranchAccessEntry {
+  string branch_id = 1;
+  string access_type = 2; // HOME | ROLE | TEMPORARY
+  optional string label = 3;
+}
+
+message GetStaffEffectiveBranchesResponse {
+  bool success = 1;
+  optional string message = 2;
+  repeated StaffBranchAccessEntry branches = 3;
+}
+
+message ValidateStaffBranchAccessRequest {
+  string user_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string branch_id = 4;
+}
+
+message ValidateStaffBranchAccessResponse {
+  bool success = 1;
+  optional string message = 2;
+  bool allowed = 3;
 }
 
 message StaffSelfSummary {
@@ -463,6 +492,8 @@ message StaffCompanyRole {
   string company_role_id = 3;
   bool is_active = 4;
   OrganizationRole company_role = 5;
+  optional string branch_id = 6;
+  optional string department_id = 7;
 }
 
 message EntityPermission {
@@ -888,6 +919,8 @@ message StaffCompanyRoleData {
   bool is_active = 3;
   optional StaffData staff = 4;
   string staff_company_role_id = 5;
+  optional string branch_id = 6;
+  optional string department_id = 7;
 }
 
 message GetCompanyRoleStaffResponse {

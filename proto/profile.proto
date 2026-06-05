@@ -86,6 +86,10 @@ service ProfileService {
   rpc StaffProbationHistory(StaffProbationHistoryRequest) returns (StaffProbationHistoryResponse);
   // ── HR: Termination ───────────────────────────────────────────────────────
   rpc TerminateStaff(TerminateStaffRequest) returns (TerminateStaffResponse);
+  rpc TransferStaffBranch(TransferStaffBranchRequest) returns (TransferStaffBranchResponse);
+  rpc CreateStaffBranchAssignment(CreateStaffBranchAssignmentRequest) returns (StaffBranchAssignmentResponse);
+  rpc ListStaffBranchAssignments(ListStaffBranchAssignmentsRequest) returns (ListStaffBranchAssignmentsResponse);
+  rpc CancelStaffBranchAssignment(CancelStaffBranchAssignmentRequest) returns (StaffBranchAssignmentActionResponse);
 
   // ── Guest CRM ─────────────────────────────────────────────────────────────
   rpc CreateGuest(CreateGuestRequest) returns (GuestProto);
@@ -93,6 +97,13 @@ service ProfileService {
   rpc UpdateGuest(UpdateGuestRequest) returns (GuestProto);
   rpc DeleteGuest(DeleteGuestRequest) returns (DeleteGuestResponse);
   rpc ListGuests(ListGuestsRequest) returns (ListGuestsResponse);
+
+  // ── Compliance: HR Audit + GDPR ───────────────────────────────────────────
+  rpc AppendHrAuditLog(AppendHrAuditLogRequest) returns (AppendHrAuditLogResponse);
+  rpc ListHrAuditLogs(ListHrAuditLogsRequest) returns (ListHrAuditLogsResponse);
+  rpc RecordPrivacyConsent(RecordPrivacyConsentRequest) returns (PrivacyConsentResponse);
+  rpc CreateDataSubjectRequest(CreateDataSubjectRequestInput) returns (DataSubjectRequestResponse);
+  rpc ListDataSubjectRequests(ListDataSubjectRequestsRequest) returns (ListDataSubjectRequestsResponse);
   
 }
 
@@ -1359,6 +1370,80 @@ message TerminateStaffResponse {
   optional string message = 3;
 }
 
+message TransferStaffBranchRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string target_branch_id = 4;
+  string transferred_by = 5;
+  optional string reason = 6;
+  optional string effective_at = 7;
+}
+
+message TransferStaffBranchResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
+  optional string previous_branch_id = 4;
+  optional string target_branch_id = 5;
+}
+
+message CreateStaffBranchAssignmentRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string branch_id = 4;
+  optional string source_branch_id = 5;
+  string assignment_type = 6; // TEMPORARY | PERMANENT
+  optional string starts_at = 7;
+  optional string ends_at = 8;
+  optional string reason = 9;
+  optional string granted_by_user_id = 10;
+}
+
+message StaffBranchAssignmentProto {
+  string assignment_id = 1;
+  string staff_id = 2;
+  string company_id = 3;
+  string branch_id = 4;
+  optional string source_branch_id = 5;
+  string assignment_type = 6;
+  string status = 7;
+  string starts_at = 8;
+  optional string ends_at = 9;
+  optional string reason = 10;
+  optional string granted_by_user_id = 11;
+}
+
+message StaffBranchAssignmentResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional StaffBranchAssignmentProto assignment = 3;
+}
+
+message ListStaffBranchAssignmentsRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  optional string status = 3;
+}
+
+message ListStaffBranchAssignmentsResponse {
+  bool success = 1;
+  repeated StaffBranchAssignmentProto assignments = 2;
+}
+
+message CancelStaffBranchAssignmentRequest {
+  string assignment_id = 1;
+  string staff_id = 2;
+  string company_id = 3;
+}
+
+message StaffBranchAssignmentActionResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
+}
+
 // ── Admin Security: Auth Audit Logs ──────────────────────────────────────────
 
 message GetAuthAuditLogsRequest {
@@ -1543,5 +1628,121 @@ message ListGuestsRequest {
 message ListGuestsResponse {
   repeated GuestProto guests = 1;
   int32 total = 2;
+}
+
+// ── Compliance: HR Audit Logs ────────────────────────────────────────────────
+
+message AppendHrAuditLogRequest {
+  optional string organization_id = 1;
+  optional string company_id = 2;
+  optional string actor_user_id = 3;
+  string entity_type = 4;
+  optional string entity_id = 5;
+  string action = 6;
+  optional string http_method = 7;
+  optional string http_path = 8;
+  optional string old_value = 9;
+  optional string new_value = 10;
+  optional string ip_address = 11;
+  optional string source = 12;
+}
+
+message AppendHrAuditLogResponse {
+  bool success = 1;
+  optional string audit_id = 2;
+  optional string error = 3;
+}
+
+message ListHrAuditLogsRequest {
+  optional string organization_id = 1;
+  optional string company_id = 2;
+  optional string entity_type = 3;
+  optional string actor_user_id = 4;
+  optional int32 page = 5;
+  optional int32 page_size = 6;
+}
+
+message HrAuditLogEntry {
+  string audit_id = 1;
+  optional string organization_id = 2;
+  optional string company_id = 3;
+  optional string actor_user_id = 4;
+  string entity_type = 5;
+  optional string entity_id = 6;
+  string action = 7;
+  optional string http_method = 8;
+  optional string http_path = 9;
+  optional string old_value = 10;
+  optional string new_value = 11;
+  optional string ip_address = 12;
+  optional string source = 13;
+  optional string prev_hash = 14;
+  string entry_hash = 15;
+  string occurred_at = 16;
+}
+
+message ListHrAuditLogsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated HrAuditLogEntry logs = 3;
+  TableMeta meta = 4;
+}
+
+// ── Compliance: GDPR ─────────────────────────────────────────────────────────
+
+message RecordPrivacyConsentRequest {
+  string user_id = 1;
+  string consent_type = 2;
+  string version = 3;
+  bool granted = 4;
+  optional string ip_address = 5;
+  optional string source = 6;
+}
+
+message PrivacyConsentResponse {
+  bool success = 1;
+  optional string consent_id = 2;
+  optional string error = 3;
+}
+
+message CreateDataSubjectRequestInput {
+  string user_id = 1;
+  optional string organization_id = 2;
+  string request_type = 3;
+  optional string notes = 4;
+}
+
+message DataSubjectRequestResponse {
+  bool success = 1;
+  optional string request_id = 2;
+  optional string status = 3;
+  optional string error = 4;
+}
+
+message ListDataSubjectRequestsRequest {
+  optional string user_id = 1;
+  optional string organization_id = 2;
+  optional string status = 3;
+  optional int32 page = 4;
+  optional int32 page_size = 5;
+}
+
+message DataSubjectRequestEntry {
+  string request_id = 1;
+  string user_id = 2;
+  optional string organization_id = 3;
+  string request_type = 4;
+  string status = 5;
+  optional string notes = 6;
+  optional string handled_by = 7;
+  optional string completed_at = 8;
+  string created_at = 9;
+}
+
+message ListDataSubjectRequestsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated DataSubjectRequestEntry requests = 3;
+  TableMeta meta = 4;
 }
 
