@@ -20,6 +20,7 @@ service FacilityService {
   rpc DeactivateFacilityNode(DeactivateFacilityNodeRequest) returns (FacilityNodeResponse);
   rpc GetAllowedChildNodeTypes(GetAllowedChildNodeTypesRequest) returns (GetAllowedChildNodeTypesResponse);
   rpc HasAnyFacilityNodes(HasAnyFacilityNodesRequest) returns (HasAnyFacilityNodesResponse);
+  rpc GetCompanyFacilitySiteOperations(GetCompanyFacilitySiteOperationsRequest) returns (GetCompanyFacilitySiteOperationsResponse);
 
   rpc GetFacilityNodeLevels(GetFacilityNodeLevelsRequest) returns (GetFacilityNodeLevelsResponse);
   rpc UpsertFacilityNodeLevels(UpsertFacilityNodeLevelsRequest) returns (UpsertFacilityNodeLevelsResponse);
@@ -349,6 +350,25 @@ message HasAnyFacilityNodesResponse {
   optional string error = 2;
   bool has_any_nodes = 3;
   int32 node_count = 4;
+}
+
+message FacilitySiteOperationMessage {
+  string key = 1;
+  string label = 2;
+  int32 location_count = 3;
+  string source = 4;
+}
+
+message GetCompanyFacilitySiteOperationsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string branch_id = 3;
+}
+
+message GetCompanyFacilitySiteOperationsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated FacilitySiteOperationMessage operations = 3;
 }
 
 message ListFacilityBulkTemplatesRequest {
