@@ -584,6 +584,8 @@ message ListHospitalReceptionRequest {
   optional string search = 5;
   optional int32 page = 6;
   optional int32 page_size = 7;
+  // HOSPITAL | ESTATE | HOSPITALITY | RESTAURANT (default HOSPITAL)
+  optional string reception_mode = 8;
 }
 
 message HospitalReceptionStatsMessage {
@@ -624,6 +626,7 @@ message HospitalReceptionLocationMessage {
   string node_name = 5;
   string node_type = 6;
   optional string bed_type = 7;
+  optional int32 capacity_max = 8;
 }
 
 message HospitalReceptionStayMessage {
