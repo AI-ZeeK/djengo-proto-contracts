@@ -40,6 +40,7 @@ service FacilityService {
   rpc ListOccupancyStays(ListOccupancyStaysRequest) returns (ListOccupancyStaysResponse);
   rpc ListNodeOccupancyStayHistory(ListNodeOccupancyStayHistoryRequest) returns (ListNodeOccupancyStayHistoryResponse);
   rpc ListHospitalReception(ListHospitalReceptionRequest) returns (ListHospitalReceptionResponse);
+  rpc GetFacilityReceptionDetail(GetFacilityReceptionDetailRequest) returns (GetFacilityReceptionDetailResponse);
 }
 
 
@@ -655,4 +656,21 @@ message ListHospitalReceptionResponse {
   repeated HospitalReceptionRowMessage rows = 3;
   int32 total = 4;
   HospitalReceptionStatsMessage stats = 5;
+}
+
+message GetFacilityReceptionDetailRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  // HOSPITAL | ESTATE | HOSPITALITY | RESTAURANT (default HOSPITAL)
+  optional string reception_mode = 4;
+  // Provide stay_id for occupant detail, or facility_node_id for vacant location detail.
+  optional string stay_id = 5;
+  optional string facility_node_id = 6;
+}
+
+message GetFacilityReceptionDetailResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional HospitalReceptionRowMessage row = 3;
 }
