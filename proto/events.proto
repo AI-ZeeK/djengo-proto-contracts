@@ -177,6 +177,7 @@ message GetOrCreateTaskBoardRequest {
   string organization_id = 2;
   string branch_id       = 3; // main branch when single-site
   string owner_id        = 4; // user_id
+  string operation_kind  = 5; // hotel | restaurant | kitchen | …
 }
 
 message TaskBoardId { string board_id = 1; }
@@ -213,6 +214,7 @@ message TaskBoardProto {
   string created_at     = 9;
   string updated_at     = 10;
   repeated TaskBoardColumnProto columns = 11;
+  string operation_kind = 12;
 }
 
 message TaskBoardColumnProto {
