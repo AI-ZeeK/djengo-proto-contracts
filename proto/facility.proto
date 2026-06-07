@@ -21,6 +21,8 @@ service FacilityService {
   rpc GetAllowedChildNodeTypes(GetAllowedChildNodeTypesRequest) returns (GetAllowedChildNodeTypesResponse);
   rpc HasAnyFacilityNodes(HasAnyFacilityNodesRequest) returns (HasAnyFacilityNodesResponse);
   rpc GetCompanyFacilitySiteOperations(GetCompanyFacilitySiteOperationsRequest) returns (GetCompanyFacilitySiteOperationsResponse);
+  rpc GetBranchFacilitySetupStatus(GetBranchFacilitySetupStatusRequest) returns (GetBranchFacilitySetupStatusResponse);
+  rpc ListBranchOperations(ListBranchOperationsRequest) returns (ListBranchOperationsResponse);
 
   rpc GetFacilityNodeLevels(GetFacilityNodeLevelsRequest) returns (GetFacilityNodeLevelsResponse);
   rpc UpsertFacilityNodeLevels(UpsertFacilityNodeLevelsRequest) returns (UpsertFacilityNodeLevelsResponse);
@@ -30,6 +32,14 @@ service FacilityService {
 
   rpc ListFacilityBulkTemplates(ListFacilityBulkTemplatesRequest) returns (ListFacilityBulkTemplatesResponse);
   rpc StartFacilityBulkCreate(StartFacilityBulkCreateRequest) returns (StartFacilityBulkCreateResponse);
+
+  rpc CreateOccupancyStay(CreateOccupancyStayRequest) returns (OccupancyStayResponse);
+  rpc EndOccupancyStay(EndOccupancyStayRequest) returns (OccupancyStayResponse);
+  rpc EvacuateOccupancyStay(EvacuateOccupancyStayRequest) returns (OccupancyStayResponse);
+  rpc GetActiveOccupancyStay(GetActiveOccupancyStayRequest) returns (OccupancyStayResponse);
+  rpc ListOccupancyStays(ListOccupancyStaysRequest) returns (ListOccupancyStaysResponse);
+  rpc ListNodeOccupancyStayHistory(ListNodeOccupancyStayHistoryRequest) returns (ListNodeOccupancyStayHistoryResponse);
+  rpc ListHospitalReception(ListHospitalReceptionRequest) returns (ListHospitalReceptionResponse);
 }
 
 
@@ -40,6 +50,7 @@ enum FacilityMode {
   HOSPITAL = 2;
   ESTATE = 3;
   HOSPITALITY = 4;
+  RESTAURANT = 5;
 }
 
 enum FacilityNodeType {
@@ -371,6 +382,51 @@ message GetCompanyFacilitySiteOperationsResponse {
   repeated FacilitySiteOperationMessage operations = 3;
 }
 
+message BranchOperationMessage {
+  string branch_operation_id = 1;
+  string branch_id           = 2;
+  string operation_kind      = 3;
+  string display_name        = 4;
+  string status              = 5;
+  optional string site_node_id = 6;
+}
+
+message ListBranchOperationsRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string branch_id       = 3;
+}
+
+message ListBranchOperationsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated BranchOperationMessage operations = 3;
+}
+
+message BranchSetupStepMessage {
+  string key     = 1;
+  string label   = 2;
+  bool   complete = 3;
+  optional string detail = 4;
+}
+
+message GetBranchFacilitySetupStatusRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string branch_id       = 3;
+}
+
+message GetBranchFacilitySetupStatusResponse {
+  bool success = 1;
+  optional string error = 2;
+  string facility_mode = 3;
+  bool has_levels = 4;
+  bool has_locations = 5;
+  bool setup_complete = 6;
+  repeated BranchSetupStepMessage steps = 7;
+  repeated BranchOperationMessage operations = 8;
+}
+
 message ListFacilityBulkTemplatesRequest {
   string company_id = 1;
   string organization_id = 2;
@@ -411,4 +467,189 @@ message StartFacilityBulkCreateResponse {
   optional string error = 2;
   string job_id = 3;
   int32 total = 4;
+}
+
+message OccupancyParticipantMessage {
+  string participant_id = 1;
+  string participant_role = 2;
+  string identity_kind = 3;
+  optional string profile_id = 4;
+  optional string partner_id = 5;
+  optional string display_name = 6;
+  bool is_anonymous = 7;
+}
+
+message OccupancyStayMessage {
+  string stay_id = 1;
+  string facility_node_id = 2;
+  string branch_id = 3;
+  string company_id = 4;
+  string organization_id = 5;
+  string stay_kind = 6;
+  string status = 7;
+  string started_at = 8;
+  optional string ended_at = 9;
+  optional string evacuated_at = 10;
+  optional string notes = 11;
+  repeated OccupancyParticipantMessage participants = 12;
+  string created_at = 13;
+  string updated_at = 14;
+}
+
+message OccupancyParticipantInput {
+  string participant_role = 1;
+  string identity_kind = 2;
+  optional string profile_id = 3;
+  optional string partner_id = 4;
+  optional string display_name = 5;
+  bool is_anonymous = 6;
+}
+
+message CreateOccupancyStayRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  string facility_node_id = 4;
+  string stay_kind = 5;
+  string started_at = 6;
+  optional string notes = 7;
+  string created_by = 8;
+  repeated OccupancyParticipantInput participants = 9;
+}
+
+message EndOccupancyStayRequest {
+  string stay_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string ended_at = 4;
+  string status = 5;
+  optional string notes = 6;
+}
+
+message EvacuateOccupancyStayRequest {
+  string stay_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string evacuated_at = 4;
+  optional string notes = 5;
+}
+
+message GetActiveOccupancyStayRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string facility_node_id = 3;
+}
+
+message ListOccupancyStaysRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  optional string facility_node_id = 4;
+  optional string status = 5;
+  optional int32 page = 6;
+  optional int32 page_size = 7;
+}
+
+message ListOccupancyStaysResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated OccupancyStayMessage stays = 3;
+  int32 total = 4;
+}
+
+message OccupancyStayResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional OccupancyStayMessage stay = 3;
+}
+
+message ListNodeOccupancyStayHistoryRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string facility_node_id = 3;
+}
+
+message ListNodeOccupancyStayHistoryResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated OccupancyStayMessage stays = 3;
+}
+
+message ListHospitalReceptionRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  // ADMITTED (active only) | ALL (include vacant + historical) | VACANT
+  optional string view = 4;
+  optional string search = 5;
+  optional int32 page = 6;
+  optional int32 page_size = 7;
+}
+
+message HospitalReceptionStatsMessage {
+  int32 admitted_count = 1;
+  int32 vacant_count = 2;
+  int32 occupiable_count = 3;
+  int32 with_patient_details_count = 4;
+}
+
+// Resolved platform user linked via profile_id or partner record.
+message HospitalReceptionUserMessage {
+  optional string profile_id = 1;
+  optional string partner_id = 2;
+  optional string email = 3;
+  optional string phone_number = 4;
+  optional string first_name = 5;
+  optional string last_name = 6;
+  // PROFILE | PARTNER | EMAIL | NONE
+  string match_source = 7;
+  bool has_account = 8;
+}
+
+// Patient or next-of-kin occupant on a stay.
+message HospitalReceptionPersonMessage {
+  string participant_id = 1;
+  string participant_role = 2;
+  string identity_kind = 3;
+  optional string display_name = 4;
+  bool is_anonymous = 5;
+  optional HospitalReceptionUserMessage user = 6;
+}
+
+message HospitalReceptionLocationMessage {
+  string facility_node_id = 1;
+  string location_path = 2;
+  repeated string location_path_segments = 3;
+  string node_code = 4;
+  string node_name = 5;
+  string node_type = 6;
+  optional string bed_type = 7;
+}
+
+message HospitalReceptionStayMessage {
+  string stay_id = 1;
+  string stay_kind = 2;
+  string stay_status = 3;
+  optional string admitted_at = 4;
+  optional string discharged_at = 5;
+  optional string evacuated_at = 6;
+  optional string notes = 7;
+}
+
+message HospitalReceptionRowMessage {
+  string row_id = 1;
+  // active | ended | evacuated | vacant
+  string reception_status = 2;
+  HospitalReceptionLocationMessage location = 3;
+  optional HospitalReceptionStayMessage stay = 4;
+  optional HospitalReceptionPersonMessage patient = 5;
+  optional HospitalReceptionPersonMessage next_of_kin = 6;
+}
+
+message ListHospitalReceptionResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated HospitalReceptionRowMessage rows = 3;
+  int32 total = 4;
+  HospitalReceptionStatsMessage stats = 5;
 }

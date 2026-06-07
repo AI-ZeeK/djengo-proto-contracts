@@ -109,6 +109,7 @@ service TaskBoardService {
   rpc UpdateBoardColumn       (UpdateTaskBoardColumnRequest) returns (TaskBoardColumnProto);
   rpc DeleteBoardColumn       (TaskBoardColumnId)           returns (DeleteResponse);
   rpc ListMyAssignedTasks     (ListMyAssignedTasksRequest)  returns (MyAssignedTasksResponse);
+  rpc ListBoardTasksByEntity  (ListBoardTasksByEntityRequest) returns (ListBoardTasksByEntityResponse);
   rpc CreateBoardTask         (CreateTaskBoardItemRequest)  returns (TaskBoardItemProto);
   rpc UpdateBoardTask         (UpdateTaskBoardItemRequest)  returns (TaskBoardItemProto);
   rpc UpdateBoardTaskAssignees (UpdateTaskBoardAssigneesRequest) returns (TaskBoardItemProto);
@@ -129,6 +130,25 @@ message ListMyAssignedTasksRequest {
   string branch_id        = 3;
   string assignee_user_id = 4; // legacy
   string assignee_staff_id = 5;
+  string entity_type      = 6; // optional filter — FACILITY_NODE, RESERVATION, ...
+  string entity_id        = 7; // optional filter — specific linked entity
+  string task_category    = 8; // optional filter — HOUSEKEEPING, MAINTENANCE, ...
+}
+
+message ListBoardTasksByEntityRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string branch_id       = 3;
+  string entity_type     = 4; // required — FACILITY_NODE, RESERVATION, ...
+  string entity_id       = 5; // optional — omit to list all tasks of this type
+  string task_category   = 6; // optional — HOUSEKEEPING, MAINTENANCE, ...
+  int32  page            = 7;
+  int32  page_size       = 8;
+}
+
+message ListBoardTasksByEntityResponse {
+  repeated TaskBoardItemProto tasks = 1;
+  int32 total = 2;
 }
 
 message MyAssignedTasksFilterOption {
@@ -225,6 +245,9 @@ message TaskBoardItemProto {
   repeated TaskBoardAssigneeProto assignees = 17;
   string board_name = 18;
   string current_column_name = 19;
+  string entity_type = 20;   // FACILITY_NODE, RESERVATION, ...
+  string entity_id   = 21;
+  string task_category = 22; // HOUSEKEEPING, MAINTENANCE, ...
 }
 
 message CreateTaskBoardItemRequest {
@@ -236,6 +259,9 @@ message CreateTaskBoardItemRequest {
   string author_id    = 6;
   string assignee_id  = 7; // legacy primary assignee user_id
   repeated TaskBoardAssigneeProto assignees = 8;
+  string entity_type   = 9;  // FACILITY_NODE, RESERVATION, ...
+  string entity_id     = 10;
+  string task_category = 11; // HOUSEKEEPING, MAINTENANCE, ...
 }
 
 message UpdateTaskBoardAssigneesRequest {
