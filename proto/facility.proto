@@ -41,6 +41,7 @@ service FacilityService {
   rpc ListNodeOccupancyStayHistory(ListNodeOccupancyStayHistoryRequest) returns (ListNodeOccupancyStayHistoryResponse);
   rpc ListHospitalReception(ListHospitalReceptionRequest) returns (ListHospitalReceptionResponse);
   rpc GetFacilityReceptionDetail(GetFacilityReceptionDetailRequest) returns (GetFacilityReceptionDetailResponse);
+  rpc HasUserPriorOccupancyAtCompany(HasUserPriorOccupancyAtCompanyRequest) returns (HasUserPriorOccupancyAtCompanyResponse);
 }
 
 
@@ -607,6 +608,7 @@ message HospitalReceptionUserMessage {
   // PROFILE | PARTNER | EMAIL | NONE
   string match_source = 7;
   bool has_account = 8;
+  optional string avatar_url = 9;
 }
 
 // Patient or next-of-kin occupant on a stay.
@@ -673,4 +675,16 @@ message GetFacilityReceptionDetailResponse {
   bool success = 1;
   optional string error = 2;
   optional HospitalReceptionRowMessage row = 3;
+}
+
+message HasUserPriorOccupancyAtCompanyRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string user_id = 3;
+}
+
+message HasUserPriorOccupancyAtCompanyResponse {
+  bool success = 1;
+  optional string error = 2;
+  bool has_prior_occupancy = 3;
 }
