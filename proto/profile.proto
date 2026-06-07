@@ -1029,12 +1029,19 @@ message PhoneMatchPreview {
   optional string staff_id = 2;
   optional string partner_id = 3;
   string display_name = 4;
+  optional string first_name = 5;
+  optional string last_name = 6;
+  optional string avatar_url = 7;
+  optional bool has_platform_account = 8;
+  optional string email = 9;
+  optional string phone_number = 10;
+  optional string phone_dial_code = 11;
 }
 
 message LookupPhoneNumberResponse {
   bool success = 1;
   optional string error = 2;
-  /** available | own | company | blocked */
+  /** available | own | company | platform_account | blocked */
   string status = 3;
   bool can_save = 4;
   optional string message = 5;
@@ -1057,12 +1064,19 @@ message EmailMatchPreview {
   optional string staff_id = 2;
   optional string partner_id = 3;
   string display_name = 4;
+  optional string first_name = 5;
+  optional string last_name = 6;
+  optional string avatar_url = 7;
+  optional bool has_platform_account = 8;
+  optional string email = 9;
+  optional string phone_number = 10;
+  optional string phone_dial_code = 11;
 }
 
 message LookupEmailResponse {
   bool success = 1;
   optional string error = 2;
-  /** available | own | company | blocked */
+  /** available | own | company | platform_account | blocked */
   string status = 3;
   bool can_save = 4;
   optional string message = 5;
