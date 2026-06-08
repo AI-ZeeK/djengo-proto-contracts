@@ -40,8 +40,13 @@ service FacilityService {
   rpc ListOccupancyStays(ListOccupancyStaysRequest) returns (ListOccupancyStaysResponse);
   rpc ListNodeOccupancyStayHistory(ListNodeOccupancyStayHistoryRequest) returns (ListNodeOccupancyStayHistoryResponse);
   rpc ListHospitalReception(ListHospitalReceptionRequest) returns (ListHospitalReceptionResponse);
+  rpc GetFacilityReceptionAnalytics(GetFacilityReceptionAnalyticsRequest) returns (GetFacilityReceptionAnalyticsResponse);
   rpc GetFacilityReceptionDetail(GetFacilityReceptionDetailRequest) returns (GetFacilityReceptionDetailResponse);
   rpc HasUserPriorOccupancyAtCompany(HasUserPriorOccupancyAtCompanyRequest) returns (HasUserPriorOccupancyAtCompanyResponse);
+
+  rpc ListFacilityAssetTypeTemplates(ListFacilityAssetTypeTemplatesRequest) returns (ListFacilityAssetTypeTemplatesResponse);
+  rpc UpsertFacilityAssetTypeTemplate(UpsertFacilityAssetTypeTemplateRequest) returns (UpsertFacilityAssetTypeTemplateResponse);
+  rpc DeleteFacilityAssetTypeTemplate(DeleteFacilityAssetTypeTemplateRequest) returns (DeleteFacilityAssetTypeTemplateResponse);
 }
 
 
@@ -589,13 +594,17 @@ message ListHospitalReceptionRequest {
   string company_id = 1;
   string organization_id = 2;
   string branch_id = 3;
-  // ADMITTED (active only) | ALL (include vacant + historical) | VACANT
+  // ADMITTED | ENDED | ALL (stays + vacant) | VACANT
   optional string view = 4;
   optional string search = 5;
   optional int32 page = 6;
   optional int32 page_size = 7;
   // HOSPITAL | ESTATE | HOSPITALITY | RESTAURANT (default HOSPITAL)
   optional string reception_mode = 8;
+  // occupant | location | started | ended | status | account
+  optional string sort_by = 9;
+  // asc | desc (default desc)
+  optional string sort_dir = 10;
 }
 
 message HospitalReceptionStatsMessage {
@@ -603,6 +612,27 @@ message HospitalReceptionStatsMessage {
   int32 vacant_count = 2;
   int32 occupiable_count = 3;
   int32 with_patient_details_count = 4;
+  int32 ended_count = 5;
+  int32 reserved_count = 6;
+  int32 maintenance_count = 7;
+}
+
+message GetFacilityReceptionAnalyticsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  // HOSPITAL | ESTATE | HOSPITALITY | RESTAURANT (default HOSPITAL)
+  optional string reception_mode = 4;
+  // _1m | _3m | _6m | _1y | all — filters ended_count
+  optional string timeline = 5;
+  optional string start_date = 6;
+  optional string end_date = 7;
+}
+
+message GetFacilityReceptionAnalyticsResponse {
+  bool success = 1;
+  optional string error = 2;
+  HospitalReceptionStatsMessage stats = 3;
 }
 
 // Resolved platform user linked via profile_id or partner record.
@@ -665,7 +695,6 @@ message ListHospitalReceptionResponse {
   optional string error = 2;
   repeated HospitalReceptionRowMessage rows = 3;
   int32 total = 4;
-  HospitalReceptionStatsMessage stats = 5;
 }
 
 message GetFacilityReceptionDetailRequest {
@@ -695,4 +724,62 @@ message HasUserPriorOccupancyAtCompanyResponse {
   bool success = 1;
   optional string error = 2;
   bool has_prior_occupancy = 3;
+}
+
+message FacilityAssetTypeTemplateMessage {
+  string template_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  optional string branch_id = 4;
+  string asset_kind = 5;
+  string name = 6;
+  optional string code = 7;
+  bool is_active = 8;
+  int32 sort_order = 9;
+  string defaults_json = 10;
+  string created_at = 11;
+  string updated_at = 12;
+}
+
+message ListFacilityAssetTypeTemplatesRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string branch_id = 3;
+  optional string asset_kind = 4;
+}
+
+message ListFacilityAssetTypeTemplatesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated FacilityAssetTypeTemplateMessage templates = 3;
+}
+
+message UpsertFacilityAssetTypeTemplateRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string branch_id = 3;
+  optional string template_id = 4;
+  string asset_kind = 5;
+  string name = 6;
+  optional string code = 7;
+  bool is_active = 8;
+  int32 sort_order = 9;
+  string defaults_json = 10;
+}
+
+message UpsertFacilityAssetTypeTemplateResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional FacilityAssetTypeTemplateMessage template = 3;
+}
+
+message DeleteFacilityAssetTypeTemplateRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string template_id = 3;
+}
+
+message DeleteFacilityAssetTypeTemplateResponse {
+  bool success = 1;
+  optional string error = 2;
 }

@@ -41,17 +41,29 @@ service OperationService {
   rpc GetTableLocations(OrganizationIdRequest) returns (GetTableLocationsResponse);
   rpc GetBedSizes(OrganizationIdRequest) returns (GetBedSizesResponse);
   rpc GetRoomLocations(OrganizationIdRequest) returns (GetRoomLocationsResponse);
+  rpc GetBedTypes(OrganizationIdRequest) returns (GetBedTypesResponse);
+  rpc GetTableTypes(OrganizationIdRequest) returns (GetTableTypesResponse);
+  rpc GetTableSizes(OrganizationIdRequest) returns (GetTableSizesResponse);
+  rpc GetFacilityRoomTypes(OrganizationIdRequest) returns (GetFacilityRoomTypesResponse);
 
 
     //Delete Utilities
   rpc DeleteTableLocation(DeleteTableLocationRequest) returns (UtilitiesResponse);
   rpc DeleteBedSize(DeleteBedSizeRequest) returns (UtilitiesResponse);
   rpc DeleteRoomLocation(DeleteRoomLocationRequest) returns (UtilitiesResponse);
+  rpc DeleteBedType(DeleteBedTypeRequest) returns (UtilitiesResponse);
+  rpc DeleteTableType(DeleteTableTypeRequest) returns (UtilitiesResponse);
+  rpc DeleteTableSize(DeleteTableSizeRequest) returns (UtilitiesResponse);
+  rpc DeleteFacilityRoomType(DeleteFacilityRoomTypeRequest) returns (UtilitiesResponse);
 
   // CREATE UTILITIES
   rpc CreateTableLocation(CreateTableLocationRequest) returns (UtilitiesResponse);
   rpc CreateBedSize(CreateBedSizeRequest) returns (UtilitiesResponse);
   rpc CreateRoomLocation(CreateRoomLocationRequest) returns (UtilitiesResponse);
+  rpc CreateBedType(CreateBedTypeRequest) returns (UtilitiesResponse);
+  rpc CreateTableType(CreateTableTypeRequest) returns (UtilitiesResponse);
+  rpc CreateTableSize(CreateTableSizeRequest) returns (UtilitiesResponse);
+  rpc CreateFacilityRoomType(CreateFacilityRoomTypeRequest) returns (UtilitiesResponse);
 }
 message EmptyRequest {}
 
@@ -274,6 +286,30 @@ message CreateRoomLocationRequest {
   string creator_id = 3;
 }
 
+message CreateBedTypeRequest {
+  string name = 1;
+  string organization_id = 2;
+  string creator_id = 3;
+}
+
+message CreateTableTypeRequest {
+  string name = 1;
+  string organization_id = 2;
+  string creator_id = 3;
+}
+
+message CreateTableSizeRequest {
+  string name = 1;
+  string organization_id = 2;
+  string creator_id = 3;
+}
+
+message CreateFacilityRoomTypeRequest {
+  string name = 1;
+  string organization_id = 2;
+  string creator_id = 3;
+}
+
 // --- Business Hours Upsert ---
 message UpsertBusinessHoursRequest {
   string service_branch_id = 1;
@@ -352,6 +388,30 @@ message GetBedSizesResponse {
   repeated BedSize bed_sizes = 3;
 }
 
+message GetBedTypesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated BedType bed_types = 3;
+}
+
+message GetTableTypesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated TableType table_types = 3;
+}
+
+message GetTableSizesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated TableSize table_sizes = 3;
+}
+
+message GetFacilityRoomTypesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated FacilityRoomType facility_room_types = 3;
+}
+
 
 
 message DeleteTableLocationRequest {
@@ -364,6 +424,22 @@ message DeleteBedSizeRequest {
 
 message DeleteRoomLocationRequest {
   int32 room_location_id = 1;
+}
+
+message DeleteBedTypeRequest {
+  int32 bed_type_id = 1;
+}
+
+message DeleteTableTypeRequest {
+  int32 table_type_id = 1;
+}
+
+message DeleteTableSizeRequest {
+  int32 table_size_id = 1;
+}
+
+message DeleteFacilityRoomTypeRequest {
+  int32 facility_room_type_id = 1;
 }
 
 message GetTableLocationsResponse {
@@ -421,6 +497,38 @@ message HotelRoom {
 
 message BedSize {
   int32 bed_size_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_global = 4;
+  bool is_active = 5;
+}
+
+message BedType {
+  int32 bed_type_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_global = 4;
+  bool is_active = 5;
+}
+
+message TableType {
+  int32 table_type_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_global = 4;
+  bool is_active = 5;
+}
+
+message TableSize {
+  int32 table_size_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_global = 4;
+  bool is_active = 5;
+}
+
+message FacilityRoomType {
+  int32 facility_room_type_id = 1;
   string name = 2;
   string description = 3;
   bool is_global = 4;
