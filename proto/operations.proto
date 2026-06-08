@@ -716,6 +716,79 @@ message ListKitchenTicketsResponse {
   TableMeta meta                      = 2;
 }
 
+// ── Restaurant Menus ───────────────────────────────────────────────────────
+
+service RestaurantMenuService {
+  rpc ListRestaurantMenus   (ListRestaurantMenusRequest)   returns (ListRestaurantMenusResponse);
+  rpc GetRestaurantMenu     (GetRestaurantMenuRequest)     returns (RestaurantMenuProto);
+  rpc CreateRestaurantMenu  (CreateRestaurantMenuRequest)  returns (RestaurantMenuProto);
+  rpc UpdateRestaurantMenu  (UpdateRestaurantMenuRequest)  returns (RestaurantMenuProto);
+  rpc DeleteRestaurantMenu  (DeleteRestaurantMenuRequest)  returns (DeleteRestaurantMenuResponse);
+}
+
+message RestaurantMenuProto {
+  string menu_id            = 1;
+  string service_branch_id  = 2;
+  string company_id         = 3;
+  string name               = 4;
+  optional string description = 5;
+  optional string category  = 6;
+  double price              = 7;
+  int64  price_minor        = 8;
+  optional string image_url = 9;
+  bool   is_active          = 10;
+  string created_at         = 11;
+  string updated_at         = 12;
+}
+
+message ListRestaurantMenusRequest {
+  string company_id               = 1;
+  string organization_id          = 2;
+  optional string branch_id       = 3;
+  optional string service_branch_id = 4;
+  optional string search          = 5;
+  optional bool   active_only     = 6;
+  optional int32  page            = 7;
+  optional int32  page_size       = 8;
+}
+
+message ListRestaurantMenusResponse {
+  repeated RestaurantMenuProto menus = 1;
+  TableMeta meta                     = 2;
+}
+
+message GetRestaurantMenuRequest { string menu_id = 1; }
+
+message CreateRestaurantMenuRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  optional string branch_id = 3;
+  optional string service_branch_id = 4;
+  string name               = 5;
+  optional string description = 6;
+  optional string category  = 7;
+  double price              = 8;
+  optional string image_url = 9;
+  bool   is_active          = 10;
+}
+
+message UpdateRestaurantMenuRequest {
+  string menu_id            = 1;
+  optional string name      = 2;
+  optional string description = 3;
+  optional string category  = 4;
+  optional double price     = 5;
+  optional string image_url = 6;
+  optional bool   is_active = 7;
+}
+
+message DeleteRestaurantMenuRequest { string menu_id = 1; }
+
+message DeleteRestaurantMenuResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
 // ── Guest Feedback ─────────────────────────────────────────────────────────
 
 service GuestFeedbackService {
