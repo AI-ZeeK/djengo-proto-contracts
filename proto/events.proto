@@ -409,6 +409,7 @@ service PositionHistoryService {
   rpc RecordPositionChange    (StaffPositionHistory) returns (PositionHistoryId);
   rpc GetPositionEntry        (PositionHistoryId)    returns (StaffPositionHistory);
   rpc ListPositionHistory     (StaffRequest)         returns (PositionHistoryList);
+  rpc ListCompanyPositionHistory (GetCompanyStaffRequest) returns (GetCompanyPositionHistoryResponse);
   rpc ClosePositionEntry      (PositionHistoryId)    returns (DeleteResponse);
 }
 
@@ -1196,6 +1197,10 @@ message StaffPositionHistory {
 
 message PositionHistoryId       { string position_history_id = 1; }
 message PositionHistoryList     { repeated StaffPositionHistory entries = 1; string message = 2; }
+message GetCompanyPositionHistoryResponse {
+  repeated StaffPositionHistory entries = 1;
+  TableMeta meta = 2;
+}
 
 
 // ─── HR: Leave Policy ────────────────────────────────────────────────────────
