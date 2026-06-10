@@ -291,6 +291,16 @@ message AddTaskBoardCommentRequest {
   string content   = 3;
 }
 
+// Enriched at query time from profiles service — read-only
+message TaskBoardCommentAuthorProto {
+  string user_id      = 1;
+  string display_name = 2;
+  string username     = 3;
+  string avatar_url   = 4;
+  string first_name   = 5;
+  string last_name    = 6;
+}
+
 message TaskBoardCommentProto {
   string comment_id = 1;
   string content    = 2;
@@ -298,6 +308,7 @@ message TaskBoardCommentProto {
   string author_id  = 4;
   string created_at = 5;
   string updated_at = 6;
+  TaskBoardCommentAuthorProto author = 7;
 }
 
 service TrainingService {
