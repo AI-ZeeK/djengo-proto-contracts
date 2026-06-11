@@ -594,7 +594,7 @@ message ListHospitalReceptionRequest {
   string company_id = 1;
   string organization_id = 2;
   string branch_id = 3;
-  // ADMITTED | ENDED | ALL (stays + vacant) | VACANT
+  // ADMITTED | ENDED | ALL (all stays) | UNITS (stays + vacant) | VACANT
   optional string view = 4;
   optional string search = 5;
   optional int32 page = 6;

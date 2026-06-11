@@ -1108,6 +1108,7 @@ message AssignShiftTemplateRequest {
   string assigned_by       = 7;
   optional string branch_id = 8;
   optional string department_id = 9;
+  repeated DayOfWeek days_of_week = 10;
 }
 
 message UpdateAssignShiftTemplateRequest {
@@ -1120,6 +1121,7 @@ message UpdateAssignShiftTemplateRequest {
   string assigned_by       = 7;
   optional string branch_id = 8;
   optional string department_id = 9;
+  repeated DayOfWeek days_of_week = 10;
 }
 
 message StaffShiftAssignment {
@@ -1136,6 +1138,7 @@ message StaffShiftAssignment {
   Staff staff = 11;
   string branch_id = 12;
   string department_id = 13;
+  repeated DayOfWeek days_of_week = 14;
 }
 
 message ShiftAssignmentId    { string assignment_id = 1; }

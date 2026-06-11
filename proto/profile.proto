@@ -1200,6 +1200,8 @@ message User {
   optional BusinessUser business_user = 16;
   repeated Staff staff = 17;
   repeated BusinessUser business_users = 18;
+  /** Calling code digits only (e.g. 254), without +. */
+  optional string phone_dial_code = 19;
 }
 
 // message BasicUser {

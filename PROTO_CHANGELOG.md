@@ -2,6 +2,25 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## 1.2.2 — Phone dial code & shift assignment days
+
+### `profile.proto`
+- `User.phone_dial_code` (field 19) — calling code digits only (e.g. `254`), returned on `GetUser` and persisted on `UpdateUser`
+- Existing `phone_dial_code` on `UpdateUserRequest`, registration, and lookup messages unchanged
+
+### `organization.proto`
+- `Company.phone_dial_code` (field 20)
+- `UpdateCompanyDetailsRequest.phone_dial_code` (field 20)
+
+### `events.proto`
+- `AssignShiftTemplateRequest.days_of_week` (field 10) — per-assignment weekdays override template schedule
+- `UpdateAssignShiftTemplateRequest.days_of_week` (field 10)
+- `StaffShiftAssignment.days_of_week` (field 14)
+- Related `days_of_week` on shift templates and schedule messages (fields 8–9)
+
+### `facility.proto`
+- `ListHospitalReceptionRequest.view` comment — documents `UNITS` filter alias
+
 ## 1.2.1 — My assigned tasks (multi-board)
 
 ### `events.proto`

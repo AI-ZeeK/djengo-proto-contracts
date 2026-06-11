@@ -337,6 +337,8 @@ message UpdateCompanyDetailsRequest {
   optional bool require_payroll_dimensions_on_run = 17;
   optional int64 petty_cash_approval_threshold_minor = 18;
   optional int32 primary_business_type_id = 19;
+  /** Calling code digits only (e.g. 254), without +. */
+  optional string phone_dial_code = 20;
 }
 
 message OrganizationRoleIdRequest {
@@ -976,6 +978,8 @@ message Company {
   Branch main_branch = 17;
   repeated Branch branches = 18;
   PayrollBudgetLinkage payroll_budget_linkage = 19;
+  /** Calling code digits only (e.g. 254), without +. */
+  optional string phone_dial_code = 20;
 }
 
 
