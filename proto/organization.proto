@@ -37,6 +37,7 @@ service BranchService {
 
   rpc FetchBranch(BranchIdRequest) returns (FetchBranchResponse);
   rpc FetchCompanyBranches(FetchCompanyRequest) returns (FetchBranchesResponse);
+  rpc CreateBranch(CreateBranchRequest) returns (CreateBranchResponse);
 
   rpc VerifyBranchId(VerifyBranchIdRequest) returns (VerifyBranchIdResponse);
 }
@@ -464,6 +465,33 @@ message EmptyRequest {
 
 message BranchIdRequest {
   string branch_id = 1;
+}
+
+message CreateBranchDepartmentInput {
+  string name = 1;
+  optional string description = 2;
+}
+
+message CreateBranchRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string creator_id = 3;
+  string name = 4;
+  optional string email = 5;
+  optional string phone_number = 6;
+  optional string description = 7;
+  optional string branch_kind = 8;
+  AddressRequest address = 9;
+  /// When true, sets company_meta_data.is_multi_branch before creating the branch.
+  bool enable_multi_branch = 10;
+  repeated CreateBranchDepartmentInput departments = 11;
+}
+
+message CreateBranchResponse {
+  bool success = 1;
+  optional string error = 2;
+  string message = 3;
+  optional Branch branch = 4;
 }
 
 message OrganizationIdRequest {

@@ -479,6 +479,7 @@ message StartFacilityBulkCreateResponse {
 message OccupancyParticipantMessage {
   string participant_id = 1;
   string participant_role = 2;
+  // PROFILE | PARTNER | GUEST | ANONYMOUS
   string identity_kind = 3;
   optional string profile_id = 4;
   optional string partner_id = 5;
@@ -488,6 +489,8 @@ message OccupancyParticipantMessage {
   optional string phone_dial_code = 9;
   optional string phone_number = 10;
   optional string lookup_channel = 11;
+  // profiles.guests — short-term visitor / hospitality CRM contact
+  optional string guest_id = 12;
 }
 
 message OccupancyStayMessage {
@@ -496,6 +499,7 @@ message OccupancyStayMessage {
   string branch_id = 3;
   string company_id = 4;
   string organization_id = 5;
+  // TENANCY | ADMISSION | RESERVATION | VISIT | GENERAL
   string stay_kind = 6;
   string status = 7;
   string started_at = 8;
@@ -505,6 +509,8 @@ message OccupancyStayMessage {
   repeated OccupancyParticipantMessage participants = 12;
   string created_at = 13;
   string updated_at = 14;
+  // For VISIT stays: links to the active TENANCY/ADMISSION stay on the same unit
+  optional string host_stay_id = 15;
 }
 
 message OccupancyParticipantInput {
@@ -518,6 +524,7 @@ message OccupancyParticipantInput {
   optional string phone_dial_code = 8;
   optional string phone_number = 9;
   optional string lookup_channel = 10;
+  optional string guest_id = 11;
 }
 
 message CreateOccupancyStayRequest {
@@ -530,6 +537,7 @@ message CreateOccupancyStayRequest {
   optional string notes = 7;
   string created_by = 8;
   repeated OccupancyParticipantInput participants = 9;
+  optional string host_stay_id = 10;
 }
 
 message EndOccupancyStayRequest {
@@ -563,6 +571,9 @@ message ListOccupancyStaysRequest {
   optional string status = 5;
   optional int32 page = 6;
   optional int32 page_size = 7;
+  optional string guest_id = 8;
+  optional string partner_id = 9;
+  optional string stay_kind = 10;
 }
 
 message ListOccupancyStaysResponse {
@@ -643,10 +654,11 @@ message HospitalReceptionUserMessage {
   optional string phone_number = 4;
   optional string first_name = 5;
   optional string last_name = 6;
-  // PROFILE | PARTNER | EMAIL | NONE
+  // PROFILE | PARTNER | GUEST | CONTACT | NONE
   string match_source = 7;
   bool has_account = 8;
   optional string avatar_url = 9;
+  optional string guest_id = 10;
 }
 
 // Patient or next-of-kin occupant on a stay.

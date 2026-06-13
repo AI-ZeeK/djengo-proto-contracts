@@ -97,6 +97,8 @@ service ProfileService {
   rpc UpdateGuest(UpdateGuestRequest) returns (GuestProto);
   rpc DeleteGuest(DeleteGuestRequest) returns (DeleteGuestResponse);
   rpc ListGuests(ListGuestsRequest) returns (ListGuestsResponse);
+  rpc ResolveOrCreateGuest(ResolveOrCreateGuestRequest) returns (ResolveOrCreateGuestResponse);
+  rpc IncrementGuestVisitCount(IncrementGuestVisitCountRequest) returns (IncrementGuestVisitCountResponse);
 
   // ── Compliance: HR Audit + GDPR ───────────────────────────────────────────
   rpc AppendHrAuditLog(AppendHrAuditLogRequest) returns (AppendHrAuditLogResponse);
@@ -1320,6 +1322,7 @@ message Branch {
   optional string deleted_at = 11;
   optional string creator_id = 12;
 }
+
 message AddressRequest {
   optional string address_id = 1;
   optional string street = 2;
@@ -1359,23 +1362,28 @@ message PayrollStaff {
   User user = 3;
   double total_adjustment = 4;
   double adjustments_counts = 5;
-
+  /** 0–1 factor for partial-month employment */
+  double proration_factor = 6;
+  optional string employment_start = 7;
+  optional string employment_end = 8;
+  bool payroll_active = 9;
 }
 
+
 message PayrollAdjustment {
-  string type = 1; // 'BONUS' or 'FINE'
+  string type = 1; 
   double amount = 2;
   optional string reason = 3;
   string effective_at = 4;
   optional string expire_at = 5;
-
 }
+
 message TerminateStaffRequest {
   string staff_id = 1;
   string company_id = 2;
   string organization_id = 3;
-  string terminated_by = 4; // user_id
-  string termination_date = 5; // ISO date
+  string terminated_by = 4;
+  string termination_date = 5; 
   optional string termination_reason = 6;
   optional string notes = 7;
 }
@@ -1644,6 +1652,32 @@ message ListGuestsRequest {
 message ListGuestsResponse {
   repeated GuestProto guests = 1;
   int32 total = 2;
+}
+
+message ResolveOrCreateGuestRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string first_name = 3;
+  optional string last_name = 4;
+  optional string email = 5;
+  optional string phone_number = 6;
+  optional string nationality = 7;
+  optional string notes = 8;
+}
+
+message ResolveOrCreateGuestResponse {
+  GuestProto guest = 1;
+  bool created = 2;
+}
+
+message IncrementGuestVisitCountRequest {
+  string guest_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+}
+
+message IncrementGuestVisitCountResponse {
+  int32 total_visits = 1;
 }
 
 // ── Compliance: HR Audit Logs ────────────────────────────────────────────────
