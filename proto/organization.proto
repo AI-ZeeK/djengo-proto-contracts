@@ -38,6 +38,7 @@ service BranchService {
   rpc FetchBranch(BranchIdRequest) returns (FetchBranchResponse);
   rpc FetchCompanyBranches(FetchCompanyRequest) returns (FetchBranchesResponse);
   rpc CreateBranch(CreateBranchRequest) returns (CreateBranchResponse);
+  rpc UpdateBranch(UpdateBranchRequest) returns (UpdateBranchResponse);
 
   rpc VerifyBranchId(VerifyBranchIdRequest) returns (VerifyBranchIdResponse);
 }
@@ -119,6 +120,8 @@ service AdminOrganizationService {
 
   rpc GetOrganization(GetOrganizationRequest) returns (OrganizationResponse);
 
+  /// Platform support enables this after a location-change request; company may update branch address once.
+  rpc SetBranchLocationUpdateAllowance(SetBranchLocationUpdateAllowanceRequest) returns (UtilitiesResponse);
 }
 
 /// Staff self-service: resolve active staff via profile (user_id), then query org by staff_id.
@@ -488,6 +491,29 @@ message CreateBranchRequest {
 }
 
 message CreateBranchResponse {
+  bool success = 1;
+  optional string error = 2;
+  string message = 3;
+  optional Branch branch = 4;
+}
+
+message UpdateBranchRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string branch_id = 3;
+  optional string name = 4;
+  optional string email = 5;
+  optional string phone_number = 6;
+  optional AddressRequest address = 7;
+}
+
+message SetBranchLocationUpdateAllowanceRequest {
+  string branch_id = 1;
+  string company_id = 2;
+  bool allow_location_update = 3;
+}
+
+message UpdateBranchResponse {
   bool success = 1;
   optional string error = 2;
   string message = 3;
@@ -1042,6 +1068,8 @@ message Branch {
   optional string deleted_at = 11;
   optional string creator_id = 12;
   PayrollBudgetLinkage payroll_budget_linkage = 13;
+  /// When true (set by platform admin), the company may update this branch's address once.
+  bool allow_location_update = 14;
 }
 
 message Department {

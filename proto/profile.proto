@@ -593,7 +593,7 @@ message Analytic {
   int32 value = 1;
   string trend = 2;
   string percentage = 3;
-  
+  repeated TrendData trend_data = 4;
 }
 
 message AdminUsersAnalyticsResponse {
