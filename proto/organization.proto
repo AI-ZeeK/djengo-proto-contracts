@@ -120,6 +120,12 @@ service AdminOrganizationService {
 
   rpc GetOrganization(GetOrganizationRequest) returns (OrganizationResponse);
 
+  /// Admin dashboard 360 view: organization + companies + branches summary.
+  rpc GetOrganizationOverview(GetOrganizationRequest) returns (GetOrganizationOverviewResponse);
+
+  /// Company people: business users, staff, partners, and deduplicated user table.
+  rpc GetCompanyUsersOverview(GetCompanyUsersOverviewRequest) returns (GetCompanyUsersOverviewResponse);
+
   /// Platform support enables this after a location-change request; company may update branch address once.
   rpc SetBranchLocationUpdateAllowance(SetBranchLocationUpdateAllowanceRequest) returns (UtilitiesResponse);
 }
@@ -923,6 +929,86 @@ message GetOrganizationRequest {
   string organization_id = 1;
 }
 
+message OrganizationBranchSummary {
+  string branch_id = 1;
+  string name = 2;
+  bool is_main_branch = 3;
+  bool is_active = 4;
+  string email = 5;
+  string phone_number = 6;
+}
+
+message OrganizationCompanySummary {
+  string company_id = 1;
+  string name = 2;
+  string email = 3;
+  bool is_active = 4;
+  bool is_multi_branch = 5;
+  int32 branch_count = 6;
+  int32 staff_count = 7;
+  repeated OrganizationBranchSummary branches = 8;
+  int32 business_users_count = 9;
+  int32 partners_count = 10;
+  int32 unique_users_count = 11;
+}
+
+message GetCompanyUsersOverviewRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string search = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+}
+
+message CompanyUserRow {
+  string user_id = 1;
+  string partner_id = 2;
+  string display_name = 3;
+  string email = 4;
+  string phone_number = 5;
+  repeated string types = 6;
+  bool is_active = 7;
+  string primary_label = 8;
+}
+
+message CompanyUsersTableMeta {
+  int32 total = 1;
+  int32 current_page = 2;
+  int32 page_size = 3;
+  int32 total_pages = 4;
+  optional int32 next_page = 5;
+  optional int32 prev_page = 6;
+}
+
+message GetCompanyUsersOverviewResponse {
+  bool success = 1;
+  optional string message = 2;
+  int32 business_users_count = 3;
+  int32 staff_count = 4;
+  int32 partners_count = 5;
+  int32 unique_users_count = 6;
+  repeated CompanyUserRow users = 7;
+  CompanyUsersTableMeta meta = 8;
+}
+
+message GetOrganizationOverviewResponse {
+  bool success = 1;
+  optional string message = 2;
+  string organization_id = 3;
+  string organization_name = 4;
+  string display_name = 5;
+  string email = 6;
+  string phone_number = 7;
+  bool is_active = 8;
+  bool is_multi_company = 9;
+  string created_at = 10;
+  repeated OrganizationCompanySummary companies = 11;
+  string primary_company_id = 12;
+  int32 companies_count = 13;
+  int32 branches_count = 14;
+  int32 multi_branch_companies_count = 15;
+}
+
 // 📤 RESPONSE MESSAGES
 
 message OrganizationResponse {
@@ -1199,6 +1285,11 @@ message OrganizationMeta {
   int32 total_business_users = 4;
   int32 active_business_users = 5;
   int32 inactive_business_users = 6;
+  optional string organization_name = 7;
+  optional string primary_company_name = 8;
+  optional string primary_company_id = 9;
+  int32 branches_count = 10;
+  int32 multi_branch_companies_count = 11;
 }
 
 message OrganizationDetail {
