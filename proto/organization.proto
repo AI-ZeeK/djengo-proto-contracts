@@ -72,6 +72,7 @@ service CompanyRoleService {
 
 /// Organization-wide dashboards (not branch-scoped).
 service OrganizationAnalyticsService {
+  /// Metrics for a single organization; requires organization_id on the request.
   rpc GetOrganizationAnalytics(OrganizationAnalyticsRequest) returns (OrganizationAnalyticsResponse);
   rpc TotalOrganizations(EmptyRequest) returns (TotalOrganizationsResponse);
   rpc TopPerformingOrganizations(TopPerformingOrganizationsRequest) returns (TopPerformingOrganizationsResponse);
@@ -122,6 +123,9 @@ service AdminOrganizationService {
 
   /// Admin dashboard 360 view: organization + companies + branches summary.
   rpc GetOrganizationOverview(GetOrganizationRequest) returns (GetOrganizationOverviewResponse);
+
+  /// Platform-wide organization metrics for admin dashboards (no organization scope).
+  rpc GetAdminOrganizationAnalytics(OrganizationAnalyticsRequest) returns (OrganizationAnalyticsResponse);
 
   /// Company people: business users, staff, partners, and deduplicated user table.
   rpc GetCompanyUsersOverview(GetCompanyUsersOverviewRequest) returns (GetCompanyUsersOverviewResponse);
@@ -1194,6 +1198,8 @@ message OrganizationAnalyticsRequest {
   string timeline = 1;
   optional string start_date = 2;
   optional string end_date = 3;
+  /// Required for OrganizationAnalyticsService.GetOrganizationAnalytics only.
+  optional string organization_id = 4;
 }
 
 message OrganizationMetric {
