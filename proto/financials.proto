@@ -372,6 +372,7 @@ message CompanyFinancialAnalyticsResponse {
   string trend = 2;
   double percentage = 3;
   repeated ChartData chart_data = 4;
+  int32 transaction_count = 5;
 }
 
 message ChartData {
