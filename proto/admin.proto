@@ -36,6 +36,11 @@ service AdminService {
   // Admin action audit log
   rpc RecordAdminAction(RecordAdminActionRequest) returns (RecordAdminActionResponse);
   rpc ListAdminActionLogs(ListAdminActionLogsRequest) returns (ListAdminActionLogsResponse);
+
+  // Fine-grained admin permissions (entity grants on roles)
+  rpc GetAdminPermissionGroups(EmptyRequest) returns (GetAdminPermissionGroupsResponse);
+  rpc GetAdminRolePermissions(GetAdminRolePermissionsRequest) returns (GetAdminRolePermissionsResponse);
+  rpc GetAdminRoleCompanies(GetAdminRoleCompaniesRequest) returns (GetAdminRoleCompaniesResponse);
 }
 
 // Platform admin pages/sections a role may access. Mirrors frontend/admin nav sections.
@@ -55,6 +60,59 @@ enum AdminModule {
 message ModuleAccess {
   AdminModule module = 1;
   bool can_manage = 2;
+}
+
+message RolePermissionGrant {
+  string permission_name = 1;
+  bool state = 2;
+}
+
+message AdminCompanyGrant {
+  string company_id = 1;
+  optional string organization_id = 2;
+  optional string company_name = 3;
+}
+
+message GetAdminRoleCompaniesRequest {
+  int32 role_id = 1;
+}
+
+message GetAdminRoleCompaniesResponse {
+  bool success = 1;
+  bool scopes_all_companies = 2;
+  repeated AdminCompanyGrant companies = 3;
+}
+
+message PermissionEntry {
+  int32 permission_id = 1;
+  string permission_name = 2;
+  string description = 3;
+  int32 level = 4;
+  string category = 5;
+}
+
+message PermissionGroupData {
+  int32 group_id = 1;
+  string group_name = 2;
+  string description = 3;
+  int32 level = 4;
+  string category = 5;
+  string group_type = 6;
+  repeated PermissionEntry permissions = 7;
+}
+
+message GetAdminPermissionGroupsResponse {
+  bool success = 1;
+  repeated PermissionGroupData groups = 2;
+}
+
+message GetAdminRolePermissionsRequest {
+  int32 role_id = 1;
+}
+
+message GetAdminRolePermissionsResponse {
+  bool success = 1;
+  repeated RolePermissionGrant permissions = 2;
 }
 
 message CreateAdminAccountRequest {
@@ -87,6 +145,9 @@ message CreateAdminRoleRequest {
   optional string description = 2;
   bool is_super_admin = 3;
   repeated ModuleAccess modules = 4;
+  repeated RolePermissionGrant permissions = 5;
+  bool scopes_all_companies = 6;
+  repeated AdminCompanyGrant companies = 7;
 }
 
 message UpdateAdminRoleRequest {
@@ -95,6 +156,9 @@ message UpdateAdminRoleRequest {
   optional string description = 3;
   optional bool is_super_admin = 4;
   repeated ModuleAccess modules = 5;
+  repeated RolePermissionGrant permissions = 6;
+  optional bool scopes_all_companies = 7;
+  repeated AdminCompanyGrant companies = 8;
 }
 
 message DeleteAdminRoleRequest {
@@ -199,6 +263,11 @@ message Role {
   repeated ModuleAccess modules = 5;
   optional string description = 6;
   int32 admin_count = 7;
+  repeated string permission_names = 8;
+  bool scopes_all_companies = 9;
+  repeated AdminCompanyGrant companies = 10;
+  /// Client-safe hint: super-admin role has every permission (is_super_admin itself stays server-only).
+  bool has_all_permissions = 11;
 }
 
 
