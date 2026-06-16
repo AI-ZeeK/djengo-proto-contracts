@@ -153,7 +153,7 @@ message GetMyStaffByUserRequest {
 
 message StaffBranchAccessEntry {
   string branch_id = 1;
-  string access_type = 2; // HOME | ROLE | TEMPORARY
+  string access_type = 2; // HOME | ROLE | TEMPORARY | COMPANY (hub, company-wide role, or position)
   optional string label = 3;
 }
 
@@ -515,6 +515,7 @@ message UpdateBranchRequest {
   optional string email = 5;
   optional string phone_number = 6;
   optional AddressRequest address = 7;
+  optional bool handles_all_branches = 8;
 }
 
 message SetBranchLocationUpdateAllowanceRequest {
@@ -1160,6 +1161,8 @@ message Branch {
   PayrollBudgetLinkage payroll_budget_linkage = 13;
   /// When true (set by platform admin), the company may update this branch's address once.
   bool allow_location_update = 14;
+  /// Hub branch — staff here may work across all company branches (default on main branch).
+  bool handles_all_branches = 15;
 }
 
 message Department {
@@ -1272,6 +1275,8 @@ message GetOrganizationsRequest {
   optional int32 page_size = 3;
   optional string sort_by = 4;
   optional string sort_order = 5;
+  optional string start_date = 6;
+  optional string end_date = 7;
 }
 
 message OrganizationAddress {

@@ -195,6 +195,7 @@ service FinancialsService {
 
   // ── Admin platform transactions (financials.transaction table) ────────────
   rpc ListAdminPlatformTransactions (ListAdminPlatformTransactionsRequest) returns (ListAdminPlatformTransactionsResponse);
+  rpc GetAdminPlatformTransaction (GetAdminPlatformTransactionRequest) returns (GetAdminPlatformTransactionResponse);
   rpc GetAdminPlatformTransactionAnalytics (GetAdminPlatformTransactionAnalyticsRequest) returns (GetAdminPlatformTransactionAnalyticsResponse);
 
   // ── Budget Variance Report ────────────────────────────────────────────────
@@ -1314,6 +1315,8 @@ message ListFinancialAuditLogsRequest {
   int32  page_size       = 6;
   string sort_order      = 7;  // "asc" | "desc", default "desc"
   string sort_by        = 8; // e.g. "timestamp", default "timestamp"
+  string start_date     = 9;
+  string end_date       = 10;
 }
 
 message ListFinancialAuditLogsResponse {
@@ -1347,6 +1350,9 @@ message AdminPlatformTransaction {
   string branch_name              = 21;
   string sender_user_name         = 22;
   string receiver_user_name       = 23;
+  string company_currency         = 24;
+  double exchange_rate            = 25; // USD per 1 unit of transaction currency at transaction time
+  double usd_amount               = 26; // Amount converted to USD at transaction time
 }
 
 message ListAdminPlatformTransactionsRequest {
@@ -1367,6 +1373,15 @@ message ListAdminPlatformTransactionsResponse {
   TableMeta meta                                 = 2;
 }
 
+message GetAdminPlatformTransactionRequest {
+  string transaction_id  = 1;
+  string transaction_ref = 2;
+}
+
+message GetAdminPlatformTransactionResponse {
+  AdminPlatformTransaction transaction = 1;
+}
+
 message GetAdminPlatformTransactionAnalyticsRequest {
   string company_id  = 1;
   Timeline timeline  = 2;
@@ -1384,6 +1399,9 @@ message GetAdminPlatformTransactionAnalyticsResponse {
   repeated ChartData volume_trend = 7;
   repeated ChartData by_status    = 8;
   repeated ChartData by_type      = 9;
+  repeated ChartData volume_by_currency = 10;
+  double total_volume_usd               = 11;
+  repeated ChartData volume_trend_usd   = 12;
 }
 
 // ── Module 6: Facility & asset management (scaffold) ──────────────────────

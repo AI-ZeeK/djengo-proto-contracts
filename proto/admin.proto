@@ -21,6 +21,144 @@ service AdminService {
 
   // Analytics
   rpc OverviewAnalytics(EmptyRequest) returns (OverviewAnalyticsResponse);
+
+  // Admin account management (admin-panel RBAC)
+  rpc CreateAdminAccount(CreateAdminAccountRequest) returns (AdminAccountResponse);
+  rpc UpdateAdminAccount(UpdateAdminAccountRequest) returns (AdminAccountResponse);
+
+  // Admin role management
+  rpc ListAdminRoles(EmptyRequest) returns (ListAdminRolesResponse);
+  rpc GetAdminRole(GetAdminRoleRequest) returns (AdminRoleResponse);
+  rpc CreateAdminRole(CreateAdminRoleRequest) returns (AdminRoleResponse);
+  rpc UpdateAdminRole(UpdateAdminRoleRequest) returns (AdminRoleResponse);
+  rpc DeleteAdminRole(DeleteAdminRoleRequest) returns (DeleteAdminRoleResponse);
+
+  // Admin action audit log
+  rpc RecordAdminAction(RecordAdminActionRequest) returns (RecordAdminActionResponse);
+  rpc ListAdminActionLogs(ListAdminActionLogsRequest) returns (ListAdminActionLogsResponse);
+}
+
+// Platform admin pages/sections a role may access. Mirrors frontend/admin nav sections.
+enum AdminModule {
+  DASHBOARD = 0;
+  CHATS = 1;
+  SUPPORT = 2;
+  MANAGEMENT = 3;
+  SECURITY = 4;
+  FINANCIAL = 5;
+  SETTINGS = 6;
+  ADMIN_MANAGEMENT = 7;
+}
+
+// A single module grant: presence = can VIEW that page. can_manage additionally
+// allows mutating actions within it — viewing a page never implies acting on it.
+message ModuleAccess {
+  AdminModule module = 1;
+  bool can_manage = 2;
+}
+
+message CreateAdminAccountRequest {
+  string email = 1;
+  string password = 2;
+  optional string first_name = 3;
+  optional string last_name = 4;
+  int32 role_id = 5;
+}
+
+message UpdateAdminAccountRequest {
+  string user_id = 1;
+  optional int32 role_id = 2;
+  optional bool is_active = 3;
+  optional bool is_blocked = 4;
+}
+
+message AdminAccountResponse {
+  bool success = 1;
+  optional string message = 2;
+  optional User user = 3;
+}
+
+message GetAdminRoleRequest {
+  int32 role_id = 1;
+}
+
+message CreateAdminRoleRequest {
+  string role_name = 1;
+  optional string description = 2;
+  bool is_super_admin = 3;
+  repeated ModuleAccess modules = 4;
+}
+
+message UpdateAdminRoleRequest {
+  int32 role_id = 1;
+  optional string role_name = 2;
+  optional string description = 3;
+  optional bool is_super_admin = 4;
+  repeated ModuleAccess modules = 5;
+}
+
+message DeleteAdminRoleRequest {
+  int32 role_id = 1;
+}
+
+message DeleteAdminRoleResponse {
+  bool success = 1;
+  optional string message = 2;
+}
+
+message AdminRoleResponse {
+  bool success = 1;
+  optional string message = 2;
+  optional Role role = 3;
+}
+
+message ListAdminRolesResponse {
+  bool success = 1;
+  repeated Role roles = 2;
+}
+
+message RecordAdminActionRequest {
+  optional string admin_user_id = 1;
+  string action = 2;
+  optional string resource_type = 3;
+  optional string resource_id = 4;
+  optional string outcome = 5;
+  optional string ip = 6;
+  optional string metadata_json = 7;
+}
+
+message RecordAdminActionResponse {
+  bool success = 1;
+}
+
+message ListAdminActionLogsRequest {
+  optional string admin_user_id = 1;
+  optional string action = 2;
+  optional string resource_type = 3;
+  optional string start_date = 4;
+  optional string end_date = 5;
+  int32 page = 6;
+  int32 page_size = 7;
+}
+
+message AdminActionLog {
+  string audit_id = 1;
+  optional string admin_user_id = 2;
+  string action = 3;
+  optional string resource_type = 4;
+  optional string resource_id = 5;
+  string outcome = 6;
+  optional string ip = 7;
+  optional string metadata_json = 8;
+  string occurred_at = 9;
+}
+
+message ListAdminActionLogsResponse {
+  bool success = 1;
+  repeated AdminActionLog logs = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 page_size = 5;
 }
 
 message FetchAllAdminResponse {
@@ -57,6 +195,10 @@ message Role {
   string role_id = 1;
   string role_name = 2;
   bool is_active = 3;
+  bool is_super_admin = 4;
+  repeated ModuleAccess modules = 5;
+  optional string description = 6;
+  int32 admin_count = 7;
 }
 
 
@@ -186,6 +328,9 @@ message User {
   string updated_at = 10;
   bool email_verified = 11;
   optional Address address = 12;
+  optional Role role = 13;
+  optional bool is_active = 14;
+  optional bool is_blocked = 15;
 }
 
 message Contact {

@@ -614,6 +614,8 @@ message GetUsersRequest {
   int32 page_size = 3;
   string sort_by = 4;
   string sort_order = 5;
+  string start_date = 6;
+  string end_date = 7;
 }
 
 message TableMeta {
