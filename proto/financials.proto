@@ -193,6 +193,10 @@ service FinancialsService {
   // ── Financial Audit Log (admin) ───────────────────────────────────────────
   rpc ListFinancialAuditLogs (ListFinancialAuditLogsRequest) returns (ListFinancialAuditLogsResponse);
 
+  // ── Admin platform transactions (financials.transaction table) ────────────
+  rpc ListAdminPlatformTransactions (ListAdminPlatformTransactionsRequest) returns (ListAdminPlatformTransactionsResponse);
+  rpc GetAdminPlatformTransactionAnalytics (GetAdminPlatformTransactionAnalyticsRequest) returns (GetAdminPlatformTransactionAnalyticsResponse);
+
   // ── Budget Variance Report ────────────────────────────────────────────────
   rpc GetBudgetVarianceReport (GetBudgetVarianceReportRequest) returns (BudgetVarianceReport);
 }
@@ -1315,6 +1319,71 @@ message ListFinancialAuditLogsRequest {
 message ListFinancialAuditLogsResponse {
   repeated FinancialAuditLogEntry logs = 1;
   TableMeta meta                       = 2;
+}
+
+// ── Admin platform transactions ───────────────────────────────────────────
+
+message AdminPlatformTransaction {
+  string transaction_id           = 1;
+  double amount                   = 2;
+  string specification            = 3;
+  string transaction_ref            = 4;
+  string status                   = 5;
+  string currency_code            = 6;
+  string receiver_user_id         = 7;
+  string sender_user_id           = 8;
+  string wallet_transaction_kind  = 9;
+  string company_id               = 10;
+  string branch_id                = 11;
+  int32  transaction_type_id      = 12;
+  string transaction_type_name    = 13;
+  double previous_balance         = 14;
+  double current_balance          = 15;
+  string created_at               = 16;
+  string completed_at             = 17;
+  string organization_id          = 18;
+  string organization_name        = 19;
+  string company_name             = 20;
+  string branch_name              = 21;
+  string sender_user_name         = 22;
+  string receiver_user_name       = 23;
+}
+
+message ListAdminPlatformTransactionsRequest {
+  string company_id          = 1;
+  string status              = 2;  // PENDING | FAILED | COMPLETED | REVERSED
+  string search              = 3;  // transaction_ref or specification
+  int32  transaction_type_id = 4;
+  string start_date          = 5;
+  string end_date            = 6;
+  int32  page                = 7;
+  int32  page_size           = 8;
+  string sort_order          = 9;  // asc | desc
+  string sort_by             = 10; // created_at | amount | status
+}
+
+message ListAdminPlatformTransactionsResponse {
+  repeated AdminPlatformTransaction transactions = 1;
+  TableMeta meta                                 = 2;
+}
+
+message GetAdminPlatformTransactionAnalyticsRequest {
+  string company_id  = 1;
+  Timeline timeline  = 2;
+  string start_date  = 3;
+  string end_date    = 4;
+}
+
+message GetAdminPlatformTransactionAnalyticsResponse {
+  double total_volume       = 1;
+  int32  transaction_count  = 2;
+  int32  completed_count    = 3;
+  int32  pending_count      = 4;
+  int32  failed_count       = 5;
+  double success_rate       = 6;
+  repeated ChartData volume_trend = 7;
+  repeated ChartData by_status    = 8;
+  repeated ChartData by_type      = 9;
 }
 
 // ── Module 6: Facility & asset management (scaffold) ──────────────────────
