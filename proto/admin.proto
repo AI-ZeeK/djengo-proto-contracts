@@ -235,6 +235,8 @@ message AdminActionLog {
   optional string ip = 7;
   optional string metadata_json = 8;
   string occurred_at = 9;
+  optional string admin_name = 10;
+  optional string admin_email = 11;
 }
 
 message ListAdminActionLogsResponse {
