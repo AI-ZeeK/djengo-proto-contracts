@@ -18,6 +18,7 @@ service OrganizationService {
   rpc UpdateCompanyDetails(UpdateCompanyDetailsRequest) returns (UtilitiesResponse);
 
   rpc GetOrganizations(GetOrganizationsRequest) returns (GetOrganizationsResponse);
+  rpc GetCompanies(GetCompaniesRequest) returns (GetCompaniesResponse);
 
   rpc GenerateEmployeeNumber(GenerateEmployeeNumberRequest) returns (GenerateEmployeeNumberResponse);
 
@@ -1333,7 +1334,30 @@ message PaginationMeta {
 message GetOrganizationsResponse {
   repeated OrganizationDetail organizations = 1;
   PaginationMeta meta = 2;
-}enum DepartmentTypeEnum {
+}
+
+message PlatformCompanyRow {
+  string company_id = 1;
+  string company_name = 2;
+  string organization_id = 3;
+  string organization_name = 4;
+  bool is_active = 5;
+}
+
+message GetCompaniesRequest {
+  optional string search = 1;
+  optional int32 page = 2;
+  optional int32 page_size = 3;
+  optional string sort_by = 4;
+  optional string sort_order = 5;
+}
+
+message GetCompaniesResponse {
+  repeated PlatformCompanyRow companies = 1;
+  PaginationMeta meta = 2;
+}
+
+enum DepartmentTypeEnum {
   KITCHEN = 0;
   RECEPTION = 1;
   HR = 2;
