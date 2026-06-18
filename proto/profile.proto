@@ -458,6 +458,8 @@ message PaginatedCompanyRequest {
   optional string sort_order = 7;
   optional RequestFilter filter = 8;
 
+  /** When set, only staff at this branch are returned. */
+  optional string branch_id = 9;
 
 }
 
@@ -482,6 +484,9 @@ message GetInvitationsByCompanyRequest  {
   optional string sort_by = 6;
   optional string sort_order = 7;
   optional InvitationRequestFilter filter = 8;
+
+  /** When set, only invitations for this branch are returned. */
+  optional string branch_id = 9;
 
 
 }
