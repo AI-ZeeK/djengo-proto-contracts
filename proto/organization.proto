@@ -150,6 +150,8 @@ message GetMyStaffByUserRequest {
   string organization_id = 3;
   /// Active property context — filters scoped roles (null/company-wide roles always included).
   optional string branch_id = 4;
+  /// When set, effective branches are limited to this domain (facility, reception, …).
+  optional BranchPermissionScope permission_scope = 5;
 }
 
 message StaffBranchAccessEntry {
@@ -484,6 +486,7 @@ enum BranchPermissionScope {
   BRANCH_PERMISSION_SCOPE_SHIFTS = 5;
   BRANCH_PERMISSION_SCOPE_TASKS = 6;
   BRANCH_PERMISSION_SCOPE_RECEPTION = 7;
+  BRANCH_PERMISSION_SCOPE_FACILITY = 8;
 }
 
 message RoleBranchScopeEntry {
