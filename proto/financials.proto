@@ -773,6 +773,7 @@ enum PayrollState {
 message GetPayrollAnalyticsRequest {
   string company_id = 1;
   string organization_id = 2;
+  optional string branch_id = 3;
 }
 
 message PayrollAnalyticsCard {
@@ -816,6 +817,9 @@ message GetPayrollAnalyticsResponse {
     int32 page_size = 5;       // Items per page
     string sort_by = 6;        // Field to sort by (e.g. "name", "scheduled_at")
     string sort_order = 7;     // "asc" or "desc"
+    optional string branch_id = 8;
+    optional int32 month = 9;
+    optional int32 year = 10;
   }
 
   message PayrollScheduleTableRow {
@@ -857,6 +861,7 @@ message ListStaffPayrollForPeriodRequest {
   string search = 6;
   string sort_by = 7;
   string sort_order = 8 ;
+  optional string branch_id = 9;
 }
 
 message StaffPayrollRow {

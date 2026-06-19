@@ -16,7 +16,9 @@ All `.proto` files in `proto/` are the **single source of truth**. Run `npm run 
 - `CompanyServiceData`: `price_plans`, `promos`, `branch_ids` — occupant-type pricing, billing period, promotional discounts
 
 ### `financials.proto`
-- Payroll analytics/schedules/staff list requests: optional `branch_id` for branch-scoped payroll views
+- `GetPayrollAnalyticsRequest.branch_id` (field 3)
+- `ListPayrollSchedulesRequest`: `branch_id` (8), `month` (9), `year` (10) — branch-scoped payroll schedules
+- `ListStaffPayrollForPeriodRequest.branch_id` (field 9)
 
 ## 1.2.2 — Phone dial code & shift assignment days
 
