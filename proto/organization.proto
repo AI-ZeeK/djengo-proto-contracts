@@ -169,6 +169,8 @@ message ValidateStaffBranchAccessRequest {
   string company_id = 2;
   string organization_id = 3;
   string branch_id = 4;
+  /// When set, checks cross-branch access for that domain only (staff, leave, financials, …).
+  optional BranchPermissionScope scope = 5;
 }
 
 message ValidateStaffBranchAccessResponse {
@@ -443,6 +445,7 @@ message CreateRoleRequest {
   optional string branch_id = 11;
   optional PartnerType partner_type = 12;
   string role_level_id = 13;
+  repeated RoleBranchScopeEntry branch_scopes = 14;
 }
 message UpdateRoleRequest {
   string role_id = 1;
@@ -464,11 +467,29 @@ message UpdateRoleRequest {
   optional string work_mode = 16;
   optional bool is_active = 17;
   string role_level_id = 18;
+  repeated RoleBranchScopeEntry branch_scopes = 19;
 }
 
 message Permission {
   string permission_name = 1;
   bool state = 2;
+}
+
+enum BranchPermissionScope {
+  BRANCH_PERMISSION_SCOPE_UNSPECIFIED = 0;
+  BRANCH_PERMISSION_SCOPE_STAFF = 1;
+  BRANCH_PERMISSION_SCOPE_LEAVE = 2;
+  BRANCH_PERMISSION_SCOPE_APPROVALS = 3;
+  BRANCH_PERMISSION_SCOPE_FINANCIALS = 4;
+  BRANCH_PERMISSION_SCOPE_SHIFTS = 5;
+  BRANCH_PERMISSION_SCOPE_TASKS = 6;
+  BRANCH_PERMISSION_SCOPE_RECEPTION = 7;
+}
+
+message RoleBranchScopeEntry {
+  BranchPermissionScope scope = 1;
+  repeated string branch_ids = 2;
+  bool all_branches = 3;
 }
 
 // 📝 REQUEST MESSAGES
@@ -614,6 +635,7 @@ message OrganizationRole {
   optional OrganizationRole superior = 25;
   repeated OrganizationRole subordinates = 26;
   RoleLevel role_level = 27;
+  repeated RoleBranchScopeEntry branch_scopes = 28;
 }
 
 
