@@ -2,6 +2,22 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## 1.2.3 — Payroll branch scope, company roles, service pricing
+
+### `profile.proto`
+- `GetStaffForPayrollRequest.branch_id` (field 10) — optional branch filter for payroll staff lists
+
+### `organization.proto`
+- `CompanyRoleService.AssignStaffCompanyRole` — assign staff to a company role (reuses `AssignStaffDepartmentRoleRequest`)
+
+### `operations.proto`
+- `CreateCompanyServicesRequest` / `UpdateCompanyServiceRequest`: `branch_ids`, `price_plans`, `promos`
+- `CompanyServicePricePlanRequest`, `CompanyServicePromoRequest`, `CompanyServicePricePlanData`, `CompanyServicePromoData`
+- `CompanyServiceData`: `price_plans`, `promos`, `branch_ids` — occupant-type pricing, billing period, promotional discounts
+
+### `financials.proto`
+- Payroll analytics/schedules/staff list requests: optional `branch_id` for branch-scoped payroll views
+
 ## 1.2.2 — Phone dial code & shift assignment days
 
 ### `profile.proto`
