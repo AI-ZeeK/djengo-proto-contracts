@@ -69,6 +69,8 @@ service CompanyRoleService {
   rpc UpsertRoleLevels(UpsertRoleLevelsRequest) returns (GetRoleLevelsResponse);
 
   rpc GetRoleStaff(GetRoleStaffRequest) returns (GetRoleStaffResponse);
+
+  rpc AssignStaffCompanyRole(AssignStaffDepartmentRoleRequest) returns (UtilitiesResponse);
 }
 
 /// Organization-wide dashboards (not branch-scoped).

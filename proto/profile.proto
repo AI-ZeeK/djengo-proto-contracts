@@ -1356,6 +1356,7 @@ message GetStaffForPayrollRequest {
   string search = 5;
   string sort_by = 8;
   string sort_order = 9;
+  optional string branch_id = 10;
 }
 
 message GetStaffForPayrollResponse {
