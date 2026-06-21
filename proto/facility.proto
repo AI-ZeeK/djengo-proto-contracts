@@ -804,6 +804,8 @@ message SearchPublicFacilityListingsRequest {
   string facility_mode = 1;
   optional string hospitality_style = 2; // HOTEL | SHORT_STAY | BNB (filters metadata)
   int32 limit = 3;
+  // When true, include branches that have facility setup but have not set is_listed yet.
+  optional bool include_unlisted = 4;
 }
 
 message PublicFacilityListingMessage {
