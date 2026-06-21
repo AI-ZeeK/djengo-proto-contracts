@@ -82,6 +82,9 @@ service ProfileService {
   
   // Staff Management
   rpc OnboardStaff(OnboardStaffRequest) returns (OnboardStaffResponse);
+  rpc ListStaffDesignations(ListStaffDesignationsRequest) returns (ListStaffDesignationsResponse);
+  rpc UpsertStaffDesignation(UpsertStaffDesignationRequest) returns (StaffDesignationResponse);
+  rpc CompleteStaffSelfProfile(CompleteStaffSelfProfileRequest) returns (CompleteStaffSelfProfileResponse);
   rpc AddStaffPaymentAdjustment(AddStaffPaymentAdjustmentRequest) returns (AddStaffPaymentAdjustmentResponse);
   rpc StaffProbationHistory(StaffProbationHistoryRequest) returns (StaffProbationHistoryResponse);
   // ── HR: Termination ───────────────────────────────────────────────────────
@@ -688,6 +691,8 @@ message Staff {
   repeated StaffCompanyRole staff_company_roles = 17;
   optional Company company = 18;
   optional string employee_number = 19;
+  bool profile_complete = 20;
+  optional string designation_id = 21;
 }
 
 
@@ -1834,5 +1839,61 @@ message ListDataSubjectRequestsResponse {
   optional string error = 2;
   repeated DataSubjectRequestEntry requests = 3;
   TableMeta meta = 4;
+}
+
+// ── Staff designations (job title taxonomy — separate from permission roles) ─
+
+message StaffDesignationMessage {
+  string designation_id = 1;
+  string company_id = 2;
+  string name = 3;
+  optional string code = 4;
+  string category = 5;
+  bool is_system = 6;
+  bool is_active = 7;
+  int32 sort_order = 8;
+}
+
+message ListStaffDesignationsRequest {
+  string company_id = 1;
+  optional string category = 2;
+  optional bool include_inactive = 3;
+}
+
+message ListStaffDesignationsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated StaffDesignationMessage designations = 3;
+}
+
+message UpsertStaffDesignationRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string designation_id = 3;
+  string name = 4;
+  optional string code = 5;
+  optional string category = 6;
+  optional bool is_active = 7;
+  optional int32 sort_order = 8;
+}
+
+message StaffDesignationResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional StaffDesignationMessage designation = 3;
+}
+
+message CompleteStaffSelfProfileRequest {
+  string staff_id = 1;
+  string user_id = 2;
+  string company_id = 3;
+  string designation_id = 4;
+  optional string bio = 5;
+}
+
+message CompleteStaffSelfProfileResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional Staff staff = 3;
 }
 

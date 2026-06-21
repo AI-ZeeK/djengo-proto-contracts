@@ -47,6 +47,9 @@ service FacilityService {
   rpc ListFacilityAssetTypeTemplates(ListFacilityAssetTypeTemplatesRequest) returns (ListFacilityAssetTypeTemplatesResponse);
   rpc UpsertFacilityAssetTypeTemplate(UpsertFacilityAssetTypeTemplateRequest) returns (UpsertFacilityAssetTypeTemplateResponse);
   rpc DeleteFacilityAssetTypeTemplate(DeleteFacilityAssetTypeTemplateRequest) returns (DeleteFacilityAssetTypeTemplateResponse);
+
+  // Public guest browse — branches that opted into public listing (no auth).
+  rpc SearchPublicFacilityListings(SearchPublicFacilityListingsRequest) returns (SearchPublicFacilityListingsResponse);
 }
 
 
@@ -794,4 +797,27 @@ message DeleteFacilityAssetTypeTemplateRequest {
 message DeleteFacilityAssetTypeTemplateResponse {
   bool success = 1;
   optional string error = 2;
+}
+
+message SearchPublicFacilityListingsRequest {
+  // HOSPITAL | ESTATE | HOSPITALITY | RESTAURANT
+  string facility_mode = 1;
+  optional string hospitality_style = 2; // HOTEL | SHORT_STAY | BNB (filters metadata)
+  int32 limit = 3;
+}
+
+message PublicFacilityListingMessage {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  string facility_mode = 4;
+  optional string metadata_json = 5;
+  optional string public_tagline = 6;
+  optional string public_description = 7;
+}
+
+message SearchPublicFacilityListingsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated PublicFacilityListingMessage listings = 3;
 }
