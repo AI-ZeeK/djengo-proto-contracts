@@ -893,6 +893,7 @@ message PublicOfferingListingMessage {
   PublicBrowseAddressMessage address = 14;
   PublicBrowseContactMessage contact = 15;
   PublicBrowseServiceMessage service = 16;
+  optional string currency = 17;
 }
 
 message SearchPublicOfferingListingsResponse {
@@ -947,6 +948,7 @@ message PublicBrowseListingMessage {
   optional PublicBrowseHospitalityFacetsMessage hospitality = 19;
   optional PublicBrowseEstateFacetsMessage estate = 20;
   PublicBrowseServiceMessage service = 21;
+  optional string currency = 22;
 }
 
 message SearchPublicBrowseListingsRequest {
