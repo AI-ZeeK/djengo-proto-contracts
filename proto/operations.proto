@@ -65,11 +65,24 @@ service OperationService {
   rpc CreateTableSize(CreateTableSizeRequest) returns (UtilitiesResponse);
   rpc CreateFacilityRoomType(CreateFacilityRoomTypeRequest) returns (UtilitiesResponse);
 }
+// Auth-free consumer browse surface.
 service PublicOperationService {
-
   rpc GetPublicCompanyServices(GetPublicCompanyServicesRequest) returns (GetPublicCompanyServicesResponse);
   rpc GetPublicCompanyService(GetPublicCompanyServiceRequest) returns (GetPublicCompanyServiceResponse);
   rpc SearchPublicCompanyServices(SearchPublicCompanyServicesRequest) returns (GetPublicCompanyServicesResponse);
+
+  // Read-only lookups used by the facility provisioner (no sensitive writes).
+  rpc GetBusinessTypes(EmptyRequest) returns (GetBusinessTypesResponse);
+  rpc GetCompanyServices(GetCompanyServicesRequest) returns (GetCompanyServicesResponse);
+}
+
+// Internal service-to-service surface (facility → operations).
+// Carries write operations that must never be exposed publicly.
+// Protected at the network boundary; no Bearer user token is expected,
+// but callers must supply the x-internal-caller header.
+service InternalOperationService {
+  rpc CreateCompanyServices(CreateCompanyServicesRequest) returns (CreateCompanyServicesResponse);
+  rpc CreateServiceBranch(CreateServiceBranchRequest) returns (CreateServiceBranchResponse);
 }
 
 message EmptyRequest {}
