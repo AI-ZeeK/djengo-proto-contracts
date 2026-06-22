@@ -50,6 +50,14 @@ service FacilityService {
 
   // Public guest browse — branches that opted into public listing (no auth).
   rpc SearchPublicFacilityListings(SearchPublicFacilityListingsRequest) returns (SearchPublicFacilityListingsResponse);
+  // Public guest browse — spa/gym/restaurant offerings enriched with org + operations (no auth).
+  rpc SearchPublicOfferingListings(SearchPublicOfferingListingsRequest) returns (SearchPublicOfferingListingsResponse);
+  // Unified guest browse — org enrichment, availability stats, distance (no auth).
+  rpc SearchPublicBrowseListings(SearchPublicBrowseListingsRequest) returns (SearchPublicBrowseListingsResponse);
+  rpc GetPublicBrowseListing(GetPublicBrowseListingRequest) returns (GetPublicBrowseListingResponse);
+
+  rpc GetBranchPublicListing(GetBranchPublicListingRequest) returns (GetBranchPublicListingResponse);
+  rpc UpsertBranchPublicListing(UpsertBranchPublicListingRequest) returns (UpsertBranchPublicListingResponse);
 }
 
 
@@ -822,4 +830,214 @@ message SearchPublicFacilityListingsResponse {
   bool success = 1;
   optional string error = 2;
   repeated PublicFacilityListingMessage listings = 3;
+}
+
+message SearchPublicOfferingListingsRequest {
+  // SPA | GYM | RESTAURANT — resolved via operations business types when business_type_id omitted.
+  string business_type_name = 1;
+  optional int32 business_type_id = 2;
+  // Branch operation kinds to backfill company services (e.g. spa, pool for wellness).
+  repeated string operation_kinds = 3;
+  int32 limit = 4;
+  // SERVICE | RESTAURANT — echoed on each listing for gateway presentation.
+  string presentation_kind = 5;
+}
+
+message PublicBrowseAddressMessage {
+  optional string street = 1;
+  optional string city = 2;
+  optional string state = 3;
+  optional string country = 4;
+  optional string postal_code = 5;
+  optional double latitude = 6;
+  optional double longitude = 7;
+}
+
+message PublicBrowseContactMessage {
+  optional string phone = 1;
+  optional string email = 2;
+}
+
+message PublicBrowsePricePlanMessage {
+  string plan_id = 1;
+  string label = 2;
+  string occupant_type = 3;
+  optional int32 occupant_count = 4;
+  string amount = 5;
+  string billing_period = 6;
+  int32 sort_order = 7;
+  bool is_active = 8;
+}
+
+message PublicBrowseServiceMessage {
+  string operation_name = 1;
+  optional string price_from = 2;
+  optional string company_service_id = 3;
+  repeated PublicBrowsePricePlanMessage price_plans = 4;
+}
+
+message PublicOfferingListingMessage {
+  string listing_id = 1;
+  string listing_source = 2;
+  string presentation_kind = 3;
+  string company_id = 4;
+  string company_name = 5;
+  string branch_id = 6;
+  string branch_name = 7;
+  optional string operation_name = 8;
+  string title = 9;
+  string tagline = 10;
+  string description = 11;
+  optional int32 business_type_id = 12;
+  optional string business_type_name = 13;
+  PublicBrowseAddressMessage address = 14;
+  PublicBrowseContactMessage contact = 15;
+  PublicBrowseServiceMessage service = 16;
+}
+
+message SearchPublicOfferingListingsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated PublicOfferingListingMessage listings = 3;
+}
+
+message PublicBrowseHospitalFacetsMessage {
+  optional bool has_emergency_department = 1;
+  optional string er_hours = 2;
+  optional bool accepts_ambulance = 3;
+  repeated string specialties = 4;
+  optional string public_phone = 5;
+  optional string public_phone_dial_code = 6;
+  optional int32 beds_available = 7;
+  optional int32 beds_total = 8;
+  optional int32 beds_in_use = 9;
+}
+
+message PublicBrowseHospitalityFacetsMessage {
+  optional string listing_style = 1;
+  optional int32 rooms_available = 2;
+  optional int32 rooms_total = 3;
+}
+
+message PublicBrowseEstateFacetsMessage {
+  optional string listing_style = 1;
+  optional int32 units_available = 2;
+  optional int32 units_total = 3;
+}
+
+message PublicBrowseListingMessage {
+  string listing_id = 1;
+  string listing_source = 2;
+  string presentation_kind = 3;
+  string company_id = 4;
+  string company_name = 5;
+  string branch_id = 6;
+  string branch_name = 7;
+  optional string operation_name = 8;
+  string title = 9;
+  optional string tagline = 10;
+  string description = 11;
+  optional int32 business_type_id = 12;
+  optional string business_type_name = 13;
+  optional string facility_mode = 14;
+  optional double distance_km = 15;
+  PublicBrowseAddressMessage address = 16;
+  PublicBrowseContactMessage contact = 17;
+  optional PublicBrowseHospitalFacetsMessage hospital = 18;
+  optional PublicBrowseHospitalityFacetsMessage hospitality = 19;
+  optional PublicBrowseEstateFacetsMessage estate = 20;
+  PublicBrowseServiceMessage service = 21;
+}
+
+message SearchPublicBrowseListingsRequest {
+  string listing_source = 1; // primary | offering
+  string presentation_kind = 2;
+  optional string facility_mode = 3;
+  optional string hospitality_style = 4;
+  optional string business_type_name = 5;
+  optional int32 business_type_id = 6;
+  repeated string operation_kinds = 7;
+  int32 limit = 8;
+  optional bool include_unlisted = 9;
+  optional double latitude = 10;
+  optional double longitude = 11;
+  optional string location_mode = 12; // anywhere | near
+  optional string location = 13;
+  optional string state = 14;
+  optional string category_description = 15;
+}
+
+message SearchPublicBrowseListingsResponse {
+  bool success = 1;
+  optional string error = 2;
+  string match_scope = 3;
+  string message = 4;
+  optional string user_state = 5;
+  int32 total_in_state = 6;
+  int32 total = 7;
+  repeated PublicBrowseListingMessage results = 8;
+}
+
+message GetPublicBrowseListingRequest {
+  string listing_id = 1;
+  optional double latitude = 2;
+  optional double longitude = 3;
+}
+
+message GetPublicBrowseListingResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional PublicBrowseListingMessage listing = 3;
+}
+
+message BranchPublicListingHospitalMessage {
+  optional bool has_emergency_department = 1;
+  optional string er_hours = 2;
+  optional bool accepts_ambulance = 3;
+  repeated string specialties = 4;
+  optional string public_phone = 5;
+  optional string public_phone_dial_code = 6;
+}
+
+message BranchPublicListingHospitalityMessage {
+  optional string listing_style = 1;
+}
+
+message BranchPublicListingEstateMessage {
+  optional string listing_style = 1;
+}
+
+message BranchPublicListingMessage {
+  bool is_listed = 1;
+  optional string tagline = 2;
+  optional string description = 3;
+  optional BranchPublicListingHospitalMessage hospital = 4;
+  optional BranchPublicListingHospitalityMessage hospitality = 5;
+  optional BranchPublicListingEstateMessage estate = 6;
+}
+
+message GetBranchPublicListingRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+}
+
+message GetBranchPublicListingResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string facility_mode = 3;
+  optional BranchPublicListingMessage listing = 4;
+}
+
+message UpsertBranchPublicListingRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  BranchPublicListingMessage listing = 4;
+}
+
+message UpsertBranchPublicListingResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional BranchPublicListingMessage listing = 3;
 }
