@@ -65,7 +65,96 @@ service OperationService {
   rpc CreateTableSize(CreateTableSizeRequest) returns (UtilitiesResponse);
   rpc CreateFacilityRoomType(CreateFacilityRoomTypeRequest) returns (UtilitiesResponse);
 }
+service PublicOperationService {
+
+  rpc GetPublicCompanyServices(GetPublicCompanyServicesRequest) returns (GetPublicCompanyServicesResponse);
+  rpc GetPublicCompanyService(GetPublicCompanyServiceRequest) returns (GetPublicCompanyServiceResponse);
+  rpc SearchPublicCompanyServices(SearchPublicCompanyServicesRequest) returns (GetPublicCompanyServicesResponse);
+}
+
 message EmptyRequest {}
+message GetPublicCompanyServicesRequest {
+  string company_id = 1;
+  optional string branch_id = 2;
+  optional bool include_inactive = 3;
+}
+
+message GetPublicCompanyServiceRequest {
+  string company_service_id = 1;
+}
+
+message SearchPublicCompanyServicesRequest {
+  optional string company_id = 1;
+  optional string service_name = 2;
+  optional int32 business_type_id = 3;
+  optional string branch_id = 4;
+}
+
+message GetPublicCompanyServicesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated PublicCompanyServiceData company_services = 3;
+}
+
+message GetPublicCompanyServiceResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional PublicCompanyServiceData company_service = 3;
+}
+
+// Public version - only exposes non-sensitive data
+message PublicCompanyServiceData {
+  string company_service_id = 1;
+  string company_id = 2;
+  int32 business_type_id = 3;
+  string name = 4;
+  string price = 5;
+  string description = 6;
+  bool is_active = 7;
+  string created_at = 8;
+  string updated_at = 9;
+  optional PublicBusinessType business_type = 10;
+  repeated PublicServiceBranch service_branches = 11;
+  repeated PublicCompanyServicePricePlanData price_plans = 12;
+  // ❌ NO promos, NO internal branch IDs, NO sensitive data
+}
+
+message PublicBusinessType {
+  int32 business_type_id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message PublicServiceBranch {
+  string branch_id = 1;
+  string description = 2;
+  repeated PublicHotelRoomType hotel_room_types = 3;
+}
+
+message PublicHotelRoomType {
+  string name = 1;
+  optional string description = 2;
+  int32 price_per_night = 3;
+  int32 max_occupancy = 4;
+  int32 bed_size_id = 5;
+  repeated PublicHotelRoom hotel_rooms = 6;
+}
+
+message PublicHotelRoom {
+  string ref = 1;
+  optional string description = 2;
+  bool is_active = 3;
+}
+
+message PublicCompanyServicePricePlanData {
+  string plan_id = 1;
+  string label = 2;
+  string occupant_type = 3;
+  optional int32 occupant_count = 4;
+  string amount = 5;
+  string billing_period = 6;
+  int32 sort_order = 7;
+}
 
 
 message CreateServiceTypeRequest {
