@@ -74,6 +74,7 @@ service PublicOperationService {
   // Read-only lookups used by the facility provisioner (no sensitive writes).
   rpc GetBusinessTypes(EmptyRequest) returns (GetBusinessTypesResponse);
   rpc GetCompanyServices(GetCompanyServicesRequest) returns (GetCompanyServicesResponse);
+  rpc SearchCompanyServices(SearchCompanyServicesRequest) returns (GetCompanyServicesResponse);
 }
 
 // Internal service-to-service surface (facility → operations).
