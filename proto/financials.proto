@@ -91,6 +91,8 @@ message RejectStepRequest {
 
 
 service FinancialsService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+
   // Get paginated payment history for a staff member
   rpc GetStaffPaymentHistory (GetStaffPaymentHistoryRequest) returns (GetStaffPaymentHistoryResponse);
 
@@ -404,6 +406,12 @@ enum Timeline {
 }
 
 message EmptyRequest {}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  string status = 1;
+}
 
 message CreateWalletRequest {
   string entity_id = 1;
