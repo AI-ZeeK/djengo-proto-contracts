@@ -89,10 +89,12 @@ message RejectStepRequest {
 }
 // --- Bank List ---
 
+// Lightweight health probe — no payment-provider or encryption dependencies.
+service FinancialsHealthService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
 
 service FinancialsService {
-  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
-
   // Get paginated payment history for a staff member
   rpc GetStaffPaymentHistory (GetStaffPaymentHistoryRequest) returns (GetStaffPaymentHistoryResponse);
 
