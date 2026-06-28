@@ -828,9 +828,10 @@ message AcceptInvitationRequest {
   string first_name = 2;
   string last_name = 3;
   optional string phone_number = 4;
-  optional string country_code = 5;
-  string password = 6;
-  AddressRequest address = 7;
+  optional string phone_dial_code = 5;
+  optional string country_code = 6;
+  string password = 7;
+  AddressRequest address = 8;
 }
 
 message AcceptInvitationResponse {
