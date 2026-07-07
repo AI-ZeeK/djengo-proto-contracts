@@ -55,6 +55,8 @@ service FacilityService {
   // Unified guest browse — org enrichment, availability stats, distance (no auth).
   rpc SearchPublicBrowseListings(SearchPublicBrowseListingsRequest) returns (SearchPublicBrowseListingsResponse);
   rpc GetPublicBrowseListing(GetPublicBrowseListingRequest) returns (GetPublicBrowseListingResponse);
+  // Public booking — bookable nodes + sections with DB-level availability (no auth).
+  rpc GetPublicBookingContext(GetPublicBookingContextRequest) returns (GetPublicBookingContextResponse);
 
   rpc GetBranchPublicListing(GetBranchPublicListingRequest) returns (GetBranchPublicListingResponse);
   rpc UpsertBranchPublicListing(UpsertBranchPublicListingRequest) returns (UpsertBranchPublicListingResponse);
@@ -1042,4 +1044,39 @@ message UpsertBranchPublicListingResponse {
   bool success = 1;
   optional string error = 2;
   optional BranchPublicListingMessage listing = 3;
+}
+
+message GetPublicBookingContextRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  optional string parent_facility_node_id = 4;
+}
+
+message PublicBookableNodeMessage {
+  string facility_node_id = 1;
+  string code = 2;
+  string name = 3;
+  string node_type = 4;
+  string asset_kind = 5;
+  optional string parent_facility_node_id = 6;
+  string parent_name = 7;
+  int32 capacity_max = 8;
+  optional double rate_amount = 9;
+  optional string billing_period = 10;
+}
+
+message PublicBookingSectionMessage {
+  string facility_node_id = 1;
+  string code = 2;
+  string name = 3;
+  string node_type = 4;
+  int32 child_count = 5;
+}
+
+message GetPublicBookingContextResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated PublicBookableNodeMessage bookable_nodes = 3;
+  repeated PublicBookingSectionMessage sections = 4;
 }
