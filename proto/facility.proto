@@ -1064,6 +1064,15 @@ message PublicBookableNodeMessage {
   int32 capacity_max = 8;
   optional double rate_amount = 9;
   optional string billing_period = 10;
+  optional int32 bedrooms = 11;
+  optional int32 bathrooms = 12;
+  optional double floor_area_sqm = 13;
+  optional string unit_type = 14;
+  optional bool ensuite = 15;
+  optional int32 default_bed_count = 16;
+  optional int32 seat_count = 17;
+  repeated string amenity_labels = 18;
+  optional string display_title = 19;
 }
 
 message PublicBookingSectionMessage {
@@ -1072,6 +1081,8 @@ message PublicBookingSectionMessage {
   string name = 3;
   string node_type = 4;
   int32 child_count = 5;
+  optional string parent_facility_node_id = 6;
+  int32 bookable_descendant_count = 7;
 }
 
 message GetPublicBookingContextResponse {
