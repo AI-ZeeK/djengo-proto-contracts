@@ -1053,6 +1053,13 @@ message GetPublicBookingContextRequest {
   optional string parent_facility_node_id = 4;
 }
 
+message PublicBookableListingImageMessage {
+  string url = 1;
+  string subject = 2;
+  optional string caption = 3;
+  bool is_thumbnail = 4;
+}
+
 message PublicBookableNodeMessage {
   string facility_node_id = 1;
   string code = 2;
@@ -1073,6 +1080,10 @@ message PublicBookableNodeMessage {
   optional int32 seat_count = 17;
   repeated string amenity_labels = 18;
   optional string display_title = 19;
+  optional string thumbnail_url = 20;
+  repeated PublicBookableListingImageMessage listing_images = 21;
+  optional int32 window_count = 22;
+  optional bool has_balcony = 23;
 }
 
 message PublicBookingSectionMessage {
