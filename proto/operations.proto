@@ -17,6 +17,7 @@ service OperationService {
   rpc DeleteCompanyService(DeleteCompanyServiceRequest) returns (DeleteCompanyServiceResponse);
   rpc GetCompanyServices(GetCompanyServicesRequest) returns (GetCompanyServicesResponse);
   rpc GetCompanyService(GetCompanyServiceRequest) returns (GetCompanyServiceResponse);
+  rpc GetCompanyServiceByBusinessTypeId(GetCompanyServiceByBusinessTypeIdRequest) returns (GetCompanyServiceResponse);
   rpc SearchCompanyServices(SearchCompanyServicesRequest) returns (GetCompanyServicesResponse);
   rpc CreateServiceBranch(CreateServiceBranchRequest) returns (CreateServiceBranchResponse);
   rpc UpsertBusinessHours(UpsertBusinessHoursRequest) returns (UpsertBusinessHoursResponse);
@@ -312,6 +313,10 @@ message GetCompanyServicesRequest {
 // --- Get Company Services ---
 message GetCompanyServiceRequest {
   string company_service_id = 1;
+}
+
+message GetCompanyServiceByBusinessTypeIdRequest {
+  int32 business_type_id = 1;
 }
 
 // --- Search Company Services with Filters ---

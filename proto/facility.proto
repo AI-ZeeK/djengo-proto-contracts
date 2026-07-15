@@ -926,6 +926,8 @@ message PublicBrowseEstateFacetsMessage {
   optional string listing_style = 1;
   optional int32 units_available = 2;
   optional int32 units_total = 3;
+  optional int32 bedrooms_available = 4;
+  optional int32 bedrooms_total = 5;
 }
 
 message PublicBrowseListingMessage {
