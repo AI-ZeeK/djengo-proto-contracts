@@ -971,6 +971,7 @@ message SearchPublicBrowseListingsRequest {
   optional string location = 13;
   optional string state = 14;
   optional string category_description = 15;
+  optional string company_id = 16;
 }
 
 message SearchPublicBrowseListingsResponse {
