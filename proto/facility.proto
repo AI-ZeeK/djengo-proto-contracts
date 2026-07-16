@@ -843,6 +843,9 @@ message SearchPublicOfferingListingsRequest {
   int32 limit = 4;
   // SERVICE | RESTAURANT — echoed on each listing for gateway presentation.
   string presentation_kind = 5;
+  // Optional scope filters (e.g. company/branch detail browse).
+  optional string company_id = 6;
+  optional string branch_id = 7;
 }
 
 message PublicBrowseAddressMessage {
