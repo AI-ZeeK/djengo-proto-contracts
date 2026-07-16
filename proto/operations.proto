@@ -1055,6 +1055,7 @@ message ReservationProto {
   optional string contact_phone      = 22;
   optional string occupancy_stay_id  = 23;
   bool has_djengo_account    = 24;
+  bool stay_anonymous        = 25;
 }
 
 message CreateReservationRequest {
@@ -1122,6 +1123,8 @@ message CreatePublicBookingRequest {
   optional string notes      = 11;
   // When true: CRM guest only — do not link / manage Djengo User account.
   bool stay_as_guest         = 12;
+  // When true: occupancy is created as anonymous (no guest/profile identity on the stay).
+  bool stay_anonymous        = 13;
 }
 
 message CreatePublicBookingResponse {
