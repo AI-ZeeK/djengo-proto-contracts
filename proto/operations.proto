@@ -1056,6 +1056,13 @@ message ReservationProto {
   optional string occupancy_stay_id  = 23;
   bool has_djengo_account    = 24;
   bool stay_anonymous        = 25;
+  // Detail enrichment (filled on GetReservation; optional on list).
+  optional string facility_node_name = 26;
+  optional string facility_node_code = 27;
+  optional string facility_node_type = 28;
+  optional string location_path      = 29;
+  optional string guest_display_name = 30;
+  optional string account_display_name = 31;
 }
 
 message CreateReservationRequest {
