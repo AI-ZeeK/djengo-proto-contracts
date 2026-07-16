@@ -76,6 +76,9 @@ service PublicOperationService {
   rpc GetBusinessTypes(EmptyRequest) returns (GetBusinessTypesResponse);
   rpc GetCompanyServices(GetCompanyServicesRequest) returns (GetCompanyServicesResponse);
   rpc SearchCompanyServices(SearchCompanyServicesRequest) returns (GetCompanyServicesResponse);
+
+  // Public booking request (PENDING only — occupancy created after ConfirmReservation).
+  rpc CreatePublicBooking(CreatePublicBookingRequest) returns (CreatePublicBookingResponse);
 }
 
 // Internal service-to-service surface (facility → operations).
@@ -1023,6 +1026,8 @@ service ReservationService {
   rpc ListReservations  (ListReservationsRequest)  returns (ListReservationsResponse);
   rpc UpdateReservation (UpdateReservationRequest) returns (ReservationProto);
   rpc CancelReservation (CancelReservationRequest) returns (ReservationProto);
+  // Staff approval: CONFIRMED + create facility occupancy stay (if node present).
+  rpc ConfirmReservation (ConfirmReservationRequest) returns (ConfirmReservationResponse);
 }
 
 message ReservationProto {
@@ -1041,6 +1046,15 @@ message ReservationProto {
   string created_by          = 13;
   string created_at          = 14;
   string updated_at          = 15;
+  optional string branch_id  = 16;
+  optional string client_user_id = 17;
+  bool stay_as_guest         = 18;
+  optional string contact_first_name = 19;
+  optional string contact_last_name  = 20;
+  optional string contact_email      = 21;
+  optional string contact_phone      = 22;
+  optional string occupancy_stay_id  = 23;
+  bool has_djengo_account    = 24;
 }
 
 message CreateReservationRequest {
@@ -1086,11 +1100,53 @@ message ListReservationsRequest {
   optional string to_time          = 7;
   optional int32  page             = 8;
   optional int32  page_size        = 9;
+  optional string branch_id        = 10;
 }
 
 message ListReservationsResponse {
   repeated ReservationProto reservations = 1;
   TableMeta meta                         = 2;
+}
+
+message CreatePublicBookingRequest {
+  string company_id          = 1;
+  string organization_id     = 2;
+  string branch_id           = 3;
+  string facility_node_id    = 4;
+  string first_name          = 5;
+  optional string last_name  = 6;
+  optional string email      = 7;
+  optional string phone_number = 8;
+  string start_time          = 9;
+  string end_time            = 10;
+  optional string notes      = 11;
+  // When true: CRM guest only — do not link / manage Djengo User account.
+  bool stay_as_guest         = 12;
+}
+
+message CreatePublicBookingResponse {
+  bool success               = 1;
+  optional string error      = 2;
+  optional string reservation_id = 3;
+  optional string guest_id   = 4;
+  optional string client_user_id = 5;
+  bool has_djengo_account    = 6;
+  optional string account_display_name = 7;
+  string status              = 8; // PENDING
+  string message             = 9;
+}
+
+message ConfirmReservationRequest {
+  string reservation_id = 1;
+  string confirmed_by   = 2;
+  optional string notes = 3;
+}
+
+message ConfirmReservationResponse {
+  bool success = 1;
+  optional string error = 2;
+  ReservationProto reservation = 3;
+  optional string occupancy_stay_id = 4;
 }
 
 // ── Incidents ─────────────────────────────────────────────────────────────
