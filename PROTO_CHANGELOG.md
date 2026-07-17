@@ -2,6 +2,11 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## 1.2.6 — Reception list pagination meta
+
+### `facility.proto`
+- `ListHospitalReceptionResponse.meta` (field 5) — full `TableMeta` for reception boards (hotel/hospital/estate/restaurant)
+
 ## 1.2.5 — Occupancy list pagination meta
 
 ### `facility.proto`

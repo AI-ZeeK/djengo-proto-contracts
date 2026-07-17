@@ -730,6 +730,7 @@ message ListHospitalReceptionResponse {
   optional string error = 2;
   repeated HospitalReceptionRowMessage rows = 3;
   int32 total = 4;
+  TableMeta meta = 5;
 }
 
 message GetFacilityReceptionDetailRequest {
