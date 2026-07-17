@@ -103,6 +103,8 @@ service ProfileService {
   rpc ResolveOrCreateGuest(ResolveOrCreateGuestRequest) returns (ResolveOrCreateGuestResponse);
   // Public booking: lookup Djengo User by email and/or phone (no create).
   rpc FindContactAccount(FindContactAccountRequest) returns (FindContactAccountResponse);
+  // Public booking (!stay_as_guest): find or create a CLIENT user and ensure CLIENT role.
+  rpc ResolveOrCreateClientAccount(ResolveOrCreateClientAccountRequest) returns (ResolveOrCreateClientAccountResponse);
   rpc IncrementGuestVisitCount(IncrementGuestVisitCountRequest) returns (IncrementGuestVisitCountResponse);
 
   // ── Compliance: HR Audit + GDPR ───────────────────────────────────────────
@@ -1732,6 +1734,26 @@ message FindContactAccountResponse {
   optional string email = 5;
   optional string phone_number = 6;
   optional string message = 7;
+}
+
+message ResolveOrCreateClientAccountRequest {
+  optional string email = 1;
+  optional string phone_number = 2;
+  optional string phone_dial_code = 3;
+  optional string first_name = 4;
+  optional string last_name = 5;
+}
+
+message ResolveOrCreateClientAccountResponse {
+  bool success = 1;
+  bool created = 2;
+  bool found = 3;
+  optional string user_id = 4;
+  optional string display_name = 5;
+  optional string email = 6;
+  optional string phone_number = 7;
+  optional string message = 8;
+  optional string error = 9;
 }
 
 message IncrementGuestVisitCountRequest {
