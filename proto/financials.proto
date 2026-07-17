@@ -1944,6 +1944,10 @@ message GuestInvoiceProto {
   repeated GuestInvoiceLineItemProto line_items = 18;
   string created_at       = 19;
   string updated_at       = 20;
+  optional string branch_id = 21;
+  optional string facility_node_id = 22;
+  // DEPOSIT | STAY | EXTRA | REFUND_ADJUSTMENT
+  string purpose          = 23;
 }
 
 message CreateGuestInvoiceRequest {
@@ -1959,6 +1963,9 @@ message CreateGuestInvoiceRequest {
   optional string due_date = 10;
   optional string notes   = 11;
   repeated GuestInvoiceLineItemProto line_items = 12;
+  optional string branch_id = 13;
+  optional string facility_node_id = 14;
+  string purpose          = 15; // DEPOSIT | STAY | EXTRA | REFUND_ADJUSTMENT
 }
 
 message GetGuestInvoiceRequest    { string invoice_id = 1; }
@@ -1972,6 +1979,10 @@ message ListGuestInvoicesRequest {
   optional string status   = 4;
   optional int32 page      = 5;
   optional int32 page_size = 6;
+  optional string reservation_id = 7;
+  optional string facility_node_id = 8;
+  optional string purpose = 9;
+  optional string branch_id = 10;
 }
 
 message ListGuestInvoicesResponse {
@@ -2016,11 +2027,99 @@ message ListGuestPaymentsRequest {
   optional string invoice_id = 4;
   optional int32 page      = 5;
   optional int32 page_size = 6;
+  optional string reservation_id = 7;
 }
 
 message ListGuestPaymentsResponse {
   repeated GuestPaymentProto payments = 1;
   TableMeta meta                      = 2;
+}
+
+// ── Hospitality billing policy (company / branch deposit & due rules) ──────
+
+service HospitalityBillingPolicyService {
+  rpc GetHospitalityBillingPolicy (GetHospitalityBillingPolicyRequest) returns (HospitalityBillingPolicyProto);
+  rpc UpsertHospitalityBillingPolicy (UpsertHospitalityBillingPolicyRequest) returns (HospitalityBillingPolicyProto);
+  rpc ListHospitalityBillingPolicies (ListHospitalityBillingPoliciesRequest) returns (ListHospitalityBillingPoliciesResponse);
+  rpc ComputeHospitalityDeposit (ComputeHospitalityDepositRequest) returns (ComputeHospitalityDepositResponse);
+}
+
+message HospitalityBillingPolicyProto {
+  string policy_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  optional string branch_id = 4;
+  string currency_code = 5;
+  bool deposit_required = 6;
+  string deposit_type = 7; // NONE | FIXED | PERCENT
+  int64 deposit_fixed_minor = 8;
+  double deposit_percent = 9;
+  string deposit_due = 10; // ON_REQUEST | BEFORE_CONFIRM | AT_CHECKIN
+  string balance_due = 11; // ON_CONFIRM | AT_CHECKIN | AT_CHECKOUT
+  bool invoice_on_public_booking = 12;
+  bool require_deposit_before_confirm = 13;
+  bool allow_confirm_without_payment = 14;
+  string payment_methods_allowed = 15;
+  bool is_active = 16;
+  string created_at = 17;
+  string updated_at = 18;
+  // COMPANY | BRANCH — meaningful on company-wide row (branch_id empty)
+  string billing_scope = 19;
+}
+
+message GetHospitalityBillingPolicyRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+}
+
+message UpsertHospitalityBillingPolicyRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  string currency_code = 4;
+  bool deposit_required = 5;
+  string deposit_type = 6;
+  int64 deposit_fixed_minor = 7;
+  double deposit_percent = 8;
+  string deposit_due = 9;
+  string balance_due = 10;
+  bool invoice_on_public_booking = 11;
+  bool require_deposit_before_confirm = 12;
+  bool allow_confirm_without_payment = 13;
+  string payment_methods_allowed = 14;
+  bool is_active = 15;
+  // COMPANY | BRANCH — set on company-wide upsert
+  string billing_scope = 16;
+}
+
+message ListHospitalityBillingPoliciesRequest {
+  string organization_id = 1;
+  string company_id = 2;
+}
+
+message ListHospitalityBillingPoliciesResponse {
+  repeated HospitalityBillingPolicyProto policies = 1;
+}
+
+message ComputeHospitalityDepositRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  int64 stay_total_minor = 4;
+}
+
+message ComputeHospitalityDepositResponse {
+  bool deposit_required = 1;
+  int64 deposit_minor = 2;
+  int64 balance_minor = 3;
+  int64 stay_total_minor = 4;
+  string currency_code = 5;
+  string deposit_due = 6;
+  string balance_due = 7;
+  bool require_deposit_before_confirm = 8;
+  bool invoice_on_public_booking = 9;
+  HospitalityBillingPolicyProto policy = 10;
 }
 
 // ── Statutory Remittances ─────────────────────────────────────────────────

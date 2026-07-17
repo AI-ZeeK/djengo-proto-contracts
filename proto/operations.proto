@@ -1063,6 +1063,13 @@ message ReservationProto {
   optional string location_path      = 29;
   optional string guest_display_name = 30;
   optional string account_display_name = 31;
+  int64 quoted_total_minor = 32;
+  string currency_code = 33;
+  // UNPAID | DEPOSIT_DUE | DEPOSIT_PAID | PARTIALLY_PAID | PAID | REFUNDED
+  string payment_status = 34;
+  optional string billing_policy_id = 35;
+  optional string deposit_invoice_id = 36;
+  optional string balance_invoice_id = 37;
 }
 
 message CreateReservationRequest {
@@ -1132,6 +1139,9 @@ message CreatePublicBookingRequest {
   bool stay_as_guest         = 12;
   // When true: occupancy is created as anonymous (no guest/profile identity on the stay).
   bool stay_anonymous        = 13;
+  // Optional soft quote for deposit % calculation (minor units).
+  optional int64 quoted_total_minor = 14;
+  optional string currency_code = 15;
 }
 
 message CreatePublicBookingResponse {
@@ -1144,6 +1154,10 @@ message CreatePublicBookingResponse {
   optional string account_display_name = 7;
   string status              = 8; // PENDING
   string message             = 9;
+  optional string deposit_invoice_id = 10;
+  optional string payment_status = 11;
+  optional int64 deposit_minor = 12;
+  optional string currency_code = 13;
 }
 
 message ConfirmReservationRequest {
