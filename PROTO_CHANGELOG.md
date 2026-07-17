@@ -2,6 +2,21 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## 1.2.4 — Public booking notifications & reservation detail enrichment
+
+### `communication.proto`
+- `rpc SendBookingMail(SendBookingMailRequest) returns (SendBookingMailResponse)` — guest confirmation + company alert emails
+- `rpc SendUserPush(SendUserPushRequest) returns (SendUserPushResponse)` — push to company/reception users
+- `enum BookingMailKind` — `BOOKING_MAIL_GUEST_CONFIRMATION`, `BOOKING_MAIL_COMPANY_ALERT`
+- Messages: `SendBookingMailRequest/Response`, `SendUserPushRequest/Response`
+
+### `operations.proto`
+- `ReservationProto` detail enrichment (filled on `GetReservation`):
+  - `facility_node_name` (26), `facility_node_code` (27), `facility_node_type` (28)
+  - `location_path` (29), `guest_display_name` (30), `account_display_name` (31)
+- `stay_anonymous` (25) on `ReservationProto` / public booking request path
+- `CreatePublicBookingRequest.stay_anonymous` / related public booking fields for anonymous stay
+
 ## 1.2.3 — Payroll branch scope, company roles, service pricing
 
 ### `profile.proto`

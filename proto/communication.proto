@@ -32,6 +32,8 @@ service CommunicationService {
   // Mail Management
   rpc SendOtpMail(SendOtpMailRequest) returns (SendOtpMailResponse);
   rpc SendStaffInvitationMail(SendStaffInvitationMailRequest) returns (SendStaffInvitationMailResponse);
+  rpc SendBookingMail(SendBookingMailRequest) returns (SendBookingMailResponse);
+  rpc SendUserPush(SendUserPushRequest) returns (SendUserPushResponse);
 
   // Push Notifications
   rpc ClearUserPushSubscriptions(ClearUserPushSubscriptionsRequest) returns (ClearUserPushSubscriptionsResponse);
@@ -74,6 +76,41 @@ message SendStaffInvitationMailRequest {
 }
 
 message SendStaffInvitationMailResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
+enum BookingMailKind {
+  BOOKING_MAIL_GUEST_CONFIRMATION = 0;
+  BOOKING_MAIL_COMPANY_ALERT = 1;
+}
+
+message SendBookingMailRequest {
+  string email = 1;
+  string guest_name = 2;
+  string company_name = 3;
+  string start_time = 4;
+  string end_time = 5;
+  string status = 6;
+  optional string notes = 7;
+  optional string location_label = 8;
+  optional string reservation_id = 9;
+  BookingMailKind kind = 10;
+}
+
+message SendBookingMailResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
+message SendUserPushRequest {
+  string user_id = 1;
+  string title = 2;
+  string body = 3;
+  map<string, string> data = 4;
+}
+
+message SendUserPushResponse {
   bool success = 1;
   optional string error = 2;
 }
