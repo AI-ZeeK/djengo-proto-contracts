@@ -2,6 +2,15 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## 1.2.5 — Occupancy list pagination meta
+
+### `facility.proto`
+- `ListOccupancyStaysResponse.meta` (field 5) — full `TableMeta` (`total`, `current_page`, `page_size`, `total_pages`, `next_page`, `prev_page`)
+- `message TableMeta` — shared pagination envelope for facility list responses (same shape as operations / org users meta)
+
+### Notes
+- `operations.proto` `ListReservationsResponse.meta` / `TableMeta` already include `next_page` / `prev_page`; services should populate the full set.
+
 ## 1.2.4 — Public booking notifications & reservation detail enrichment
 
 ### `communication.proto`
