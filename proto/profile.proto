@@ -34,6 +34,7 @@ service ProfileService {
   rpc GetOtpExpiry(GetOtpExpiryRequest) returns (GetOtpExpiryResponse);
   rpc Logout(LogoutRequest) returns (SendOtpResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc SocialLogin(SocialLoginRequest) returns (SocialLoginResponse);
   
   rpc GetRoles(EmptyRequest) returns (GetRolesResponse);
   
@@ -957,6 +958,27 @@ message VerifyOtpRequest {
   SendOtpType type = 3;
   string device_info = 4;
   SessionSource source = 5;
+}
+
+// Sign in / sign up with a Google or Apple identity token.
+message SocialLoginRequest {
+  string provider = 1;              // "GOOGLE" | "APPLE"
+  string id_token = 2;              // OIDC identity token from the provider
+  optional string first_name = 3;   // Apple only returns the name on first auth
+  optional string last_name = 4;
+  string device_info = 5;
+  SessionSource source = 6;
+  optional string role_name = 7;    // defaults to CLIENT for new users
+}
+
+message SocialLoginResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
+  optional string access_token = 4;
+  optional string refresh_token = 5;
+  optional User user = 6;
+  bool is_new_user = 7;
 }
 
 message SendOtpResponse {

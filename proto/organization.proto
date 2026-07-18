@@ -386,6 +386,20 @@ message FetchCompanyMetaResponse {
   optional string error = 2;
   CompanyMetaData company_meta_data = 3;
   string message = 4;
+  // Per-branch metadata (id, name, resolved currency) so clients can bill/pay
+  // in the branch's currency without extra round-trips.
+  repeated BranchMetaData branch_meta_data = 5;
+}
+
+message BranchMetaData {
+  string branch_id = 1;
+  string name = 2;
+  bool is_main_branch = 3;
+  bool is_active = 4;
+  // Resolved ISO 4217 currency for the branch: branch override or company base_currency.
+  string base_currency = 5;
+  // ISO country code inherited from the company locale.
+  string country_code = 6;
 }
 message FetchBranchResponse {    
   bool success = 1;
@@ -526,6 +540,8 @@ message CreateBranchRequest {
   /// When true, sets company_meta_data.is_multi_branch before creating the branch.
   bool enable_multi_branch = 10;
   repeated CreateBranchDepartmentInput departments = 11;
+  /// ISO 4217 currency override for the branch (optional; company base_currency by default).
+  optional string base_currency = 12;
 }
 
 message CreateBranchResponse {
@@ -544,6 +560,8 @@ message UpdateBranchRequest {
   optional string phone_number = 6;
   optional AddressRequest address = 7;
   optional bool handles_all_branches = 8;
+  /// ISO 4217 currency override; empty string clears the override (falls back to company).
+  optional string base_currency = 9;
 }
 
 message SetBranchLocationUpdateAllowanceRequest {
@@ -1192,6 +1210,8 @@ message Branch {
   bool allow_location_update = 14;
   /// Hub branch — staff here may work across all company branches (default on main branch).
   bool handles_all_branches = 15;
+  /// ISO 4217 currency override; empty falls back to company base_currency.
+  optional string base_currency = 16;
 }
 
 message Department {

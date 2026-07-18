@@ -1914,6 +1914,11 @@ service GuestBillingService {
   rpc ListGuestPayments   (ListGuestPaymentsRequest)   returns (ListGuestPaymentsResponse);
   // Issue (if draft), email guest, notify Djengo user, write activity log.
   rpc SendGuestInvoice    (SendGuestInvoiceRequest)    returns (SendGuestInvoiceResponse);
+  // Online payment (Paystack): hosted checkout for the invoice balance,
+  // verify by reference, and gateway webhook ingestion.
+  rpc InitializeGuestInvoicePayment (InitializeGuestInvoicePaymentRequest) returns (InitializeGuestInvoicePaymentResponse);
+  rpc VerifyGuestInvoicePayment (VerifyGuestInvoicePaymentRequest) returns (VerifyGuestInvoicePaymentResponse);
+  rpc HandlePaystackWebhook (PaystackWebhookRequest) returns (PaystackWebhookResponse);
 }
 
 message GuestInvoiceLineItemProto {
@@ -2023,6 +2028,12 @@ message GuestPaymentProto {
   optional string recorded_by = 12;
   optional string notes  = 13;
   string created_at      = 14;
+  // FX snapshot: USD per 1 unit of currency_code at pay time (accounting is USD-based).
+  optional double exchange_rate = 15;
+  // USD value of the payment in minor units (cents) at pay time.
+  optional int64 usd_amount_minor = 16;
+  // Processing gateway (e.g. PAYSTACK); empty for manual/desk records.
+  optional string gateway = 17;
 }
 
 message RecordGuestPaymentRequest {
@@ -2051,6 +2062,48 @@ message ListGuestPaymentsRequest {
 message ListGuestPaymentsResponse {
   repeated GuestPaymentProto payments = 1;
   TableMeta meta                      = 2;
+}
+
+message InitializeGuestInvoicePaymentRequest {
+  string invoice_id = 1;
+  // Payer email — required by Paystack; callers pass guest/contact email.
+  optional string email = 2;
+  // Defaults to the outstanding invoice balance when omitted or <= 0.
+  optional int64 amount_minor = 3;
+  optional string callback_url = 4;
+  optional string initiated_by = 5;
+}
+
+message InitializeGuestInvoicePaymentResponse {
+  bool success = 1;
+  string message = 2;
+  string authorization_url = 3;
+  string reference = 4;
+  string access_code = 5;
+  int64 amount_minor = 6;
+  string currency_code = 7;
+}
+
+message VerifyGuestInvoicePaymentRequest { string reference = 1; }
+
+message VerifyGuestInvoicePaymentResponse {
+  bool success = 1;
+  // COMPLETED | PENDING | FAILED
+  string status = 2;
+  string message = 3;
+  GuestPaymentProto payment = 4;
+}
+
+message PaystackWebhookRequest {
+  // Raw JSON body exactly as received (HMAC-SHA512 verified against signature).
+  string raw_payload = 1;
+  // x-paystack-signature header value.
+  string signature = 2;
+}
+
+message PaystackWebhookResponse {
+  bool success = 1;
+  string message = 2;
 }
 
 // ── Hospitality billing policy (company / branch deposit & due rules) ──────
