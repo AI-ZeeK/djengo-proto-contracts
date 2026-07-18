@@ -1912,6 +1912,8 @@ service GuestBillingService {
   rpc VoidGuestInvoice    (VoidGuestInvoiceRequest)    returns (GuestInvoiceProto);
   rpc RecordGuestPayment  (RecordGuestPaymentRequest)  returns (GuestPaymentProto);
   rpc ListGuestPayments   (ListGuestPaymentsRequest)   returns (ListGuestPaymentsResponse);
+  // Issue (if draft), email guest, notify Djengo user, write activity log.
+  rpc SendGuestInvoice    (SendGuestInvoiceRequest)    returns (SendGuestInvoiceResponse);
 }
 
 message GuestInvoiceLineItemProto {
@@ -1971,6 +1973,22 @@ message CreateGuestInvoiceRequest {
 message GetGuestInvoiceRequest    { string invoice_id = 1; }
 message IssueGuestInvoiceRequest  { string invoice_id = 1; string issued_by = 2; }
 message VoidGuestInvoiceRequest   { string invoice_id = 1; string voided_by = 2; string reason = 3; }
+
+message SendGuestInvoiceRequest {
+  string invoice_id = 1;
+  string issued_by = 2;
+  string company_id = 3;
+  string organization_id = 4;
+  bool issue_if_draft = 5;
+}
+
+message SendGuestInvoiceResponse {
+  GuestInvoiceProto invoice = 1;
+  bool emailed = 2;
+  bool notified = 3;
+  bool activity_logged = 4;
+  string message = 5;
+}
 
 message ListGuestInvoicesRequest {
   string company_id        = 1;
