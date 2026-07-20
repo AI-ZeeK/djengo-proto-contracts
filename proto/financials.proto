@@ -1984,7 +1984,7 @@ message SendGuestInvoiceRequest {
   string issued_by = 2;
   string company_id = 3;
   string organization_id = 4;
-  bool issue_if_draft = 5;
+  bool issue_if_draft = 5; // default true when omitted by clients that always send true
 }
 
 message SendGuestInvoiceResponse {
