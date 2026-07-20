@@ -1070,6 +1070,10 @@ message ReservationProto {
   optional string billing_policy_id = 35;
   optional string deposit_invoice_id = 36;
   optional string balance_invoice_id = 37;
+  // Guest-selected stay duration (structured, not free text):
+  // HOUR | NIGHT | DAY | WEEK | MONTH | YEAR + count.
+  optional string duration_unit = 38;
+  optional int32 duration_count = 39;
 }
 
 message CreateReservationRequest {
@@ -1142,6 +1146,10 @@ message CreatePublicBookingRequest {
   // Optional soft quote for deposit % calculation (minor units).
   optional int64 quoted_total_minor = 14;
   optional string currency_code = 15;
+  // Structured stay duration chosen by the guest:
+  // HOUR | NIGHT | DAY | WEEK | MONTH | YEAR + count.
+  optional string duration_unit = 16;
+  optional int32 duration_count = 17;
 }
 
 message CreatePublicBookingResponse {
