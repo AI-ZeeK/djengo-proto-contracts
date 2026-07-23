@@ -1036,6 +1036,8 @@ message BranchPublicListingMessage {
   optional BranchPublicListingHospitalMessage hospital = 4;
   optional BranchPublicListingHospitalityMessage hospitality = 5;
   optional BranchPublicListingEstateMessage estate = 6;
+  // Branch operation kinds (spa, gym, hotel, …) that are publicly visible.
+  repeated string public_operation_kinds = 7;
 }
 
 message GetBranchPublicListingRequest {
@@ -1102,6 +1104,8 @@ message PublicBookableNodeMessage {
   repeated PublicBookableListingImageMessage listing_images = 21;
   optional int32 window_count = 22;
   optional bool has_balcony = 23;
+  // Estate / unit offer: RENT | LEASE | BUY (from node metadata_json.listing_offer).
+  optional string listing_offer = 24;
 }
 
 message PublicBookingSectionMessage {
