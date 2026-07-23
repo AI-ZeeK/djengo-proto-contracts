@@ -59,10 +59,26 @@ service FacilityService {
   rpc GetPublicBookingContext(GetPublicBookingContextRequest) returns (GetPublicBookingContextResponse);
 
   rpc GetBranchPublicListing(GetBranchPublicListingRequest) returns (GetBranchPublicListingResponse);
+  rpc GetBranchListingTypes(GetBranchListingTypeRequest) returns (GetBranchListingTypeResponse);
   rpc UpsertBranchPublicListing(UpsertBranchPublicListingRequest) returns (UpsertBranchPublicListingResponse);
 }
 
+message GetBranchListingTypeRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+}
 
+message ListBranchListingType {
+  string listing_type = 1;
+  string display_name = 2;
+}
+
+message GetBranchListingTypeResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated ListBranchListingType listing_types = 3;
+}
 
 enum FacilityMode {
   FACILITY_MODE_UNSPECIFIED = 0;

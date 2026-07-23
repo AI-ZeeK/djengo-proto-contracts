@@ -2,6 +2,19 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## 1.2.7 — Overview analytics money typing & payroll designation fetch
+
+### `profile.proto`
+- `OverviewAnalyticsMeta.currency_code` (4), `exchange_rate` (5) — display currency + USD FX for the overview payload
+- `AnalyticsBlock.total` (8), `value_type` (9), `currency_code` (10), `exchange_rate` (11) — distinguish money vs count/percent cards; monetary values in major units
+- `rpc GetStaffDesignation` + `GetStaffDesignationRequest` — fetch a single company designation for edit/upsert
+
+### `financials.proto`
+- `GetCompanyFinancialOverviewResponse.currency_code` (4), `exchange_rate` (5) — company/branch currency and FX for overview cards
+
+### `facility.proto`
+- `rpc GetBranchListingTypes` + `GetBranchListingTypeRequest` / `ListBranchListingType` / `GetBranchListingTypeResponse` — public listing operation kinds for a branch
+
 ## 1.2.6 — Reception list pagination meta
 
 ### `facility.proto`

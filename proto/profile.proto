@@ -84,6 +84,7 @@ service ProfileService {
   // Staff Management
   rpc OnboardStaff(OnboardStaffRequest) returns (OnboardStaffResponse);
   rpc ListStaffDesignations(ListStaffDesignationsRequest) returns (ListStaffDesignationsResponse);
+  rpc GetStaffDesignation(GetStaffDesignationRequest) returns (StaffDesignationResponse);
   rpc UpsertStaffDesignation(UpsertStaffDesignationRequest) returns (StaffDesignationResponse);
   rpc CompleteStaffSelfProfile(CompleteStaffSelfProfileRequest) returns (CompleteStaffSelfProfileResponse);
   rpc AddStaffPaymentAdjustment(AddStaffPaymentAdjustmentRequest) returns (AddStaffPaymentAdjustmentResponse);
@@ -377,6 +378,8 @@ message OverviewAnalyticsMeta {
   AnalyticsScopeLevel effective_scope = 1;
   string scope_label = 2;
   repeated string visible_domains = 3;
+  optional string currency_code = 4;
+  optional double exchange_rate = 5;
 }
 
 // Analytics block for cards
@@ -388,6 +391,13 @@ message AnalyticsBlock {
   double percentage = 5;
   repeated TrendData chart_data = 6;
   string slug = 7; // Optional, for unique identification (e.g., branch_analytics)
+  // Monetary display value (major units). Prefer this over amount when value_type=money.
+  optional double total = 8;
+  // money | count | percent | number
+  optional string value_type = 9;
+  optional string currency_code = 10;
+  // USD per 1 unit of currency_code when known
+  optional double exchange_rate = 11;
 }
 
 // Chart block for charts array
@@ -1927,6 +1937,11 @@ message ListStaffDesignationsResponse {
   bool success = 1;
   optional string error = 2;
   repeated StaffDesignationMessage designations = 3;
+}
+
+message GetStaffDesignationRequest {
+  string company_id = 1;
+  string designation_id = 2;
 }
 
 message UpsertStaffDesignationRequest {

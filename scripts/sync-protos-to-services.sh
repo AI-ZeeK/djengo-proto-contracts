@@ -35,7 +35,7 @@ DESTS=(
   "$ROOT/facility/protos"
   "$ROOT/events/protos"
   "$ROOT/operations/protos"
-  "$ROOT/comms/proto"
+  "$ROOT/comms/protos"
 )
 
 echo "Syncing protos from: $SRC"

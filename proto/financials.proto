@@ -1164,6 +1164,10 @@ message GetCompanyFinancialOverviewResponse {
   repeated FinancialOverviewCard  cards  = 1;
   repeated FinancialOverviewChart charts = 2;
   optional string alert = 3;
+  /** ISO 4217 display currency for monetary card totals (company/branch). */
+  optional string currency_code = 4;
+  /** USD per 1 unit of currency_code when known (from FX service or latest txn). */
+  optional double exchange_rate = 5;
 }
 
 // Cost Center messages
