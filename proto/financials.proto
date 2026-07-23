@@ -511,6 +511,19 @@ message BudgetAllocation {
   string allocated_by = 11;
   /// When set, ties the line to a cost center (minor units path unchanged).
   optional string cost_center_id = 12;
+  /// Display fields resolved from joined reference tables (not stored on the row).
+  optional string cost_center_name = 13;
+  optional string cost_center_code = 14;
+  optional string entity_name = 15;
+}
+
+/// Lookup row for allocation entity / cost-center display (id → label).
+message BudgetAllocationReference {
+  string id = 1;
+  /// cost_center | branch | company | organization
+  string kind = 2;
+  string name = 3;
+  optional string code = 4;
 }
 
 // Payroll snapshot embedded in budget responses
@@ -655,6 +668,7 @@ message ListBudgetAllocationsRequest {
 message ListBudgetAllocationsResponse {
   repeated BudgetAllocation allocations = 1;
   string next_page_token = 2;
+  repeated BudgetAllocationReference references = 3;
 }
 
 message GetBudgetCreatePayrollContextRequest {
@@ -677,6 +691,9 @@ message GetBudgetCreatePayrollContextResponse {
   string payroll_status = 8;
   string schedule_status = 9;
   PayrollState payroll_state = 10;
+  /// Company, branch, and cost_center lookup rows for create UI (names — not raw UUIDs).
+  /// Organization scope is intentionally omitted; org-level budgets are handled elsewhere.
+  repeated BudgetAllocationReference references = 11;
 }
 
 message CreatePayrollRequest {
