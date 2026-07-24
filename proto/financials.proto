@@ -1976,6 +1976,13 @@ message GuestInvoiceProto {
   optional string facility_node_id = 22;
   // DEPOSIT | STAY | EXTRA | REFUND_ADJUSTMENT
   string purpose          = 23;
+  /// Display labels resolved server-side (do not show raw UUIDs to users).
+  optional string guest_name = 24;
+  optional string reservation_label = 25;
+  optional string facility_node_name = 26;
+  optional string branch_name = 27;
+  /// Lookup rows: guest | reservation | facility_node | branch
+  repeated BudgetAllocationReference references = 28;
 }
 
 message CreateGuestInvoiceRequest {
@@ -2032,6 +2039,8 @@ message ListGuestInvoicesRequest {
 message ListGuestInvoicesResponse {
   repeated GuestInvoiceProto invoices = 1;
   TableMeta meta                      = 2;
+  /// Deduped lookup rows for list UI (guest | reservation | facility_node | branch).
+  repeated BudgetAllocationReference references = 3;
 }
 
 message GuestPaymentProto {
