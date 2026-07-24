@@ -136,6 +136,8 @@ service FinancialsService {
   // Budget
   rpc CreateMonthlyBudget(CreateMonthlyBudgetRequest) returns (MonthlyBudget);
   rpc GetMonthlyBudget(GetMonthlyBudgetRequest) returns (MonthlyBudget);
+  /** Single budget for month/year (+ optional branch) with allocations — for create/edit upsert UI. */
+  rpc GetMonthlyBudgetByPeriod(GetMonthlyBudgetByPeriodRequest) returns (GetMonthlyBudgetByPeriodResponse);
   rpc UpdateMonthlyBudget(UpdateMonthlyBudgetRequest) returns (MonthlyBudget);
   rpc ListMonthlyBudgets(ListMonthlyBudgetsRequest) returns (ListMonthlyBudgetsResponse);
   rpc CreateBudgetAllocation(CreateBudgetAllocationRequest) returns (BudgetAllocation);
@@ -549,6 +551,7 @@ message MonthlyBudget {
   repeated BudgetAllocation allocations = 8;
   BudgetState budget_state = 9;
   optional PayrollSummary payroll_summary = 10;
+  optional string branch_id = 11;
 }
 
 // Payroll resource
@@ -596,6 +599,22 @@ message GetMonthlyBudgetRequest {
     string organization_id = 2;
   string company_id = 3;
   string budget_type = 4; // "organization", "company", or "branch"
+}
+
+// Get single budget for a calendar period (create/edit upsert). Returns budget_found=false when none.
+message GetMonthlyBudgetByPeriodRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  int32 month = 3;
+  int32 year = 4;
+  /** Empty = company-wide (BranchId null); otherwise match branch. */
+  string branch_id = 5;
+  string budget_type = 6;
+}
+
+message GetMonthlyBudgetByPeriodResponse {
+  bool budget_found = 1;
+  MonthlyBudget budget = 2;
 }
 
 // Update

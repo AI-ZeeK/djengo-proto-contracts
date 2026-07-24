@@ -2,6 +2,12 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## 1.2.8 — Monthly budget by period (upsert UI)
+
+### `financials.proto`
+- `rpc GetMonthlyBudgetByPeriod` + `GetMonthlyBudgetByPeriodRequest` / `GetMonthlyBudgetByPeriodResponse` — single budget for month/year (+ optional branch) including allocations; `budget_found=false` when none
+- `MonthlyBudget.branch_id` (11) — optional branch on budget resource
+
 ## 1.2.7 — Overview analytics money typing & payroll designation fetch
 
 ### `profile.proto`
