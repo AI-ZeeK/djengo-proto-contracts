@@ -30,6 +30,8 @@ service OrganizationService {
   rpc AssignPartnerRole(AssignPartnerRoleRequest) returns (UtilitiesResponse);
   rpc RemovePartnerRole(RemovePartnerRoleRequest) returns (UtilitiesResponse);
   rpc GetPartnerTypes(EmptyRequest) returns (GetPartnerTypesResponse);
+  rpc FetchStaffCompanyRoles(FetchStaffCompanyRolesRequest) returns (GetStaffCompanyRolesResponse);
+
 }
 
 /// Branch fetch + branch-level analytics / verification.
@@ -244,6 +246,12 @@ message GetRoleRequest {
 
 message GetStaffCompanyRolesRequest {
   string staff_id = 1;
+}
+
+message FetchStaffCompanyRolesRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
 }
 
 message GetRoleResponse {
