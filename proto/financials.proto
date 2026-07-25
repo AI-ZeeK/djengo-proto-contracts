@@ -1646,6 +1646,15 @@ service ProcurementService {
   rpc GetGoodsReceiptNote     (GetGoodsReceiptNoteRequest)     returns (GoodsReceiptNoteProto);
   rpc ListGoodsReceiptNotes   (ListGoodsReceiptNotesRequest)   returns (ListGoodsReceiptNotesResponse);
   rpc CompleteGoodsReceipt    (CompleteGoodsReceiptRequest)    returns (GoodsReceiptNoteProto);
+
+  // Request for Quote
+  rpc CreateRfq      (CreateRfqRequest)      returns (RfqProto);
+  rpc GetRfq         (GetRfqRequest)         returns (RfqProto);
+  rpc ListRfqs       (ListRfqsRequest)       returns (ListRfqsResponse);
+  rpc SendRfq        (SendRfqRequest)        returns (RfqProto);
+  rpc AddRfqQuote    (AddRfqQuoteRequest)    returns (RfqProto);
+  rpc SelectRfqQuote (SelectRfqQuoteRequest) returns (PurchaseOrderProto);
+  rpc CancelRfq      (CancelRfqRequest)      returns (RfqProto);
 }
 
 // --- Vendor ---
@@ -1758,6 +1767,7 @@ message PurchaseRequestProto {
   string updated_at      = 17;
   int64  total_estimated_minor = 18;
   optional string approval_instance_id = 19;
+  optional string cost_center_id = 20;
 }
 
 message CreatePurchaseRequestRequest {
@@ -1770,6 +1780,7 @@ message CreatePurchaseRequestRequest {
   optional string required_by  = 7;
   optional string justification = 8;
   repeated PurchaseRequestItemProto items = 9;
+  optional string cost_center_id = 10;
 }
 
 message GetPurchaseRequestRequest  { string pr_id = 1; }
@@ -1838,6 +1849,7 @@ message PurchaseOrderProto {
   string created_at         = 19;
   string updated_at         = 20;
   optional string approval_instance_id = 21;
+  optional string cost_center_id = 22;
 }
 
 message CreatePurchaseOrderRequest {
@@ -1851,6 +1863,7 @@ message CreatePurchaseOrderRequest {
   optional string delivery_address  = 8;
   optional string notes     = 9;
   repeated PurchaseOrderItemProto items = 10;
+  optional string cost_center_id = 11;
 }
 
 message GetPurchaseOrderRequest    { string po_id = 1; }
@@ -2294,3 +2307,107 @@ service StatutoryRemittanceService {
   rpc ListStatutoryRemittances (ListStatutoryRemittancesRequest) returns (ListStatutoryRemittancesResponse);
   rpc MarkRemittancePaid       (MarkRemittancePaidRequest)       returns (StatutoryRemittanceProto);
 }
+
+// --- Request for Quote ---
+
+message RfqItemProto {
+  string rfq_item_id = 1;
+  string rfq_id = 2;
+  string description = 3;
+  double quantity = 4;
+  optional string unit = 5;
+  optional string inventory_item_id = 6;
+  int32 line_order = 7;
+}
+
+message RfqQuoteItemProto {
+  string quote_item_id = 1;
+  string quote_id = 2;
+  string rfq_item_id = 3;
+  int64 unit_price_minor = 4;
+  int64 total_minor = 5;
+  optional string notes = 6;
+}
+
+message RfqQuoteProto {
+  string quote_id = 1;
+  string rfq_id = 2;
+  string vendor_id = 3;
+  string currency_code = 4;
+  optional int32 lead_time_days = 5;
+  optional string valid_until = 6;
+  optional string notes = 7;
+  int64 total_minor = 8;
+  bool is_selected = 9;
+  repeated RfqQuoteItemProto items = 10;
+  string created_at = 11;
+}
+
+message RfqProto {
+  string rfq_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  optional string branch_id = 4;
+  optional string pr_id = 5;
+  optional string cost_center_id = 6;
+  string rfq_number = 7;
+  string status = 8;
+  optional string title = 9;
+  optional string notes = 10;
+  optional string required_by = 11;
+  optional string selected_quote_id = 12;
+  optional string awarded_po_id = 13;
+  string created_by = 14;
+  optional string approval_instance_id = 15;
+  repeated RfqItemProto items = 16;
+  repeated RfqQuoteProto quotes = 17;
+  string created_at = 18;
+  string updated_at = 19;
+}
+
+message CreateRfqRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string created_by = 3;
+  optional string branch_id = 4;
+  optional string pr_id = 5;
+  optional string cost_center_id = 6;
+  optional string title = 7;
+  optional string notes = 8;
+  optional string required_by = 9;
+  repeated RfqItemProto items = 10;
+}
+
+message GetRfqRequest { string rfq_id = 1; }
+message SendRfqRequest { string rfq_id = 1; string sent_by = 2; }
+message CancelRfqRequest { string rfq_id = 1; optional string reason = 2; }
+
+message AddRfqQuoteRequest {
+  string rfq_id = 1;
+  string vendor_id = 2;
+  string currency_code = 3;
+  optional int32 lead_time_days = 4;
+  optional string valid_until = 5;
+  optional string notes = 6;
+  repeated RfqQuoteItemProto items = 7;
+}
+
+message SelectRfqQuoteRequest {
+  string rfq_id = 1;
+  string quote_id = 2;
+  string selected_by = 3;
+}
+
+message ListRfqsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string status = 3;
+  optional int32 page = 4;
+  optional int32 page_size = 5;
+}
+
+message ListRfqsResponse {
+  repeated RfqProto rfqs = 1;
+  TableMeta meta = 2;
+}
+
