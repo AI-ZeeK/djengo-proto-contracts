@@ -22,6 +22,9 @@ service OrganizationService {
 
   rpc GenerateEmployeeNumber(GenerateEmployeeNumberRequest) returns (GenerateEmployeeNumberResponse);
 
+  /// Resolve user/staff recipients who hold a granted permission (via roles or direct grant).
+  rpc GetStaffsForNotification(GetStaffsForNotificationRequest) returns (GetStaffsForNotificationResponse);
+
   rpc CreatePartner(CreatePartnerRequest) returns (PartnerResponse);
   rpc UpdatePartner(UpdatePartnerRequest) returns (PartnerResponse);
   rpc GetPartner(GetPartnerRequest) returns (PartnerResponse);
@@ -277,6 +280,23 @@ message GenerateEmployeeNumberResponse {
   bool success = 1;
   optional string error = 2;
   optional string employee_number = 3; // e.g. "ACME-2025-0042"
+}
+
+/// Find users/staff who currently hold a permission for notifications / fan-out.
+message GetStaffsForNotificationRequest {
+  string company_id = 1;
+  repeated string permission_names = 2;
+  optional string permission_category = 3;
+  optional string branch_id = 4;
+}
+
+message GetStaffsForNotificationResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated string user_ids = 3;
+  repeated string staff_ids = 4;
+  repeated string permission_names = 5;
+  int32 role_count = 6;
 }
 
 /// Payroll vs budgeting control mode (company default; branch may override via `Branch.payroll_budget_linkage`).
