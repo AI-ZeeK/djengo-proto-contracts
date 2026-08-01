@@ -1541,6 +1541,7 @@ enum ApprovalEntityType {
   PURCHASE_REQUEST = 5;
   PURCHASE_ORDER = 6;
   GOODS_RECEIPT = 7;
+  RESERVATION = 8;
 }
 
 message TableMeta {
