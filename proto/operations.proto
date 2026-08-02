@@ -1028,6 +1028,10 @@ service ReservationService {
   rpc CancelReservation (CancelReservationRequest) returns (ReservationProto);
   // Staff approval: CONFIRMED + create facility occupancy stay (if node present).
   rpc ConfirmReservation (ConfirmReservationRequest) returns (ConfirmReservationResponse);
+  // Multi-step approval chain: advances one step; auto-confirms when the last step clears.
+  rpc ApproveReservation (ApproveReservationRequest) returns (ApproveReservationResponse);
+  // Reject a pending reservation (and its approval instance, when present).
+  rpc RejectReservation  (RejectReservationRequest)  returns (RejectReservationResponse);
 }
 
 message ReservationProto {
@@ -1074,6 +1078,8 @@ message ReservationProto {
   // HOUR | NIGHT | DAY | WEEK | MONTH | YEAR + count.
   optional string duration_unit = 38;
   optional int32 duration_count = 39;
+  // Events-service approval chain instance, when the booking requires multi-step approval.
+  optional string approval_instance_id = 40;
 }
 
 message CreateReservationRequest {
@@ -1179,6 +1185,33 @@ message ConfirmReservationResponse {
   optional string error = 2;
   ReservationProto reservation = 3;
   optional string occupancy_stay_id = 4;
+}
+
+message ApproveReservationRequest {
+  string reservation_id = 1;
+  string approver_user_id = 2;
+  optional string comment = 3;
+}
+
+message ApproveReservationResponse {
+  bool success = 1;
+  optional string error = 2;
+  // True when this approval was the final step and occupancy was created.
+  bool fully_approved = 3;
+  ReservationProto reservation = 4;
+  optional string occupancy_stay_id = 5;
+}
+
+message RejectReservationRequest {
+  string reservation_id = 1;
+  string rejector_user_id = 2;
+  optional string reason = 3;
+}
+
+message RejectReservationResponse {
+  bool success = 1;
+  optional string error = 2;
+  ReservationProto reservation = 3;
 }
 
 // ── Incidents ─────────────────────────────────────────────────────────────

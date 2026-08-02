@@ -48,6 +48,14 @@ service FacilityService {
   rpc UpsertFacilityAssetTypeTemplate(UpsertFacilityAssetTypeTemplateRequest) returns (UpsertFacilityAssetTypeTemplateResponse);
   rpc DeleteFacilityAssetTypeTemplate(DeleteFacilityAssetTypeTemplateRequest) returns (DeleteFacilityAssetTypeTemplateResponse);
 
+  // Binding a template to many nodes at once, and keeping them in sync afterwards.
+  // Unrelated to ListFacilityBulkTemplates, which is the tree-shape preset generator.
+  rpc PreviewAssetTemplateBinding(PreviewAssetTemplateBindingRequest) returns (PreviewAssetTemplateBindingResponse);
+  rpc BindAssetTemplateToNodes(BindAssetTemplateToNodesRequest) returns (BindAssetTemplateToNodesResponse);
+  rpc SetNodeTemplateSyncMode(SetNodeTemplateSyncModeRequest) returns (SetNodeTemplateSyncModeResponse);
+  // Template-free bulk edit: append photos, set shared fields across a selection.
+  rpc BulkPatchFacilityNodeAssets(BulkPatchFacilityNodeAssetsRequest) returns (BulkPatchFacilityNodeAssetsResponse);
+
   // Public guest browse — branches that opted into public listing (no auth).
   rpc SearchPublicFacilityListings(SearchPublicFacilityListingsRequest) returns (SearchPublicFacilityListingsResponse);
   // Public guest browse — spa/gym/restaurant offerings enriched with org + operations (no auth).
@@ -269,6 +277,28 @@ message FacilityNodeAssetMessage {
   FacilityAssetKind asset_kind = 2;
   int32 capacity_max = 3;
   optional string metadata_json = 4;
+  // Template binding. Absent template_id = hand-built, or a legacy node whose only
+  // binding is the untyped breadcrumb inside metadata_json.
+  optional string template_id = 5;
+  optional string template_name = 6;
+  FacilityTemplateSyncMode template_sync_mode = 7;
+  int32 template_version_applied = 8;
+  // Current version of the bound template; > template_version_applied means the
+  // node is showing stale values.
+  int32 template_version = 9;
+  // Metadata keys the operator edited away from the template. A push skips these.
+  repeated string overridden_fields = 10;
+  bool images_pinned = 11;
+}
+
+enum FacilityTemplateSyncMode {
+  TEMPLATE_SYNC_MODE_UNSPECIFIED = 0;
+  // Not bound to a template.
+  TEMPLATE_SYNC_MODE_NONE = 1;
+  // Template edits are pushed, skipping locally overridden fields.
+  TEMPLATE_SYNC_MODE_FOLLOW = 2;
+  // Frozen: keeps the binding for reference but never receives a push.
+  TEMPLATE_SYNC_MODE_DETACHED = 3;
 }
 
 // Occupancy profile when creating/updating occupiable nodes (bed, room, table, …).
@@ -278,6 +308,10 @@ message FacilityNodeAssetSetupMessage {
   // Max occupants (tenants, patients, seats). 0 = use branch/mode defaults.
   int32 capacity_max = 2;
   optional string metadata_json = 3;
+  // Bind this node to a template. Omit to leave the existing binding untouched;
+  // send an empty string to unbind.
+  optional string template_id = 4;
+  optional FacilityTemplateSyncMode template_sync_mode = 5;
 }
 
 message GetFacilityTreeRequest {
@@ -791,6 +825,13 @@ message FacilityAssetTypeTemplateMessage {
   string defaults_json = 10;
   string created_at = 11;
   string updated_at = 12;
+  // Bumped whenever defaults_json changes.
+  int32 version = 13;
+  // Binding counts, so the catalog can show "used by N locations" without a
+  // second round trip.
+  int32 following_count = 14;
+  int32 detached_count = 15;
+  int32 out_of_date_count = 16;
 }
 
 message ListFacilityAssetTypeTemplatesRequest {
@@ -823,6 +864,17 @@ message UpsertFacilityAssetTypeTemplateResponse {
   bool success = 1;
   optional string error = 2;
   optional FacilityAssetTypeTemplateMessage template = 3;
+  // Result of pushing this save onto following nodes.
+  optional TemplatePropagationSummary propagation = 4;
+}
+
+// Outcome of pushing a template onto the nodes bound to it.
+message TemplatePropagationSummary {
+  int32 matched = 1;
+  int32 updated = 2;
+  int32 skipped = 3;
+  // More nodes matched than one inline push handles; the rest are still stale.
+  bool truncated = 4;
 }
 
 message DeleteFacilityAssetTypeTemplateRequest {
@@ -834,6 +886,102 @@ message DeleteFacilityAssetTypeTemplateRequest {
 message DeleteFacilityAssetTypeTemplateResponse {
   bool success = 1;
   optional string error = 2;
+}
+
+// Which nodes a bulk template operation should touch. Explicit ids come from a
+// tree selection; the filters cover "every room on this floor" without the client
+// having to enumerate them.
+message FacilityNodeSelectorMessage {
+  string branch_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  repeated string facility_node_ids = 4;
+  optional string node_level_id = 5;
+  // Every descendant of this node, at any depth.
+  optional string parent_facility_node_id = 6;
+  optional FacilityAssetKind asset_kind = 7;
+  // Skip nodes already bound to a template.
+  bool only_unbound = 8;
+  bool include_inactive = 9;
+}
+
+message PreviewAssetTemplateBindingRequest {
+  FacilityNodeSelectorMessage selector = 1;
+  string template_id = 2;
+}
+
+message PreviewAssetTemplateBindingResponse {
+  bool success = 1;
+  optional string error = 2;
+  // Nodes the selector resolves to and that accept this template's asset kind.
+  int32 eligible = 3;
+  // Matched but the wrong asset kind for the template.
+  int32 kind_mismatch = 4;
+  // Already bound to this exact template.
+  int32 already_bound = 5;
+  // Bound to a different template; binding would rebind them.
+  int32 rebound = 6;
+  // Currently detached, so they will not receive the values unless re-followed.
+  int32 detached = 7;
+  // Would lose local edits if overwrite_local_edits is set.
+  int32 with_local_edits = 8;
+}
+
+message BindAssetTemplateToNodesRequest {
+  FacilityNodeSelectorMessage selector = 1;
+  string template_id = 2;
+  // FOLLOW keeps them updated; DETACHED copies the values once and freezes.
+  FacilityTemplateSyncMode sync_mode = 3;
+  // Discard existing local edits and take every field from the template.
+  bool overwrite_local_edits = 4;
+}
+
+message BindAssetTemplateToNodesResponse {
+  bool success = 1;
+  optional string error = 2;
+  int32 bound = 3;
+  int32 updated = 4;
+  int32 skipped = 5;
+  repeated string failed_node_ids = 6;
+}
+
+message SetNodeTemplateSyncModeRequest {
+  FacilityNodeSelectorMessage selector = 1;
+  FacilityTemplateSyncMode sync_mode = 2;
+  // With FOLLOW, immediately pull current template values before resuming sync.
+  bool resync_now = 3;
+  // With resync_now, also discard local edits.
+  bool overwrite_local_edits = 4;
+}
+
+message SetNodeTemplateSyncModeResponse {
+  bool success = 1;
+  optional string error = 2;
+  int32 changed = 3;
+  int32 resynced = 4;
+}
+
+// Bulk edit that bypasses templates. Applied on top of whatever the node already
+// has, so it does not disturb a template binding — the touched keys simply become
+// local overrides on following nodes.
+message BulkPatchFacilityNodeAssetsRequest {
+  FacilityNodeSelectorMessage selector = 1;
+  // Merged into each node's metadata_json, key by key.
+  optional string metadata_patch_json = 2;
+  // Listing images appended to each node's gallery; existing photos are kept.
+  optional string append_listing_images_json = 3;
+  optional int32 capacity_max = 4;
+  // Record the patched keys as overrides so a later template push cannot undo
+  // them. Off means the next push wins.
+  bool pin_as_overrides = 5;
+}
+
+message BulkPatchFacilityNodeAssetsResponse {
+  bool success = 1;
+  optional string error = 2;
+  int32 matched = 3;
+  int32 updated = 4;
+  repeated string failed_node_ids = 5;
 }
 
 message SearchPublicFacilityListingsRequest {
@@ -853,6 +1001,7 @@ message PublicFacilityListingMessage {
   optional string metadata_json = 5;
   optional string public_tagline = 6;
   optional string public_description = 7;
+  optional string cover_image_url = 8;
 }
 
 message SearchPublicFacilityListingsResponse {
@@ -926,6 +1075,7 @@ message PublicOfferingListingMessage {
   PublicBrowseContactMessage contact = 15;
   PublicBrowseServiceMessage service = 16;
   optional string currency = 17;
+  optional string cover_image_url = 18;
 }
 
 message SearchPublicOfferingListingsResponse {
@@ -983,6 +1133,7 @@ message PublicBrowseListingMessage {
   optional PublicBrowseEstateFacetsMessage estate = 20;
   PublicBrowseServiceMessage service = 21;
   optional string currency = 22;
+  optional string cover_image_url = 23;
 }
 
 message SearchPublicBrowseListingsRequest {
@@ -1054,6 +1205,8 @@ message BranchPublicListingMessage {
   optional BranchPublicListingEstateMessage estate = 6;
   // Branch operation kinds (spa, gym, hotel, …) that are publicly visible.
   repeated string public_operation_kinds = 7;
+  // Public browse card cover. Promoted through files-service on upsert.
+  optional string cover_image_url = 8;
 }
 
 message GetBranchPublicListingRequest {
