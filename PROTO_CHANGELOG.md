@@ -2,6 +2,14 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## 1.2.9 — Payroll finalize / return-to-draft
+
+### `financials.proto`
+- `rpc FinalizePayroll` + `FinalizePayrollRequest` — DRAFT → PENDING, start payroll approval chain, lock staff roster
+- `rpc ReturnPayrollToDraft` + `ReturnPayrollToDraftRequest` — PENDING → DRAFT only when no approval step has been approved yet
+- `ListStaffPayrollForPeriodResponse`: `payroll_id`, `payroll_status`, `approval_instance_id`, `can_edit_staff`
+- `ListPayrollSchedulesRequest.payroll_status` (11) — optional filter by payroll status (DRAFT, PENDING, APPROVED, …)
+
 ## 1.2.8 — Monthly budget by period (upsert UI)
 
 ### `financials.proto`

@@ -148,6 +148,13 @@ service FinancialsService {
   rpc GetBudgetCreatePayrollContext (GetBudgetCreatePayrollContextRequest) returns (GetBudgetCreatePayrollContextResponse);
   // Payroll
   rpc CreatePayroll(CreatePayrollRequest) returns (Payroll);
+  /** Lock staff roster and start the payroll approval chain (DRAFT → PENDING). */
+  rpc FinalizePayroll(FinalizePayrollRequest) returns (Payroll);
+  /**
+   * Return a finalized payroll to DRAFT so staff can be edited again.
+   * Rejected once any approval step has been approved.
+   */
+  rpc ReturnPayrollToDraft(ReturnPayrollToDraftRequest) returns (Payroll);
   rpc RunPayroll(RunPayrollRequest) returns (Payroll);
   rpc MarkPayrollPaid(MarkPayrollPaidRequest) returns (Payroll);
   rpc GetPayroll(GetPayrollRequest) returns (Payroll);
@@ -721,6 +728,22 @@ message CreatePayrollRequest {
   Payroll payroll = 3;
   string user_id = 4; // User initiating the payroll creation (for audit logging)
 }
+
+message FinalizePayrollRequest {
+  string payroll_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string user_id = 4; // Initiator — used for audit + approval chain
+  optional string branch_id = 5;
+}
+
+message ReturnPayrollToDraftRequest {
+  string payroll_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string user_id = 4;
+}
+
 message RunPayrollRequest {
   string name = 1;
   // When set, overrides schedule branch only for linkage + budget-scope resolution.
@@ -866,6 +889,8 @@ message GetPayrollAnalyticsResponse {
     optional string branch_id = 8;
     optional int32 month = 9;
     optional int32 year = 10;
+    /** Filter by payroll status: DRAFT, PENDING, PROCESSING, APPROVED, PAID, CLOSED, FAILED. Empty / ALL = no filter. */
+    optional string payroll_status = 11;
   }
 
   message PayrollScheduleTableRow {
@@ -931,6 +956,10 @@ message ListStaffPayrollForPeriodResponse {
   int32 period_month = 6;
   int32 period_year = 7;
   string schedule_scheduled_at = 8; // From payroll schedule (e.g. planned run / payout date reference)
+  string payroll_id = 9;
+  string payroll_status = 10; // DRAFT | PENDING | PROCESSING | APPROVED | PAID | CLOSED | FAILED
+  optional string approval_instance_id = 11;
+  bool can_edit_staff = 12; // true only while DRAFT and approval has not started
 }
 
 // --- Upsert Payroll Staff for a Payroll Period ---

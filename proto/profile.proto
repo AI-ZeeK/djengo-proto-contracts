@@ -83,6 +83,7 @@ service ProfileService {
   
   // Staff Management
   rpc OnboardStaff(OnboardStaffRequest) returns (OnboardStaffResponse);
+  rpc UpdateStaffPayrollDetails(UpdateStaffPayrollDetailsRequest) returns (UpdateStaffPayrollDetailsResponse);
   rpc ListStaffDesignations(ListStaffDesignationsRequest) returns (ListStaffDesignationsResponse);
   rpc GetStaffDesignation(GetStaffDesignationRequest) returns (StaffDesignationResponse);
   rpc UpsertStaffDesignation(UpsertStaffDesignationRequest) returns (StaffDesignationResponse);
@@ -265,6 +266,24 @@ message OnboardStaffResponse {
   bool success = 1;
   optional string error = 2;
   optional StaffMeta staff_meta = 3;
+}
+
+message UpdateStaffPayrollDetailsRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  optional double base_salary = 4;
+  string account_name = 5;
+  string account_number = 6;
+  string bank_name = 7;
+  optional string sort_code = 8;
+  optional PAYMENT_FREQUENCY_ENUM payment_frequency = 9;
+}
+
+message UpdateStaffPayrollDetailsResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
 }
 
 
