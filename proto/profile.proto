@@ -35,6 +35,10 @@ service ProfileService {
   rpc Logout(LogoutRequest) returns (SendOtpResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
   rpc SocialLogin(SocialLoginRequest) returns (SocialLoginResponse);
+  /// Email → OTP flow for first-time password create or forgot-password reset.
+  rpc RequestPasswordReset(RequestPasswordResetRequest) returns (AuthInitialResponse);
+  /// After OTP verify (FORGOT_PASSWORD), set a new password with the reset token.
+  rpc ResetPassword(ResetPasswordRequest) returns (SendOtpResponse);
   
   rpc GetRoles(EmptyRequest) returns (GetRolesResponse);
   
@@ -128,6 +132,8 @@ service AdminProfileService {
   rpc GetSecurityPrincipal(GetSecurityPrincipalRequest) returns (GetSecurityPrincipalResponse);
   rpc ApplySecurityRestriction(ApplySecurityRestrictionRequest) returns (ApplySecurityRestrictionResponse);
   rpc LiftSecurityRestriction(LiftSecurityRestrictionRequest) returns (LiftSecurityRestrictionResponse);
+  /// Platform admin sets a (usually temporary) password for a platform user.
+  rpc AdminSetUserPassword(AdminSetUserPasswordRequest) returns (SendOtpResponse);
   
   rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
   rpc AdminUsersAnalytics(AdminUsersAnalyticsRequest) returns (AdminUsersAnalyticsResponse);
@@ -962,6 +968,8 @@ message VerifyOtpResponse {
   optional string access_token = 4;
   optional User user = 5;
   optional string refresh_token = 6;
+  /// Issued when type=FORGOT_PASSWORD — use with ResetPassword (no session).
+  optional string reset_token = 7;
 }
 
 enum SessionSource {
@@ -1050,7 +1058,23 @@ message AuthInitialResponse {
   optional string message = 3;
   optional string auth_token = 4;
 }
-  
+
+message RequestPasswordResetRequest {
+  string email = 1;
+}
+
+message ResetPasswordRequest {
+  /// reset_token from VerifyOtp (FORGOT_PASSWORD)
+  string token = 1;
+  string password = 2;
+  string confirm_password = 3;
+}
+
+message AdminSetUserPasswordRequest {
+  string user_id = 1;
+  string password = 2;
+}
+
 
 
 message RegisterRequest {
@@ -1276,6 +1300,8 @@ message User {
   repeated BusinessUser business_users = 18;
   /** Calling code digits only (e.g. 254), without +. */
   optional string phone_dial_code = 19;
+  /** True when the user has a usable (bcrypt) password set. */
+  optional bool has_password = 20;
 }
 
 // message BasicUser {

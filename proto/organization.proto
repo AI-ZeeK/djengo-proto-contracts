@@ -35,6 +35,12 @@ service OrganizationService {
   rpc GetPartnerTypes(EmptyRequest) returns (GetPartnerTypesResponse);
   rpc FetchStaffCompanyRoles(FetchStaffCompanyRolesRequest) returns (GetStaffCompanyRolesResponse);
 
+  /// Upsert partner + assign PARTNER_ROLE of the given partner_type (TENANT/PATIENT/GUEST).
+  /// Used when a booking is confirmed so the guest account gains a tenancy/stay relationship.
+  rpc EnsurePartnerForOccupancy(EnsurePartnerForOccupancyRequest) returns (PartnerResponse);
+  /// Cross-company partners linked to a profile (guest "my stays" surface).
+  rpc GetPartnersByProfile(GetPartnersByProfileRequest) returns (GetPartnersResponse);
+
 }
 
 /// Branch fetch + branch-level analytics / verification.
@@ -1605,6 +1611,28 @@ message GetPartnersRequest {
   optional int32 page = 6;
   optional int32 page_size = 7;
   optional string branch_id = 8;
+  optional string profile_id = 9; // Filter partners linked to a profile
+}
+
+message EnsurePartnerForOccupancyRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  string profile_id = 4;
+  string first_name = 5;
+  string last_name = 6;
+  optional string email = 7;
+  optional string phone_number = 8;
+  /// TENANT | PATIENT | GUEST (and other PartnerType keys)
+  string partner_type = 9;
+  optional string creator_id = 10;
+}
+
+message GetPartnersByProfileRequest {
+  string profile_id = 1;
+  /// When set, only partners holding an active PARTNER_ROLE of this type
+  optional string partner_type = 2;
+  optional bool active_only = 3;
 }
 
 message DeletePartnerRequest {

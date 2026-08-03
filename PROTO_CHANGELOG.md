@@ -2,6 +2,30 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## 1.2.11 — Guest stays & bookings (partner occupancy + my bookings)
+
+### `organization.proto`
+- `rpc EnsurePartnerForOccupancy` + `EnsurePartnerForOccupancyRequest` — upsert Partner for a profile at a company and assign/create `PARTNER_ROLE` of type `TENANT` | `PATIENT` | `GUEST` (booking confirm path)
+- `rpc GetPartnersByProfile` + `GetPartnersByProfileRequest` — cross-company partners linked to a profile (optional `partner_type`, `active_only`)
+- `GetPartnersRequest.profile_id` (9) — filter partners by linked profile
+
+### `facility.proto`
+- `ListOccupancyStaysRequest.branch_id` — now **optional** when filtering by `partner_id`, `guest_id`, or `profile_id`
+- `ListOccupancyStaysRequest.profile_id` (11) — filter stays by participant profile
+
+### `operations.proto`
+- `rpc ListMyBookings` + `ListMyBookingsRequest` — guest booking history by `client_user_id` and/or matching contact email/phone (covers `stay_as_guest` / `stay_anonymous`)
+- `rpc GetMyBooking` + `GetMyBookingRequest` — single booking with ownership check (linked account or matching contact)
+
+## 1.2.10 — Password create / reset + admin temp password
+
+### `profile.proto`
+- `rpc RequestPasswordReset` + `RequestPasswordResetRequest` — email → OTP (`FORGOT_PASSWORD`) + `auth_token`
+- `rpc ResetPassword` + `ResetPasswordRequest` — set password with `reset_token` from OTP verify
+- `VerifyOtpResponse.reset_token` (7) — issued for `FORGOT_PASSWORD` (no session tokens)
+- `rpc AdminSetUserPassword` + `AdminSetUserPasswordRequest` — platform admin sets temp password
+- `User.has_password` (20) — whether a usable password hash is set
+
 ## 1.2.9 — Payroll finalize / return-to-draft
 
 ### `financials.proto`

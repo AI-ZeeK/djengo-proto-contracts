@@ -1032,6 +1032,10 @@ service ReservationService {
   rpc ApproveReservation (ApproveReservationRequest) returns (ApproveReservationResponse);
   // Reject a pending reservation (and its approval instance, when present).
   rpc RejectReservation  (RejectReservationRequest)  returns (RejectReservationResponse);
+  /// Guest account: bookings linked by client_user_id and/or matching contact email/phone
+  /// (covers stay_as_guest / stay_anonymous bookings made with the same contact).
+  rpc ListMyBookings (ListMyBookingsRequest) returns (ListReservationsResponse);
+  rpc GetMyBooking   (GetMyBookingRequest)   returns (ReservationProto);
 }
 
 message ReservationProto {
@@ -1131,6 +1135,22 @@ message ListReservationsRequest {
 message ListReservationsResponse {
   repeated ReservationProto reservations = 1;
   TableMeta meta                         = 2;
+}
+
+message ListMyBookingsRequest {
+  string client_user_id = 1;
+  optional string email = 2;
+  optional string phone = 3;
+  optional int32 page = 4;
+  optional int32 page_size = 5;
+  optional string status = 6;
+}
+
+message GetMyBookingRequest {
+  string reservation_id = 1;
+  string client_user_id = 2;
+  optional string email = 3;
+  optional string phone = 4;
 }
 
 message CreatePublicBookingRequest {

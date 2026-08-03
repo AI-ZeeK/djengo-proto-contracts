@@ -55,6 +55,8 @@ service FacilityService {
   rpc SetNodeTemplateSyncMode(SetNodeTemplateSyncModeRequest) returns (SetNodeTemplateSyncModeResponse);
   // Template-free bulk edit: append photos, set shared fields across a selection.
   rpc BulkPatchFacilityNodeAssets(BulkPatchFacilityNodeAssetsRequest) returns (BulkPatchFacilityNodeAssetsResponse);
+  // Parents / leaf candidates for the bulk-apply template UI (branch hierarchy aware).
+  rpc ListAssetTemplateBindingTargets(ListAssetTemplateBindingTargetsRequest) returns (ListAssetTemplateBindingTargetsResponse);
 
   // Public guest browse — branches that opted into public listing (no auth).
   rpc SearchPublicFacilityListings(SearchPublicFacilityListingsRequest) returns (SearchPublicFacilityListingsResponse);
@@ -629,7 +631,8 @@ message GetActiveOccupancyStayRequest {
 message ListOccupancyStaysRequest {
   string company_id = 1;
   string organization_id = 2;
-  string branch_id = 3;
+  // Optional when filtering by partner_id, guest_id, or profile_id
+  optional string branch_id = 3;
   optional string facility_node_id = 4;
   optional string status = 5;
   optional int32 page = 6;
@@ -637,6 +640,7 @@ message ListOccupancyStaysRequest {
   optional string guest_id = 8;
   optional string partner_id = 9;
   optional string stay_kind = 10;
+  optional string profile_id = 11;
 }
 
 message ListOccupancyStaysResponse {
@@ -982,6 +986,62 @@ message BulkPatchFacilityNodeAssetsResponse {
   int32 matched = 3;
   int32 updated = 4;
   repeated string failed_node_ids = 5;
+}
+
+/**
+ * List parents / candidates for the bulk-apply template UI. Parents are the
+ * immediate parents of nodes that already have an asset of the given kind
+ * (e.g. floors that own houses) — whatever the branch hierarchy actually is.
+ */
+message ListAssetTemplateBindingTargetsRequest {
+  string branch_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  FacilityAssetKind asset_kind = 4;
+  // Empty → return parent filter options. Set → return leaf candidates under
+  // that immediate parent only (not deep descendants).
+  optional string parent_facility_node_id = 5;
+  optional string search = 6;
+  optional int32 page = 7;
+  optional int32 page_size = 8;
+  bool include_inactive = 9;
+  bool only_unbound = 10;
+}
+
+message AssetTemplateBindingParentOption {
+  string facility_node_id = 1;
+  string name = 2;
+  string code = 3;
+  string node_type = 4;
+  // Grandparent display name when present (helps disambiguate "Floor 1").
+  string parent_name = 5;
+  int32 candidate_count = 6;
+}
+
+message AssetTemplateBindingCandidate {
+  string facility_node_id = 1;
+  string name = 2;
+  string code = 3;
+  string node_type = 4;
+  string parent_facility_node_id = 5;
+  bool has_template = 6;
+  string template_id = 7;
+  string template_name = 8;
+  FacilityTemplateSyncMode template_sync_mode = 9;
+  bool with_local_edits = 10;
+}
+
+message ListAssetTemplateBindingTargetsResponse {
+  bool success = 1;
+  optional string error = 2;
+  // Most common parent node_type among options (e.g. FLOOR) — UI label only.
+  string parent_filter_node_type = 3;
+  repeated AssetTemplateBindingParentOption parents = 4;
+  repeated AssetTemplateBindingCandidate candidates = 5;
+  int32 total = 6;
+  int32 page = 7;
+  int32 page_size = 8;
+  int32 total_pages = 9;
 }
 
 message SearchPublicFacilityListingsRequest {
