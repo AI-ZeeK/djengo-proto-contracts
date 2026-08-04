@@ -757,6 +757,18 @@ message HospitalReceptionLocationMessage {
   string node_type = 6;
   optional string bed_type = 7;
   optional int32 capacity_max = 8;
+  optional int32 bedrooms = 9;
+  optional int32 bathrooms = 10;
+  optional double rate_amount = 11;
+  // PER_NIGHT | PER_MONTH | PER_YEAR | …
+  optional string billing_period = 12;
+  optional double floor_area_sqm = 13;
+  optional string asset_kind = 14;
+  optional bool ensuite = 15;
+  repeated string amenity_labels = 16;
+  optional string display_title = 17;
+  // ISO 4217 from branch override or company base currency.
+  optional string currency_code = 18;
 }
 
 message HospitalReceptionStayMessage {
