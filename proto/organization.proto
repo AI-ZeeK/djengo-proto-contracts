@@ -394,6 +394,8 @@ message UpdateCompanyDetailsRequest {
   optional int32 primary_business_type_id = 19;
   /** Calling code digits only (e.g. 254), without +. */
   optional string phone_dial_code = 20;
+  /// STAFF_FROM_COMPANY | COMPANY — guest-facing BRANCH chat labels.
+  optional string chat_representation = 21;
 }
 
 message OrganizationRoleIdRequest {
@@ -1224,6 +1226,8 @@ message CompanyMetaData {
   string country_code = 12;
   string base_currency = 13;
   optional int32 primary_business_type_id = 14;
+  /// STAFF_FROM_COMPANY (default) | COMPANY — how staff appear to guests in BRANCH chats.
+  string chat_representation = 15;
 }
 
 message Branch {

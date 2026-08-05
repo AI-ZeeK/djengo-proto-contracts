@@ -114,6 +114,13 @@ enum FacilityNodeType {
   ZONE = 11;
   SECTION = 12;
   SITE = 13;
+  CHAIR = 14;
+}
+
+enum FacilityHierarchyDomain {
+  FACILITY_HIERARCHY_DOMAIN_UNSPECIFIED = 0;
+  PRIMARY = 1;
+  DINING = 2;
 }
 
 enum SpatialOrientation {
@@ -132,6 +139,7 @@ enum FacilityAssetKind {
   ASSET_KIND_HOUSE = 4;
   ASSET_KIND_UNIT = 5;
   ASSET_KIND_SECTION = 6;
+  ASSET_KIND_CHAIR = 7;
 }
 
 enum FacilityStatus {
@@ -208,6 +216,8 @@ message FacilityNodeLevelUpsertMessage {
   reserved 3, 4; // removed: name, description (labels come from node_type)
   optional string color = 5;
   bool is_active = 6;
+  /// PRIMARY (default) | DINING — which hierarchy chain this level belongs to.
+  FacilityHierarchyDomain hierarchy_domain = 7;
 }
 
 message FacilityNodeLevelMessage {
@@ -223,6 +233,8 @@ message FacilityNodeLevelMessage {
   string created_at = 11;
   string updated_at = 12;
   optional string deleted_at = 13;
+  /// PRIMARY | DINING
+  string hierarchy_domain = 14;
 }
 
 message UpsertFacilityNodeLevelsRequest {
@@ -230,6 +242,8 @@ message UpsertFacilityNodeLevelsRequest {
   string organization_id = 2;
   string branch_id = 3;
   repeated FacilityNodeLevelUpsertMessage levels = 4;
+  /// When set, only this domain's levels are replaced; other domains are left intact.
+  optional FacilityHierarchyDomain hierarchy_domain = 5;
 }
 
 message UpsertFacilityNodeLevelsResponse {
@@ -1347,6 +1361,8 @@ message PublicBookableNodeMessage {
   optional bool has_balcony = 23;
   // Estate / unit offer: RENT | LEASE | BUY (from node metadata_json.listing_offer).
   optional string listing_offer = 24;
+  /// Floor-plan placement JSON: { grid_x, grid_z, rotation_deg, placed }.
+  optional string spatial_position_json = 25;
 }
 
 message PublicBookingSectionMessage {

@@ -312,6 +312,8 @@ message Chat {
   string created_at = 6;
   string updated_at = 7;
   optional string deleted_at = 8;
+  optional string company_id = 9;
+  optional string branch_id = 10;
 }
 
 message ChatWithDetails {
@@ -327,6 +329,8 @@ message ChatWithDetails {
   int32 participant_count = 10;
   string created_at = 11;
   string updated_at = 12;
+  optional string company_id = 13;
+  optional string branch_id = 14;
 }
 
 message Message {
@@ -367,6 +371,7 @@ enum ChatType {
   CHAT_TYPE_DIRECT = 0;
   CHAT_TYPE_GROUP = 1;
   CHAT_TYPE_CHANNEL = 2;
+  CHAT_TYPE_BRANCH = 3;
 }
 
 enum ChatStatus {
