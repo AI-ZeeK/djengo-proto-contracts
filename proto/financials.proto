@@ -1774,6 +1774,11 @@ message PurchaseRequestItemProto {
   double quantity                = 5;
   optional string unit           = 6;
   int64  estimated_unit_cost_minor = 7;
+  optional string brand          = 8;
+  optional string model          = 9;
+  optional string specifications = 10;
+  optional int64  spend_limit_minor = 11;
+  optional string delivery_notes = 12;
 }
 
 message PurchaseRequestProto {
@@ -2004,6 +2009,9 @@ service GuestBillingService {
   // Duplicate audit report + reviewed repair (never silent auto-refund).
   rpc ReportGuestBillingDuplicates (ReportGuestBillingDuplicatesRequest) returns (ReportGuestBillingDuplicatesResponse);
   rpc RepairGuestBillingDuplicates (RepairGuestBillingDuplicatesRequest) returns (RepairGuestBillingDuplicatesResponse);
+  // Company wallet top-up via Paystack (CWAL- references).
+  rpc InitializeCompanyWalletFund (InitializeCompanyWalletFundRequest) returns (InitializeCompanyWalletFundResponse);
+  rpc VerifyCompanyWalletFund (VerifyCompanyWalletFundRequest) returns (VerifyCompanyWalletFundResponse);
 }
 
 message GuestInvoiceLineItemProto {
@@ -2259,6 +2267,56 @@ message RepairGuestBillingDuplicatesResponse {
   int32 payments_cancelled = 4;
   int32 overpay_notes_added = 5;
   repeated string changed_ids = 6;
+}
+
+// ── Company wallet Paystack funding ───────────────────────────────────────
+
+message InitializeCompanyWalletFundRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  int64 amount_minor = 3;
+  optional string currency_code = 4;
+  optional string email = 5;
+  optional string callback_url = 6;
+  optional string initiated_by = 7;
+  optional string client_operation_id = 8;
+  // card | bank
+  optional string channel = 9;
+}
+
+message InitializeCompanyWalletFundResponse {
+  bool success = 1;
+  string message = 2;
+  string authorization_url = 3;
+  string reference = 4;
+  string access_code = 5;
+  int64 amount_minor = 6;
+  string currency_code = 7;
+}
+
+message VerifyCompanyWalletFundRequest { string reference = 1; }
+
+message CompanyWalletFundingProto {
+  string funding_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string wallet_id = 4;
+  int64 amount_minor = 5;
+  string currency_code = 6;
+  string payment_method = 7;
+  string reference = 8;
+  string status = 9;
+  string gateway = 10;
+  string paid_at = 11;
+  string created_at = 12;
+}
+
+message VerifyCompanyWalletFundResponse {
+  bool success = 1;
+  // COMPLETED | PENDING | FAILED
+  string status = 2;
+  string message = 3;
+  CompanyWalletFundingProto funding = 4;
 }
 
 // ── Hospitality billing policy (company / branch deposit & due rules) ──────
