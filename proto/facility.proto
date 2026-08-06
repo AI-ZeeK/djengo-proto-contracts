@@ -36,6 +36,8 @@ service FacilityService {
   rpc CreateOccupancyStay(CreateOccupancyStayRequest) returns (OccupancyStayResponse);
   rpc EndOccupancyStay(EndOccupancyStayRequest) returns (OccupancyStayResponse);
   rpc EvacuateOccupancyStay(EvacuateOccupancyStayRequest) returns (OccupancyStayResponse);
+  // Move a future-dated ACTIVE hold (reserved) to in-residence by setting started_at = now.
+  rpc CheckInOccupancyStay(CheckInOccupancyStayRequest) returns (OccupancyStayResponse);
   rpc GetActiveOccupancyStay(GetActiveOccupancyStayRequest) returns (OccupancyStayResponse);
   rpc ListOccupancyStays(ListOccupancyStaysRequest) returns (ListOccupancyStaysResponse);
   rpc ListNodeOccupancyStayHistory(ListNodeOccupancyStayHistoryRequest) returns (ListNodeOccupancyStayHistoryResponse);
@@ -337,6 +339,8 @@ message GetFacilityTreeRequest {
   bool include_inactive = 4;
   bool shallow = 5;
   optional string parent_facility_node_id = 6;
+  // PRIMARY by default; pass DINING for the restaurant hierarchy.
+  optional string hierarchy_domain = 7;
 }
 
 message GetFacilityTreeResponse {
@@ -364,6 +368,8 @@ message SearchFacilityNodesByCodeRequest {
   string code = 4;
   bool include_inactive = 5;
   int32 limit = 6;
+  // PRIMARY by default; pass DINING for the restaurant hierarchy.
+  optional string hierarchy_domain = 7;
 }
 
 message SearchFacilityNodesByCodeResponse {
@@ -636,6 +642,15 @@ message EvacuateOccupancyStayRequest {
   optional string notes = 5;
 }
 
+message CheckInOccupancyStayRequest {
+  string stay_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  // Defaults to now when omitted. Must be <= now for the stay to leave "reserved".
+  optional string checked_in_at = 4;
+  optional string notes = 5;
+}
+
 message GetActiveOccupancyStayRequest {
   string company_id = 1;
   string organization_id = 2;
@@ -696,7 +711,7 @@ message ListHospitalReceptionRequest {
   string company_id = 1;
   string organization_id = 2;
   string branch_id = 3;
-  // ADMITTED | ENDED | ALL (all stays) | UNITS (stays + vacant) | VACANT
+  // ADMITTED | RESERVED | ENDED | ALL (all stays) | UNITS (stays + vacant) | VACANT
   optional string view = 4;
   optional string search = 5;
   optional int32 page = 6;
@@ -1108,6 +1123,9 @@ message SearchPublicOfferingListingsRequest {
   // Optional scope filters (e.g. company/branch detail browse).
   optional string company_id = 6;
   optional string branch_id = 7;
+  // Mirrors the primary path: publish a branch's active operations even when the
+  // branch never filled in public_operation_kinds.
+  optional bool include_unlisted = 8;
 }
 
 message PublicBrowseAddressMessage {
@@ -1293,6 +1311,8 @@ message BranchPublicListingMessage {
   repeated string public_operation_kinds = 7;
   // Public browse card cover. Promoted through files-service on upsert.
   optional string cover_image_url = 8;
+  // Stable opaque code for a shareable /booking?ref=... URL.
+  optional string booking_reference = 9;
 }
 
 message GetBranchPublicListingRequest {
@@ -1326,6 +1346,20 @@ message GetPublicBookingContextRequest {
   string organization_id = 2;
   string branch_id = 3;
   optional string parent_facility_node_id = 4;
+  // Resolves company + branch server-side; preferred for public share links.
+  optional string booking_reference = 5;
+  optional int32 page = 6;
+  optional int32 page_size = 7;
+  optional string search = 8;
+  optional int32 min_capacity = 9;
+  // NAME | PRICE_ASC | PRICE_DESC | AREA
+  optional string sort = 10;
+  // Restrict the response to one exact node for modal/detail refreshes.
+  optional string facility_node_id = 11;
+  // Which side of a mixed branch to book. A hotel + restaurant share one branch,
+  // so without this the hotel listing lists dining tables among its rooms.
+  // STAY (rooms/units/beds/houses) | DINING (tables/chairs). Unset = legacy mixed.
+  optional string booking_domain = 12;
 }
 
 message PublicBookableListingImageMessage {
@@ -1380,4 +1414,11 @@ message GetPublicBookingContextResponse {
   optional string error = 2;
   repeated PublicBookableNodeMessage bookable_nodes = 3;
   repeated PublicBookingSectionMessage sections = 4;
+  int32 total_count = 5;
+  int32 page = 6;
+  int32 page_size = 7;
+  bool has_more = 8;
+  optional string company_id = 9;
+  optional string organization_id = 10;
+  optional string branch_id = 11;
 }

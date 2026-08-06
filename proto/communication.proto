@@ -33,6 +33,7 @@ service CommunicationService {
   rpc SendOtpMail(SendOtpMailRequest) returns (SendOtpMailResponse);
   rpc SendStaffInvitationMail(SendStaffInvitationMailRequest) returns (SendStaffInvitationMailResponse);
   rpc SendBookingMail(SendBookingMailRequest) returns (SendBookingMailResponse);
+  rpc SendOpsAlertMail(SendOpsAlertMailRequest) returns (SendOpsAlertMailResponse);
   rpc SendUserPush(SendUserPushRequest) returns (SendUserPushResponse);
 
   // Push Notifications
@@ -99,6 +100,20 @@ message SendBookingMailRequest {
 }
 
 message SendBookingMailResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
+message SendOpsAlertMailRequest {
+  string email = 1;
+  string subject = 2;
+  string title = 3;
+  string message = 4;
+  string severity = 5;
+  map<string, string> details = 6;
+}
+
+message SendOpsAlertMailResponse {
   bool success = 1;
   optional string error = 2;
 }

@@ -405,6 +405,9 @@ message OverviewAnalyticsMeta {
   repeated string visible_domains = 3;
   optional string currency_code = 4;
   optional double exchange_rate = 5;
+  // Domains that timed out or failed; their cards are missing from this response
+  // and the client can refetch for them without discarding what did arrive.
+  repeated string pending_domains = 6;
 }
 
 // Analytics block for cards

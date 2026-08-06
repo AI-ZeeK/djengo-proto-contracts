@@ -2001,6 +2001,9 @@ service GuestBillingService {
   rpc InitializeGuestInvoicePayment (InitializeGuestInvoicePaymentRequest) returns (InitializeGuestInvoicePaymentResponse);
   rpc VerifyGuestInvoicePayment (VerifyGuestInvoicePaymentRequest) returns (VerifyGuestInvoicePaymentResponse);
   rpc HandlePaystackWebhook (PaystackWebhookRequest) returns (PaystackWebhookResponse);
+  // Duplicate audit report + reviewed repair (never silent auto-refund).
+  rpc ReportGuestBillingDuplicates (ReportGuestBillingDuplicatesRequest) returns (ReportGuestBillingDuplicatesResponse);
+  rpc RepairGuestBillingDuplicates (RepairGuestBillingDuplicatesRequest) returns (RepairGuestBillingDuplicatesResponse);
 }
 
 message GuestInvoiceLineItemProto {
@@ -2062,6 +2065,8 @@ message CreateGuestInvoiceRequest {
   optional string branch_id = 13;
   optional string facility_node_id = 14;
   string purpose          = 15; // DEPOSIT | STAY | EXTRA | REFUND_ADJUSTMENT
+  // Client idempotency key — retries with the same key return the prior invoice.
+  optional string client_operation_id = 16;
 }
 
 message GetGuestInvoiceRequest    { string invoice_id = 1; }
@@ -2138,6 +2143,10 @@ message RecordGuestPaymentRequest {
   optional string reference = 8;
   string recorded_by     = 9;
   optional string notes  = 10;
+  // Client idempotency key — desk double-submit returns the prior payment.
+  optional string client_operation_id = 11;
+  // When false/omitted, reject amounts above the outstanding balance.
+  optional bool allow_overpay = 12;
 }
 
 message ListGuestPaymentsRequest {
@@ -2163,6 +2172,8 @@ message InitializeGuestInvoicePaymentRequest {
   optional int64 amount_minor = 3;
   optional string callback_url = 4;
   optional string initiated_by = 5;
+  // Client idempotency key — "Try again" reuses the same PENDING checkout.
+  optional string client_operation_id = 6;
 }
 
 message InitializeGuestInvoicePaymentResponse {
@@ -2195,6 +2206,59 @@ message PaystackWebhookRequest {
 message PaystackWebhookResponse {
   bool success = 1;
   string message = 2;
+}
+
+message ReportGuestBillingDuplicatesRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  // Optional: limit to one reservation.
+  optional string reservation_id = 3;
+}
+
+message GuestBillingDuplicateFinding {
+  // DUPLICATE_DEPOSIT_INVOICE | OVERPAID_INVOICE | DUPLICATE_PENDING_PAYMENT
+  string kind = 1;
+  string reservation_id = 2;
+  string invoice_id = 3;
+  string invoice_number = 4;
+  string payment_id = 5;
+  string payment_reference = 6;
+  int64 amount_minor = 7;
+  string currency_code = 8;
+  string status = 9;
+  string gateway = 10;
+  string created_at = 11;
+  string detail = 12;
+}
+
+message ReportGuestBillingDuplicatesResponse {
+  repeated GuestBillingDuplicateFinding findings = 1;
+  string summary = 2;
+}
+
+message RepairGuestBillingDuplicatesRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string reviewed_by = 3;
+  // When true, only report what would change.
+  bool dry_run = 4;
+  // Invoice IDs to void (unpaid duplicate deposits).
+  repeated string void_invoice_ids = 5;
+  // PENDING payment IDs to mark CANCELLED.
+  repeated string cancel_payment_ids = 6;
+  // Invoice IDs that are overpaid with captured charges — attach a support note
+  // and optional REFUND_ADJUSTMENT draft; never auto-refund Paystack.
+  repeated string note_overpaid_invoice_ids = 7;
+  optional string repair_note = 8;
+}
+
+message RepairGuestBillingDuplicatesResponse {
+  bool success = 1;
+  string message = 2;
+  int32 invoices_voided = 3;
+  int32 payments_cancelled = 4;
+  int32 overpay_notes_added = 5;
+  repeated string changed_ids = 6;
 }
 
 // ── Hospitality billing policy (company / branch deposit & due rules) ──────
