@@ -107,6 +107,7 @@ service FinancialsService {
 
   rpc ListPayrollSchedules (ListPayrollSchedulesRequest) returns (ListPayrollSchedulesResponse);
   rpc CreateWallet (CreateWalletRequest) returns (WalletReply);
+  rpc GetWallet (GetWalletRequest) returns (WalletReply);
   rpc UpdateWallet (UpdateWalletRequest) returns (WalletReply);
   rpc Credit (WalletTransactionRequest) returns (WalletReply);
   rpc Debit (WalletTransactionRequest) returns (WalletReply);
@@ -210,6 +211,10 @@ service FinancialsService {
   rpc ListAdminPlatformTransactions (ListAdminPlatformTransactionsRequest) returns (ListAdminPlatformTransactionsResponse);
   rpc GetAdminPlatformTransaction (GetAdminPlatformTransactionRequest) returns (GetAdminPlatformTransactionResponse);
   rpc GetAdminPlatformTransactionAnalytics (GetAdminPlatformTransactionAnalyticsRequest) returns (GetAdminPlatformTransactionAnalyticsResponse);
+
+  // ── Admin platform payrolls ───────────────────────────────────────────────
+  rpc ListAdminPlatformPayrolls (ListAdminPlatformPayrollsRequest) returns (ListAdminPlatformPayrollsResponse);
+  rpc GetAdminPlatformPayrollAnalytics (GetAdminPlatformPayrollAnalyticsRequest) returns (GetAdminPlatformPayrollAnalyticsResponse);
 
   // ── Budget Variance Report ────────────────────────────────────────────────
   rpc GetBudgetVarianceReport (GetBudgetVarianceReportRequest) returns (BudgetVarianceReport);
@@ -430,6 +435,19 @@ message CreateWalletRequest {
   string currency_code = 3;
 }
 
+message GetWalletRequest {
+  string entity_id = 1;
+  WALLET_ENTITY_TYPE_ENUM entity_type = 2;
+  // Prefer empty — server resolves from branch/company settings when omitted.
+  string currency_code = 3;
+  string organization_id = 4;
+  string company_id = 5;
+  // When true, create a zero-balance wallet if none exists.
+  bool ensure = 6;
+  // Active / funding branch. Currency is resolved from this branch (main branch
+  // supplies the network/company operating currency for multi-branch firms).
+  string branch_id = 7;
+}
 
 message GetCountryRequest {
   string country_code = 1;
@@ -1437,6 +1455,16 @@ message AdminPlatformTransaction {
   string company_currency         = 24;
   double exchange_rate            = 25; // USD per 1 unit of transaction currency at transaction time
   double usd_amount               = 26; // Amount converted to USD at transaction time
+  // Guest / company deposit enrichment (optional; empty when N/A)
+  string payer_email              = 27; // Non-platform payer email (Paystack guest, etc.)
+  string payer_name               = 28; // Guest or payer display name
+  string invoice_id               = 29;
+  string invoice_number           = 30;
+  string payment_id               = 31;
+  string guest_id                 = 32;
+  // When true, funds credit the company wallet — prefer company_name over receiver_user_*.
+  bool   company_is_receiver      = 33;
+  string sender_email             = 34; // Sender email when resolved from profile or payer notes
 }
 
 message ListAdminPlatformTransactionsRequest {
@@ -1450,6 +1478,8 @@ message ListAdminPlatformTransactionsRequest {
   int32  page_size           = 8;
   string sort_order          = 9;  // asc | desc
   string sort_by             = 10; // created_at | amount | status
+  // When set, only rows where this user is sender or receiver.
+  optional string user_id    = 11;
 }
 
 message ListAdminPlatformTransactionsResponse {
@@ -1486,6 +1516,74 @@ message GetAdminPlatformTransactionAnalyticsResponse {
   repeated ChartData volume_by_currency = 10;
   double total_volume_usd               = 11;
   repeated ChartData volume_trend_usd   = 12;
+}
+
+// ── Admin platform payrolls ─────────────────────────────────────────────────
+
+message AdminPlatformPayroll {
+  string payroll_id         = 1;
+  string schedule_id        = 2;
+  string schedule_name      = 3;
+  string organization_id    = 4;
+  string organization_name  = 5;
+  string company_id         = 6;
+  string company_name       = 7;
+  string payment_frequency  = 8;  // MONTHLY | BIWEEKLY | WEEKLY
+  string payroll_status     = 9;  // DRAFT | PENDING | PROCESSING | APPROVED | PAID | CLOSED | FAILED
+  int32  staff_count        = 10;
+  double total_amount       = 11; // major currency units
+  string currency_code      = 12;
+  int32  month              = 13;
+  int32  year               = 14;
+  string scheduled_at       = 15;
+  string completed_at       = 16;
+  string created_at         = 17;
+}
+
+message ListAdminPlatformPayrollsRequest {
+  string organization_id   = 1;
+  string company_id        = 2;
+  string status            = 3;
+  string payment_frequency = 4;
+  string search            = 5;
+  string start_date        = 6;
+  string end_date          = 7;
+  int32  page              = 8;
+  int32  page_size         = 9;
+  string sort_order        = 10;
+  string sort_by           = 11;
+  string timeline          = 12; // optional: 1m|3m|6m|1y|all
+}
+
+message ListAdminPlatformPayrollsResponse {
+  repeated AdminPlatformPayroll payrolls = 1;
+  TableMeta meta                         = 2;
+}
+
+message GetAdminPlatformPayrollAnalyticsRequest {
+  string organization_id = 1;
+  string company_id      = 2;
+  Timeline timeline      = 3;
+  string start_date      = 4;
+  string end_date        = 5;
+}
+
+message AdminPayrollAnalytic {
+  double value      = 1;
+  string trend      = 2; // increase | decrease | neutral
+  double percentage = 3;
+  repeated ChartData trend_data = 4;
+}
+
+message GetAdminPlatformPayrollAnalyticsResponse {
+  AdminPayrollAnalytic total_volume     = 1;
+  AdminPayrollAnalytic active_payrolls  = 2;
+  AdminPayrollAnalytic monthly_payroll  = 3;
+  AdminPayrollAnalytic average_payroll  = 4;
+  AdminPayrollAnalytic on_time_rate     = 5;
+  AdminPayrollAnalytic pending_payrolls = 6;
+  AdminPayrollAnalytic failed_payrolls  = 7;
+  AdminPayrollAnalytic total_employees  = 8;
 }
 
 // ── Module 6: Facility & asset management (scaffold) ──────────────────────
@@ -2001,17 +2099,29 @@ service GuestBillingService {
   rpc ListGuestPayments   (ListGuestPaymentsRequest)   returns (ListGuestPaymentsResponse);
   // Issue (if draft), email guest, notify Djengo user, write activity log.
   rpc SendGuestInvoice    (SendGuestInvoiceRequest)    returns (SendGuestInvoiceResponse);
-  // Online payment (Paystack): hosted checkout for the invoice balance,
+  // Online payment (Paystack / Stripe): hosted checkout for the invoice balance,
   // verify by reference, and gateway webhook ingestion.
   rpc InitializeGuestInvoicePayment (InitializeGuestInvoicePaymentRequest) returns (InitializeGuestInvoicePaymentResponse);
   rpc VerifyGuestInvoicePayment (VerifyGuestInvoicePaymentRequest) returns (VerifyGuestInvoicePaymentResponse);
   rpc HandlePaystackWebhook (PaystackWebhookRequest) returns (PaystackWebhookResponse);
+  // Stripe Checkout webhook (checkout.session.completed). Same payload shape as Paystack
+  // (raw body + signature header); financials verifies Stripe-Signature HMAC.
+  rpc HandleStripeWebhook (PaystackWebhookRequest) returns (PaystackWebhookResponse);
   // Duplicate audit report + reviewed repair (never silent auto-refund).
   rpc ReportGuestBillingDuplicates (ReportGuestBillingDuplicatesRequest) returns (ReportGuestBillingDuplicatesResponse);
   rpc RepairGuestBillingDuplicates (RepairGuestBillingDuplicatesRequest) returns (RepairGuestBillingDuplicatesResponse);
-  // Company wallet top-up via Paystack (CWAL- references).
+  // Company wallet top-up via Paystack or Stripe (CWAL- references).
   rpc InitializeCompanyWalletFund (InitializeCompanyWalletFundRequest) returns (InitializeCompanyWalletFundResponse);
   rpc VerifyCompanyWalletFund (VerifyCompanyWalletFundRequest) returns (VerifyCompanyWalletFundResponse);
+  // Admin-only (not auth-exempt): credit wallet when provider already paid but auto-verify failed.
+  rpc ForceCompleteCompanyWalletFund (ForceCompleteCompanyWalletFundRequest) returns (VerifyCompanyWalletFundResponse);
+
+  // Company wallet withdrawal requests (approval chain → platform admin → debit).
+  rpc CreateWalletWithdrawal (CreateWalletWithdrawalRequest) returns (CreateWalletWithdrawalResponse);
+  rpc ListWalletWithdrawals (ListWalletWithdrawalsRequest) returns (ListWalletWithdrawalsResponse);
+  rpc ListWalletWithdrawalsAwaitingAdmin (ListWalletWithdrawalsRequest) returns (ListWalletWithdrawalsResponse);
+  rpc AdminApproveWalletWithdrawal (AdminReviewWalletWithdrawalRequest) returns (CreateWalletWithdrawalResponse);
+  rpc AdminRejectWalletWithdrawal (AdminReviewWalletWithdrawalRequest) returns (CreateWalletWithdrawalResponse);
 }
 
 message GuestInvoiceLineItemProto {
@@ -2275,6 +2385,7 @@ message InitializeCompanyWalletFundRequest {
   string company_id = 1;
   string organization_id = 2;
   int64 amount_minor = 3;
+  // Ignored when branch_id is set — server resolves branch/main-branch currency.
   optional string currency_code = 4;
   optional string email = 5;
   optional string callback_url = 6;
@@ -2282,6 +2393,7 @@ message InitializeCompanyWalletFundRequest {
   optional string client_operation_id = 8;
   // card | bank
   optional string channel = 9;
+  optional string branch_id = 10;
 }
 
 message InitializeCompanyWalletFundResponse {
@@ -2295,6 +2407,12 @@ message InitializeCompanyWalletFundResponse {
 }
 
 message VerifyCompanyWalletFundRequest { string reference = 1; }
+
+message ForceCompleteCompanyWalletFundRequest {
+  string reference = 1;
+  optional string admin_note = 2;
+  optional string admin_user_id = 3;
+}
 
 message CompanyWalletFundingProto {
   string funding_id = 1;
@@ -2317,6 +2435,76 @@ message VerifyCompanyWalletFundResponse {
   string status = 2;
   string message = 3;
   CompanyWalletFundingProto funding = 4;
+}
+
+// ── Company wallet withdrawal requests ────────────────────────────────────
+
+message CreateWalletWithdrawalRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  int64 amount_minor = 3;
+  string bank_name = 4;
+  string bank_code = 5;
+  string account_number = 6;
+  string account_name = 7;
+  optional string branch_id = 8;
+  optional string note = 9;
+  optional string requested_by = 10;
+}
+
+message CompanyWalletWithdrawalProto {
+  string withdrawal_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string wallet_id = 4;
+  string branch_id = 5;
+  int64 amount_minor = 6;
+  string currency_code = 7;
+  string reference = 8;
+  string bank_name = 9;
+  string bank_code = 10;
+  string account_number = 11;
+  string account_name = 12;
+  string note = 13;
+  // PENDING_APPROVAL | AWAITING_ADMIN | COMPLETED | REJECTED | CANCELLED
+  string status = 14;
+  string approval_instance_id = 15;
+  string requested_by = 16;
+  string requester_name = 17;
+  string requester_email = 18;
+  string admin_note = 19;
+  string created_at = 20;
+  string updated_at = 21;
+  string reviewed_at = 22;
+  string completed_at = 23;
+}
+
+message CreateWalletWithdrawalResponse {
+  bool success = 1;
+  string message = 2;
+  CompanyWalletWithdrawalProto withdrawal = 3;
+}
+
+message ListWalletWithdrawalsRequest {
+  optional string company_id = 1;
+  optional string branch_id = 2;
+  optional string status = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+}
+
+message ListWalletWithdrawalsResponse {
+  bool success = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+  repeated CompanyWalletWithdrawalProto withdrawals = 5;
+}
+
+message AdminReviewWalletWithdrawalRequest {
+  string withdrawal_id = 1;
+  optional string admin_user_id = 2;
+  optional string admin_note = 3;
 }
 
 // ── Hospitality billing policy (company / branch deposit & due rules) ──────

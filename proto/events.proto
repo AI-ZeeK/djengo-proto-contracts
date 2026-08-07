@@ -509,6 +509,12 @@ message CreateCalendarEventRequest {
   CalendarRecurrencePreset recurrence_preset = 17;
   /// Last calendar day (yyyy-MM-dd, inclusive) the series repeats; RRULE gains UNTIL.
   optional string recurrence_series_end_date = 18;
+  /// COMPANY | BRANCH | PARTICIPANTS
+  string visibility_scope = 19;
+  optional string branch_id = 20;
+  optional string linked_entity_type = 21;
+  optional string linked_entity_id = 22;
+  repeated CalendarEventParticipantInput participants = 23;
 }
 
 
@@ -532,6 +538,11 @@ message UpdateCalendarEventRequest {
   bool is_recurring = 17;
   CalendarRecurrencePreset recurrence_preset = 18;
   optional string recurrence_series_end_date = 19;
+  string visibility_scope = 20;
+  optional string branch_id = 21;
+  optional string linked_entity_type = 22;
+  optional string linked_entity_id = 23;
+  repeated CalendarEventParticipantInput participants = 24;
 }
 
 // ─── ActivityLog ─────────────────────────────────────────────────────────────
@@ -674,6 +685,25 @@ message CalendarEvent {
   // Business calendar classification
   // string calendar_category    = 26;  // Deprecated: mirror of event_type (uppercase). Use event_type only; same enum names (HOLIDAY, MAINTENANCE, …).
   string country_code         = 27;  // ISO code for imported public holidays
+  string visibility_scope     = 28;  // COMPANY | BRANCH | PARTICIPANTS
+  string branch_id            = 29;
+  string linked_entity_type   = 30;
+  string linked_entity_id     = 31;
+  repeated CalendarEventParticipant participants = 32;
+}
+
+message CalendarEventParticipant {
+  string staff_id = 1;
+  string user_id = 2;
+  string staff_display_name = 3;
+  string role = 4; // ATTENDEE | ORGANIZER
+}
+
+message CalendarEventParticipantInput {
+  string staff_id = 1;
+  string user_id = 2;
+  string staff_display_name = 3;
+  string role = 4;
 }
 
 message CalendarEventRef            { string event_id = 1; }
@@ -689,6 +719,7 @@ message ListCalendarEventsRequest {
   string entity_id          = 5;
   string from               = 6;  // "yyyy-MM-dd"
   string to                 = 7;  // "yyyy-MM-dd"
+  string branch_id          = 8;  // optional filter for BRANCH-scoped events
 }
 
 message ImportPublicHolidaysRequest {
@@ -1542,6 +1573,7 @@ enum ApprovalEntityType {
   PURCHASE_ORDER = 6;
   GOODS_RECEIPT = 7;
   RESERVATION = 8;
+  WALLET_WITHDRAWAL = 9;
 }
 
 message TableMeta {

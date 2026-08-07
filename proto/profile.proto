@@ -137,6 +137,9 @@ service AdminProfileService {
   
   rpc AdminGetUsers(GetUsersRequest) returns (GetUsersResponse); 
   rpc AdminUsersAnalytics(AdminUsersAnalyticsRequest) returns (AdminUsersAnalyticsResponse);
+  /// Platform-wide user retention / survival metrics for admin financial dashboards.
+  rpc AdminUserSurvivalAnalytics(AdminUserSurvivalAnalyticsRequest) returns (AdminUserSurvivalAnalyticsResponse);
+  rpc AdminUserSurvivalTable(AdminUserSurvivalTableRequest) returns (AdminUserSurvivalTableResponse);
 }
 
 message GetStaffRequest {
@@ -657,6 +660,71 @@ message AdminUsersAnalyticsResponse {
   Analytic deactivated_users = 6;
   Analytic high_value_users = 7;
   Analytic at_risk_users = 8;
+}
+
+message AdminUserSurvivalAnalyticsRequest {
+  optional Timeline timeline = 1;
+  optional string start_date = 2;
+  optional string end_date = 3;
+  optional string organization_id = 4;
+  optional string activity_level = 5; // active | at_risk | churned | champion
+}
+
+/**
+ * Survival / retention KPIs. Percentage-style metrics (rates, lifespan months)
+ * use Analytic.value as a rounded integer (e.g. 72 for 72%, 19 for 18.7 months).
+ * Exact decimal values are also returned in SurvivalRateFields when needed by UI.
+ */
+message AdminUserSurvivalAnalyticsResponse {
+  Analytic survived_users = 1;           // active & account age >= 6 months
+  Analytic overall_survival_rate = 2;    // % of 6m+ cohort still active
+  Analytic churned_users = 3;            // inactive 90d+ or deactivated (had login)
+  Analytic average_lifespan = 4;         // avg months created_at → last_login
+  Analytic new_users_30d = 5;            // created in last 30 days
+  Analytic retention_30d = 6;            // % of 30–60d cohort retained
+  Analytic retention_90d = 7;            // % of 90–120d cohort retained
+  Analytic high_value_survivors = 8;     // business users, 6m+, still active
+  Analytic at_risk_users = 9;            // no login 30–90d, account active
+  Analytic reactivated_users = 10;       // login in last 30d after 30d+ gap (auth audit)
+  Analytic platform_champions = 11;      // active & account age >= 12 months
+  Analytic financial_user_survival = 12; // % of business users still active
+  // Decimal companions for rate/lifespan cards (Analytic.value is int32)
+  double overall_survival_rate_exact = 13;
+  double average_lifespan_exact = 14;
+  double retention_30d_exact = 15;
+  double retention_90d_exact = 16;
+  double financial_user_survival_exact = 17;
+}
+
+message AdminUserSurvivalTableRequest {
+  optional string search = 1;
+  optional int32 page = 2;
+  optional int32 page_size = 3;
+  optional string sort_by = 4;
+  optional string sort_order = 5;
+  optional string activity_level = 6;
+  optional string organization_id = 7;
+  optional string start_date = 8;
+  optional string end_date = 9;
+}
+
+message UserSurvivalRow {
+  string user_id = 1;
+  string name = 2;
+  string email = 3;
+  string organization = 4;
+  string cohort = 5;           // e.g. "2024-Q1"
+  double lifespan_months = 6;
+  string activity_level = 7;   // champion | survived | active | at_risk | churned
+  string status = 8;
+  string last_login = 9;
+  string created_at = 10;
+  bool is_business = 11;
+}
+
+message AdminUserSurvivalTableResponse {
+  repeated UserSurvivalRow rows = 1;
+  TableMeta meta = 2;
 }
 
 message GetUsersRequest {
