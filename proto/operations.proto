@@ -745,6 +745,7 @@ service OrderService {
   rpc ListOrders          (ListOrdersRequest)          returns (ListOrdersResponse);
   rpc UpdateOrderStatus   (UpdateOrderStatusRequest)   returns (OrderProto);
   rpc CancelOrder         (CancelOrderRequest)         returns (OrderProto);
+  rpc UpdateOrderPayment  (UpdateOrderPaymentRequest)  returns (OrderProto);
 }
 
 message OrderItemProto {
@@ -782,6 +783,8 @@ message OrderProto {
   repeated OrderItemProto items = 21;
   string created_at         = 22;
   string updated_at         = 23;
+  optional string payment_status = 24; // UNPAID | PENDING | PARTIALLY_PAID | PAID | REFUNDED
+  optional string invoice_id     = 25;
 }
 
 message PlaceOrderRequest {
@@ -800,6 +803,13 @@ message PlaceOrderRequest {
 
 message GetOrderRequest           { string order_id = 1; }
 message CancelOrderRequest        { string order_id = 1; string cancelled_by = 2; optional string reason = 3; }
+
+message UpdateOrderPaymentRequest {
+  string order_id = 1;
+  string payment_status = 2; // UNPAID | PENDING | PARTIALLY_PAID | PAID | REFUNDED
+  optional string invoice_id = 3;
+  optional string guest_id = 4;
+}
 
 message UpdateOrderStatusRequest {
   string order_id    = 1;
@@ -831,6 +841,7 @@ service KitchenService {
   rpc GetKitchenTicket            (GetKitchenTicketRequest)           returns (KitchenTicketProto);
   rpc UpdateKitchenTicketStatus   (UpdateKitchenTicketStatusRequest)  returns (KitchenTicketProto);
   rpc AssignKitchenTicket         (AssignKitchenTicketRequest)        returns (KitchenTicketProto);
+  rpc LinkKitchenTicketTask       (LinkKitchenTicketTaskRequest)      returns (KitchenTicketProto);
 }
 
 message KitchenTicketProto {
@@ -848,6 +859,7 @@ message KitchenTicketProto {
   optional string notes  = 12;
   string created_at      = 13;
   string updated_at      = 14;
+  optional string task_id = 15;
 }
 
 message GetKitchenTicketRequest { string ticket_id = 1; }
@@ -861,6 +873,11 @@ message UpdateKitchenTicketStatusRequest {
 message AssignKitchenTicketRequest {
   string ticket_id   = 1;
   string assigned_to = 2;
+}
+
+message LinkKitchenTicketTaskRequest {
+  string ticket_id = 1;
+  string task_id   = 2;
 }
 
 message ListKitchenTicketsRequest {
@@ -1297,6 +1314,174 @@ service IncidentService {
   rpc GetIncident          (GetIncidentRequest)          returns (IncidentResponse);
   rpc ListIncidents        (ListIncidentsRequest)        returns (ListIncidentsResponse);
   rpc UpdateIncidentStatus (UpdateIncidentStatusRequest) returns (IncidentResponse);
+}
+
+// ── Engagement documents (booking contracts + clinical) ─────────────────────
+service EngagementDocumentService {
+  rpc UpsertTemplate (UpsertEngagementDocumentTemplateRequest) returns (EngagementDocumentTemplateProto);
+  rpc GetTemplate (GetEngagementDocumentTemplateRequest) returns (EngagementDocumentTemplateProto);
+  rpc GetChecklist (GetEngagementDocumentChecklistRequest) returns (EngagementDocumentChecklistResponse);
+  rpc ListInstances (ListEngagementDocumentInstancesRequest) returns (ListEngagementDocumentInstancesResponse);
+  rpc ListMyDocuments (ListMyEngagementDocumentsRequest) returns (ListEngagementDocumentInstancesResponse);
+  rpc SendDocuments (SendEngagementDocumentsRequest) returns (EngagementDocumentInstanceProto);
+  rpc CreateClinicalRecord (CreateClinicalDocumentRequest) returns (EngagementDocumentInstanceProto);
+  rpc AcknowledgeDocument (AcknowledgeEngagementDocumentRequest) returns (EngagementDocumentInstanceProto);
+}
+
+message EngagementDocumentRequirementProto {
+  string requirement_id = 1;
+  string title = 2;
+  string doc_kind = 3;
+  string when_phase = 4;
+  string visibility = 5;
+  string audience = 6;
+  int32 sort_order = 7;
+  bool blocks_confirm = 8;
+  bool is_required = 9;
+  string instructions = 10;
+  string template_file_id = 11;
+}
+
+message EngagementDocumentTemplateProto {
+  string template_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string branch_id = 4;
+  string facility_mode = 5;
+  string name = 6;
+  bool is_enabled = 7;
+  repeated EngagementDocumentRequirementProto requirements = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message UpsertEngagementDocumentTemplateRequest {
+  string template_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string branch_id = 4;
+  string facility_mode = 5;
+  string name = 6;
+  optional bool is_enabled = 7;
+  repeated EngagementDocumentRequirementProto requirements = 8;
+}
+
+message GetEngagementDocumentTemplateRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  string facility_mode = 4;
+}
+
+message EngagementDocumentInstanceProto {
+  string instance_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string branch_id = 4;
+  string requirement_id = 5;
+  string reservation_id = 6;
+  string occupancy_stay_id = 7;
+  string guest_user_id = 8;
+  string partner_id = 9;
+  string title = 10;
+  string doc_kind = 11;
+  string visibility = 12;
+  string audience = 13;
+  string status = 14;
+  string file_id = 15;
+  string file_url = 16;
+  string sent_at = 17;
+  string viewed_at = 18;
+  string acknowledged_at = 19;
+  string acknowledged_by_name = 20;
+  string created_at = 21;
+}
+
+message ListEngagementDocumentInstancesRequest {
+  string company_id = 1;
+  string reservation_id = 2;
+  string occupancy_stay_id = 3;
+  string guest_user_id = 4;
+  // CLIENT | CONFIDENTIAL | STAFF | STAFF_ALL
+  string visibility_filter = 5;
+}
+
+message ListMyEngagementDocumentsRequest {
+  string guest_user_id = 1;
+}
+
+message ListEngagementDocumentInstancesResponse {
+  repeated EngagementDocumentInstanceProto instances = 1;
+}
+
+message SendEngagementDocumentsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  string reservation_id = 4;
+  string occupancy_stay_id = 5;
+  string guest_user_id = 6;
+  string facility_mode = 7;
+  string when_phase = 8;
+  repeated string requirement_ids = 9;
+  string sent_by = 10;
+  string title = 11;
+  string doc_kind = 12;
+  string visibility = 13;
+  string audience = 14;
+  string file_id = 15;
+  string file_url = 16;
+}
+
+message CreateClinicalDocumentRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  string occupancy_stay_id = 4;
+  string reservation_id = 5;
+  string guest_user_id = 6;
+  string partner_id = 7;
+  string title = 8;
+  string doc_kind = 9;
+  string visibility = 10;
+  string audience = 11;
+  string file_id = 12;
+  string file_url = 13;
+  string created_by = 14;
+}
+
+message AcknowledgeEngagementDocumentRequest {
+  string instance_id = 1;
+  string guest_user_id = 2;
+  string acknowledged_by_name = 3;
+}
+
+message GetEngagementDocumentChecklistRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  string facility_mode = 4;
+  string reservation_id = 5;
+}
+
+message EngagementDocumentChecklistItem {
+  string requirement_id = 1;
+  string title = 2;
+  string doc_kind = 3;
+  string when_phase = 4;
+  string visibility = 5;
+  bool blocks_confirm = 6;
+  bool is_required = 7;
+  string status = 8;
+  string instance_id = 9;
+  bool satisfied = 10;
+}
+
+message EngagementDocumentChecklistResponse {
+  string facility_mode = 1;
+  bool template_enabled = 2;
+  repeated EngagementDocumentChecklistItem items = 3;
+  int32 blocking_incomplete = 4;
 }
 
 message TableMeta {

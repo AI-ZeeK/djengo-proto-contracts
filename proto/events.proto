@@ -2061,12 +2061,16 @@ message UpdateComplaintCategoryRequest {
 // ── Employment Contracts ──────────────────────────────────────────────────────
 
 service EmploymentContractService {
-  rpc CreateContract       (EmploymentContractMsg)    returns (EmploymentContractId);
-  rpc GetContract          (EmploymentContractId)     returns (EmploymentContractMsg);
-  rpc ListStaffContracts   (StaffRequest)             returns (EmploymentContractList);
-  rpc ListCompanyContracts (GetCompanyStaffRequest)           returns (GetCompanyContractsResponse);
-  rpc ActivateContract     (EmploymentContractId)     returns (EmploymentContractId);
-  rpc TerminateContract    (TerminateContractRequest) returns (EmploymentContractId);
+  rpc CreateContract       (EmploymentContractMsg)     returns (EmploymentContractId);
+  rpc GetContract          (EmploymentContractId)      returns (EmploymentContractMsg);
+  rpc ListStaffContracts   (StaffRequest)              returns (EmploymentContractList);
+  rpc ListCompanyContracts (GetCompanyStaffRequest)    returns (GetCompanyContractsResponse);
+  rpc AttachTerms          (AttachContractTermsRequest) returns (EmploymentContractMsg);
+  rpc SendContract         (EmploymentContractId)      returns (EmploymentContractMsg);
+  rpc BindInviteContract   (BindInviteContractRequest) returns (EmploymentContractMsg);
+  rpc SignContract         (SignContractRequest)       returns (EmploymentContractMsg);
+  rpc ActivateContract     (EmploymentContractId)      returns (EmploymentContractId);
+  rpc TerminateContract    (TerminateContractRequest)  returns (EmploymentContractId);
 }
 
 message GetCompanyContractsResponse{
@@ -2075,24 +2079,34 @@ message GetCompanyContractsResponse{
 }
 
 message EmploymentContractMsg {
-  string contract_id        = 1;
-  string staff_id           = 2;
-  string company_id         = 3;
-  string organization_id    = 4;
-  string employment_type    = 5;
-  string job_title          = 6;
-  double salary             = 7;
-  string currency_code      = 8;
-  string start_date         = 9;
-  string end_date           = 10;
-  double hours_per_week     = 11;
-  string probation_end_date = 12;
-  string status             = 13;
-  string terms_url          = 14;
-  string notes              = 15;
-  string issued_by          = 16;
-  string created_at         = 17;
-  string updated_at         = 18;
+  string contract_id          = 1;
+  string staff_id             = 2;
+  string company_id           = 3;
+  string organization_id      = 4;
+  string employment_type      = 5;
+  string job_title            = 6;
+  double salary               = 7;
+  string currency_code        = 8;
+  string start_date           = 9;
+  string end_date             = 10;
+  double hours_per_week       = 11;
+  string probation_end_date   = 12;
+  string status               = 13;
+  string terms_url            = 14;
+  string notes                = 15;
+  string issued_by            = 16;
+  string created_at           = 17;
+  string updated_at           = 18;
+  string invitation_id        = 19;
+  string terms_file_id        = 20;
+  string designation_id       = 21;
+  string designation_name     = 22;
+  string signature_method     = 23;
+  string signed_name          = 24;
+  string signature_image_url  = 25;
+  string signed_at            = 26;
+  string signed_by_user_id    = 27;
+  bool   send_now             = 28;
 }
 
 message EmploymentContractId {
@@ -2107,6 +2121,27 @@ message EmploymentContractList {
 message TerminateContractRequest {
   string contract_id = 1;
   string reason      = 2;
+}
+
+message AttachContractTermsRequest {
+  string contract_id    = 1;
+  string terms_url      = 2;
+  string terms_file_id  = 3;
+}
+
+message BindInviteContractRequest {
+  string invitation_id = 1;
+  string staff_id      = 2;
+  string company_id    = 3;
+}
+
+message SignContractRequest {
+  string contract_id         = 1;
+  string staff_id            = 2;
+  string signed_by_user_id   = 3;
+  string signature_method    = 4; // ACK | DRAW
+  string signed_name         = 5;
+  string signature_image_url = 6;
 }
 
 // ── Staff Documents ───────────────────────────────────────────────────────────

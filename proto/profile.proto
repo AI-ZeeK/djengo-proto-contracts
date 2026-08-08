@@ -39,6 +39,10 @@ service ProfileService {
   rpc RequestPasswordReset(RequestPasswordResetRequest) returns (AuthInitialResponse);
   /// After OTP verify (FORGOT_PASSWORD), set a new password with the reset token.
   rpc ResetPassword(ResetPasswordRequest) returns (SendOtpResponse);
+  /// Authenticated user: change password with current password verification.
+  rpc ChangePassword(ChangePasswordRequest) returns (SendOtpResponse);
+  /// Authenticated user: update sign-in OTP preference (and related flags).
+  rpc UpdateSecurityPreferences(UpdateSecurityPreferencesRequest) returns (UpdateSecurityPreferencesResponse);
   
   rpc GetRoles(EmptyRequest) returns (GetRolesResponse);
   
@@ -1054,6 +1058,9 @@ message LoginRequest {
   string email = 1;
   string password = 2;
   optional string ip = 3;
+  /// Used when sign-in OTP is opted out — creates the session directly.
+  optional string device_info = 4;
+  optional SessionSource source = 5;
 }
 
 message SendOtpRequest {
@@ -1128,6 +1135,12 @@ message AuthInitialResponse {
   optional string error = 2;
   optional string message = 3;
   optional string auth_token = 4;
+  /// Present when sign-in OTP is not required (opted out) — session issued immediately.
+  optional string access_token = 5;
+  optional string refresh_token = 6;
+  optional User user = 7;
+  /// Defaults to true. When false, access_token/refresh_token are set instead of auth_token.
+  optional bool otp_required = 8;
 }
 
 message RequestPasswordResetRequest {
@@ -1139,6 +1152,24 @@ message ResetPasswordRequest {
   string token = 1;
   string password = 2;
   string confirm_password = 3;
+}
+
+message ChangePasswordRequest {
+  string user_id = 1;
+  string current_password = 2;
+  string new_password = 3;
+  string confirm_password = 4;
+}
+
+message UpdateSecurityPreferencesRequest {
+  string user_id = 1;
+  optional bool require_signin_otp = 2;
+}
+
+message UpdateSecurityPreferencesResponse {
+  bool success = 1;
+  optional string message = 2;
+  optional bool require_signin_otp = 3;
 }
 
 message AdminSetUserPasswordRequest {
@@ -1373,6 +1404,11 @@ message User {
   optional string phone_dial_code = 19;
   /** True when the user has a usable (bcrypt) password set. */
   optional bool has_password = 20;
+  /**
+   * When true (default), email/password sign-in requires email OTP.
+   * Users may opt out from account security settings.
+   */
+  optional bool require_signin_otp = 21;
 }
 
 // message BasicUser {
