@@ -2,6 +2,19 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## 1.2.12 — Ledger filters, payment abandon, facility bulk level counts
+
+### `financials.proto`
+- `AdminPlatformTransaction.sender_type` (35), `receiver_type` (36) — ledger party kinds (`USER` | `GUEST` | `COMPANY` | `SYSTEM`)
+- `ListAdminPlatformTransactionsRequest.transaction_type_name` (12) — exact type name filter (e.g. `WALLET_FUNDING`)
+- `ListAdminPlatformTransactionsRequest.exclude_transaction_type_name` (13) — exclude a type from company activity ledger
+- `VerifyGuestInvoicePaymentRequest.abandon` (2) — mark PENDING guest checkout FAILED on cancel
+- `VerifyCompanyWalletFundRequest.abandon` (2) — mark PENDING wallet funding FAILED on cancel
+
+### `facility.proto`
+- `message FacilityBulkLevelCountOverride` — per-level `facility_node_level_id` + `count_per_parent`
+- `StartFacilityBulkCreateRequest.level_counts` (6) — required for custom bulk layouts
+
 ## 1.2.11 — Guest stays & bookings (partner occupancy + my bookings)
 
 ### `organization.proto`

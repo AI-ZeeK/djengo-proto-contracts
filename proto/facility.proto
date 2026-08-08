@@ -546,12 +546,20 @@ message ListFacilityBulkTemplatesResponse {
   repeated FacilityBulkTemplateMessage templates = 3;
 }
 
+message FacilityBulkLevelCountOverride {
+  string facility_node_level_id = 1;
+  int32 count_per_parent = 2;
+}
+
 message StartFacilityBulkCreateRequest {
   string company_id = 1;
   string organization_id = 2;
   string branch_id = 3;
+  // Preset: compact | balanced | expanded, optionally scoped primary: / dining:.
+  // Custom: custom | primary:custom | dining:custom — requires level_counts.
   string template_id = 4;
   string user_id = 5;
+  repeated FacilityBulkLevelCountOverride level_counts = 6;
 }
 
 message StartFacilityBulkCreateResponse {

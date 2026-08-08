@@ -1465,6 +1465,8 @@ message AdminPlatformTransaction {
   // When true, funds credit the company wallet — prefer company_name over receiver_user_*.
   bool   company_is_receiver      = 33;
   string sender_email             = 34; // Sender email when resolved from profile or payer notes
+  string sender_type              = 35; // USER | GUEST | COMPANY | SYSTEM
+  string receiver_type            = 36; // USER | GUEST | COMPANY | SYSTEM
 }
 
 message ListAdminPlatformTransactionsRequest {
@@ -1480,6 +1482,10 @@ message ListAdminPlatformTransactionsRequest {
   string sort_by             = 10; // created_at | amount | status
   // When set, only rows where this user is sender or receiver.
   optional string user_id    = 11;
+  // Exact type name match (e.g. WALLET_FUNDING). Prefer over id when stable naming matters.
+  optional string transaction_type_name = 12;
+  // Exclude rows of this type name (e.g. WALLET_FUNDING on company activity ledger).
+  optional string exclude_transaction_type_name = 13;
 }
 
 message ListAdminPlatformTransactionsResponse {
@@ -2304,7 +2310,11 @@ message InitializeGuestInvoicePaymentResponse {
   string currency_code = 7;
 }
 
-message VerifyGuestInvoicePaymentRequest { string reference = 1; }
+message VerifyGuestInvoicePaymentRequest {
+  string reference = 1;
+  // When true, mark a PENDING checkout as FAILED (payer cancelled / left).
+  optional bool abandon = 2;
+}
 
 message VerifyGuestInvoicePaymentResponse {
   bool success = 1;
@@ -2406,7 +2416,11 @@ message InitializeCompanyWalletFundResponse {
   string currency_code = 7;
 }
 
-message VerifyCompanyWalletFundRequest { string reference = 1; }
+message VerifyCompanyWalletFundRequest {
+  string reference = 1;
+  // When true, mark a PENDING funding checkout as FAILED (payer cancelled / left).
+  optional bool abandon = 2;
+}
 
 message ForceCompleteCompanyWalletFundRequest {
   string reference = 1;
