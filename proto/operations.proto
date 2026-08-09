@@ -746,6 +746,7 @@ service OrderService {
   rpc UpdateOrderStatus   (UpdateOrderStatusRequest)   returns (OrderProto);
   rpc CancelOrder         (CancelOrderRequest)         returns (OrderProto);
   rpc UpdateOrderPayment  (UpdateOrderPaymentRequest)  returns (OrderProto);
+  rpc GetKitchenAnalyticsOverview (GetKitchenAnalyticsOverviewRequest) returns (GetKitchenAnalyticsOverviewResponse);
 }
 
 message OrderItemProto {
@@ -837,11 +838,60 @@ message ListOrdersRequest {
   optional int32  page      = 8;
   optional int32  page_size = 9;
   optional string profile_type = 10; // GUEST | CLIENT_USER
+  optional string start_date = 11; // yyyy-MM-dd (inclusive, UTC day)
+  optional string end_date   = 12; // yyyy-MM-dd (inclusive, UTC day)
 }
 
 message ListOrdersResponse {
   repeated OrderProto orders = 1;
   TableMeta meta             = 2;
+}
+
+enum KitchenTimeline {
+  KITCHEN_TODAY = 0;
+  KITCHEN_7D    = 1;
+  KITCHEN_30D   = 2;
+  KITCHEN_1Y    = 3;
+  KITCHEN_ALL   = 4;
+}
+
+message KitchenChartData {
+  string name  = 1;
+  double value = 2;
+}
+
+message KitchenOverviewCard {
+  string title       = 1;
+  double total       = 2;
+  string trend       = 3;
+  double percentage  = 4;
+  string description = 5;
+  repeated KitchenChartData chart_data = 6;
+  optional string formatted_value = 7;
+}
+
+message KitchenOverviewChart {
+  string title      = 1;
+  string type       = 2;
+  string data_key   = 3;
+  string color      = 4;
+  string trend      = 5;
+  double percentage = 6;
+  repeated KitchenChartData data = 7;
+}
+
+message GetKitchenAnalyticsOverviewRequest {
+  string company_id      = 1;
+  KitchenTimeline timeline = 2;
+  string start_date      = 3;
+  string end_date        = 4;
+  string organization_id = 5;
+}
+
+message GetKitchenAnalyticsOverviewResponse {
+  repeated KitchenOverviewCard  cards  = 1;
+  repeated KitchenOverviewChart charts = 2;
+  string period_label = 3;
 }
 
 // ── Kitchen Tickets ────────────────────────────────────────────────────────
