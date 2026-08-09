@@ -757,6 +757,7 @@ message OrderItemProto {
   int64  unit_price_minor  = 6;
   int64  total_minor       = 7;
   optional string special_instructions = 8;
+  optional string catalog_kind = 9; // MENU | COMBO
 }
 
 message OrderProto {
@@ -766,7 +767,8 @@ message OrderProto {
   string source_id          = 4;
   string source_type        = 5; // RESTAURANT | HOTEL | SPA | GYM | BAR | ROOM_SERVICE | OTHER
   optional string destination_ref = 6;
-  optional string guest_id  = 7;
+  /// CRM guest id or authenticated client user id — see profile_type
+  optional string profile_id = 7;
   string order_number       = 8;
   string order_type         = 9; // DINE_IN | TAKEAWAY | ROOM_SERVICE | DELIVERY
   string status             = 10; // PENDING | CONFIRMED | PREPARING | READY | SERVED | CANCELLED | REFUNDED
@@ -785,6 +787,9 @@ message OrderProto {
   string updated_at         = 23;
   optional string payment_status = 24; // UNPAID | PENDING | PARTIALLY_PAID | PAID | REFUNDED
   optional string invoice_id     = 25;
+  /// GUEST | CLIENT_USER
+  optional string profile_type = 26;
+  optional string facility_node_id = 27;
 }
 
 message PlaceOrderRequest {
@@ -793,12 +798,15 @@ message PlaceOrderRequest {
   string source_id          = 3;
   string source_type        = 4;
   optional string destination_ref = 5;
-  optional string guest_id  = 6;
+  optional string profile_id = 6;
   string order_type         = 7;
   string currency_code      = 8;
   optional string special_instructions = 9;
   string placed_by          = 10;
   repeated OrderItemProto items = 11;
+  /// GUEST | CLIENT_USER — required when profile_id is set
+  optional string profile_type = 12;
+  optional string facility_node_id = 13;
 }
 
 message GetOrderRequest           { string order_id = 1; }
@@ -808,7 +816,8 @@ message UpdateOrderPaymentRequest {
   string order_id = 1;
   string payment_status = 2; // UNPAID | PENDING | PARTIALLY_PAID | PAID | REFUNDED
   optional string invoice_id = 3;
-  optional string guest_id = 4;
+  optional string profile_id = 4;
+  optional string profile_type = 5; // GUEST | CLIENT_USER
 }
 
 message UpdateOrderStatusRequest {
@@ -823,10 +832,11 @@ message ListOrdersRequest {
   optional string source_id = 3;
   optional string source_type = 4;
   optional string status    = 5;
-  optional string guest_id  = 6;
+  optional string profile_id = 6;
   optional string search    = 7;
   optional int32  page      = 8;
   optional int32  page_size = 9;
+  optional string profile_type = 10; // GUEST | CLIENT_USER
 }
 
 message ListOrdersResponse {
@@ -918,6 +928,7 @@ message RestaurantMenuProto {
   bool   is_active          = 10;
   string created_at         = 11;
   string updated_at         = 12;
+  optional string category_id = 13;
 }
 
 message ListRestaurantMenusRequest {
@@ -949,6 +960,7 @@ message CreateRestaurantMenuRequest {
   double price              = 8;
   optional string image_url = 9;
   bool   is_active          = 10;
+  optional string category_id = 11;
 }
 
 message UpdateRestaurantMenuRequest {
@@ -959,6 +971,7 @@ message UpdateRestaurantMenuRequest {
   optional double price     = 5;
   optional string image_url = 6;
   optional bool   is_active = 7;
+  optional string category_id = 8;
 }
 
 message DeleteRestaurantMenuRequest { string menu_id = 1; }
@@ -966,6 +979,221 @@ message DeleteRestaurantMenuRequest { string menu_id = 1; }
 message DeleteRestaurantMenuResponse {
   bool success = 1;
   optional string error = 2;
+}
+
+// ── Menu categories ────────────────────────────────────────────────────────
+
+service RestaurantMenuCategoryService {
+  rpc ListMenuCategories   (ListMenuCategoriesRequest)   returns (ListMenuCategoriesResponse);
+  rpc CreateMenuCategory   (CreateMenuCategoryRequest)   returns (MenuCategoryProto);
+  rpc UpdateMenuCategory   (UpdateMenuCategoryRequest)   returns (MenuCategoryProto);
+  rpc DeleteMenuCategory   (DeleteMenuCategoryRequest)   returns (DeleteMenuCategoryResponse);
+}
+
+message MenuCategoryProto {
+  string category_id        = 1;
+  string company_id         = 2;
+  string organization_id    = 3;
+  string service_branch_id  = 4;
+  string name               = 5;
+  int32  sort_order         = 6;
+  bool   is_active          = 7;
+  string created_at         = 8;
+  string updated_at         = 9;
+}
+
+message ListMenuCategoriesRequest {
+  string company_id               = 1;
+  string organization_id          = 2;
+  optional string branch_id       = 3;
+  optional string service_branch_id = 4;
+  optional bool   active_only     = 5;
+}
+
+message ListMenuCategoriesResponse {
+  repeated MenuCategoryProto categories = 1;
+}
+
+message CreateMenuCategoryRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  optional string branch_id = 3;
+  optional string service_branch_id = 4;
+  string name               = 5;
+  optional int32 sort_order = 6;
+  optional bool  is_active  = 7;
+}
+
+message UpdateMenuCategoryRequest {
+  string category_id        = 1;
+  optional string name      = 2;
+  optional int32  sort_order = 3;
+  optional bool   is_active = 4;
+}
+
+message DeleteMenuCategoryRequest { string category_id = 1; }
+message DeleteMenuCategoryResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
+// ── Menu combos ────────────────────────────────────────────────────────────
+
+service RestaurantMenuComboService {
+  rpc ListMenuCombos   (ListMenuCombosRequest)   returns (ListMenuCombosResponse);
+  rpc GetMenuCombo     (GetMenuComboRequest)     returns (MenuComboProto);
+  rpc CreateMenuCombo  (CreateMenuComboRequest)  returns (MenuComboProto);
+  rpc UpdateMenuCombo  (UpdateMenuComboRequest)  returns (MenuComboProto);
+  rpc DeleteMenuCombo  (DeleteMenuComboRequest)  returns (DeleteMenuComboResponse);
+}
+
+message MenuComboItemProto {
+  string menu_id   = 1;
+  string name      = 2;
+  int32  quantity  = 3;
+}
+
+message MenuComboProto {
+  string combo_id           = 1;
+  string service_branch_id  = 2;
+  string company_id         = 3;
+  string name               = 4;
+  optional string description = 5;
+  optional string category_id = 6;
+  optional string category  = 7;
+  double price              = 8;
+  int64  price_minor        = 9;
+  optional string image_url = 10;
+  bool   is_active          = 11;
+  repeated MenuComboItemProto items = 12;
+  string created_at         = 13;
+  string updated_at         = 14;
+}
+
+message ListMenuCombosRequest {
+  string company_id               = 1;
+  string organization_id          = 2;
+  optional string branch_id       = 3;
+  optional string service_branch_id = 4;
+  optional bool   active_only     = 5;
+}
+
+message ListMenuCombosResponse {
+  repeated MenuComboProto combos = 1;
+}
+
+message GetMenuComboRequest { string combo_id = 1; }
+
+message CreateMenuComboRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  optional string branch_id = 3;
+  optional string service_branch_id = 4;
+  string name               = 5;
+  optional string description = 6;
+  optional string category_id = 7;
+  double price              = 8;
+  optional string image_url = 9;
+  bool   is_active          = 10;
+  repeated MenuComboItemProto items = 11;
+}
+
+message UpdateMenuComboRequest {
+  string combo_id           = 1;
+  optional string name      = 2;
+  optional string description = 3;
+  optional string category_id = 4;
+  optional double price     = 5;
+  optional string image_url = 6;
+  optional bool   is_active = 7;
+  repeated MenuComboItemProto items = 8;
+}
+
+message DeleteMenuComboRequest { string combo_id = 1; }
+message DeleteMenuComboResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
+// ── Food refund policy ─────────────────────────────────────────────────────
+
+service FoodRefundPolicyService {
+  rpc GetFoodRefundPolicy    (GetFoodRefundPolicyRequest)    returns (FoodRefundPolicyProto);
+  rpc UpsertFoodRefundPolicy (UpsertFoodRefundPolicyRequest) returns (FoodRefundPolicyProto);
+  rpc RequestOrderRefund     (RequestOrderRefundRequest)     returns (OrderRefundRequestProto);
+  rpc ListOrderRefunds       (ListOrderRefundsRequest)       returns (ListOrderRefundsResponse);
+  rpc DecideOrderRefund      (DecideOrderRefundRequest)      returns (OrderRefundRequestProto);
+}
+
+message FoodRefundPolicyProto {
+  string policy_id          = 1;
+  string company_id         = 2;
+  string organization_id    = 3;
+  optional string branch_id = 4;
+  bool   enabled            = 5;
+  int32  window_minutes     = 6;
+  string full_refund_until_status = 7; // PENDING | CONFIRMED | PREPARING
+  bool   partial_allowed    = 8;
+  bool   auto_approve_unpaid_cancel = 9;
+  string created_at         = 10;
+  string updated_at         = 11;
+}
+
+message GetFoodRefundPolicyRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  optional string branch_id = 3;
+}
+
+message UpsertFoodRefundPolicyRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  optional string branch_id = 3;
+  bool   enabled            = 4;
+  int32  window_minutes     = 5;
+  string full_refund_until_status = 6;
+  bool   partial_allowed    = 7;
+  bool   auto_approve_unpaid_cancel = 8;
+}
+
+message OrderRefundRequestProto {
+  string refund_request_id  = 1;
+  string order_id           = 2;
+  string company_id         = 3;
+  string status             = 4; // PENDING | APPROVED | DENIED | CANCELLED
+  optional string reason    = 5;
+  optional string decided_by = 6;
+  optional string decided_at = 7;
+  optional string decision_note = 8;
+  string requested_by       = 9;
+  string created_at         = 10;
+  string updated_at         = 11;
+}
+
+message RequestOrderRefundRequest {
+  string order_id           = 1;
+  string company_id         = 2;
+  string organization_id    = 3;
+  string requested_by       = 4;
+  optional string reason    = 5;
+}
+
+message ListOrderRefundsRequest {
+  string company_id         = 1;
+  string organization_id    = 2;
+  optional string status    = 3;
+  optional string order_id  = 4;
+}
+
+message ListOrderRefundsResponse {
+  repeated OrderRefundRequestProto refunds = 1;
+}
+
+message DecideOrderRefundRequest {
+  string refund_request_id  = 1;
+  string decided_by         = 2;
+  bool   approve            = 3;
+  optional string decision_note = 4;
 }
 
 // ── Guest Feedback ─────────────────────────────────────────────────────────

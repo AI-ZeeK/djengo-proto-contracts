@@ -301,6 +301,104 @@ export class Helpers {
     return { percentage: Math.round(pct * 10) / 10, trend };
   }
 
+  /**
+   * Proto Timeline._1m = 0 so String(timeline) is "0". Also accepts "_1m" / "1m".
+   */
+  static normalizeTimelineKey(
+    timeline: string | number | undefined | null,
+  ): string {
+    const byNumber: Record<number, string> = {
+      0: Timeline._1m,
+      1: Timeline._3m,
+      2: Timeline._6m,
+      3: Timeline._1y,
+      4: Timeline.all,
+    };
+    if (typeof timeline === "number" && byNumber[timeline]) {
+      return byNumber[timeline];
+    }
+    if (typeof timeline === "string") {
+      const trimmed = timeline.trim().replace(/^_/, "");
+      if (["1m", "3m", "6m", "1y", "1yr", "all"].includes(trimmed)) {
+        return trimmed === "1yr" ? Timeline._1y : trimmed;
+      }
+      const asNum = Number(trimmed);
+      if (!Number.isNaN(asNum) && byNumber[asNum]) return byNumber[asNum];
+    }
+    return Timeline.all;
+  }
+
+  /**
+   * Calendar buckets covering [dateFrom, dateTo], always including today.
+   * End is exclusive except callers should treat the last bucket as inclusive of dateTo.
+   */
+  static buildFilledTimelineBuckets(
+    dateFrom: Date,
+    dateTo: Date,
+    timeline?: string | number | null,
+  ): Array<{ start: Date; end: Date; label: string }> {
+    const key = Helpers.normalizeTimelineKey(timeline);
+    const buckets: Array<{ start: Date; end: Date; label: string }> = [];
+    const endExclusive = new Date(dateTo.getTime() + 1);
+
+    if (key === Timeline._1m) {
+      for (let i = 0; i < 4; i++) {
+        const start = new Date(dateFrom);
+        start.setDate(dateFrom.getDate() + i * 7);
+        const isLast = i === 3;
+        const end = isLast
+          ? endExclusive
+          : new Date(
+              dateFrom.getFullYear(),
+              dateFrom.getMonth(),
+              dateFrom.getDate() + (i + 1) * 7,
+            );
+        const label = isLast
+          ? `W${i + 1} ${start.toLocaleString("en", { day: "2-digit", month: "short" })}–${dateTo.toLocaleString("en", { day: "2-digit", month: "short" })}`
+          : `W${i + 1} ${start.toLocaleString("en", { day: "2-digit", month: "short" })}`;
+        buckets.push({ start, end, label });
+      }
+      return buckets;
+    }
+
+    if (
+      key === Timeline._3m ||
+      key === Timeline._6m ||
+      key === Timeline._1y
+    ) {
+      let cursor = new Date(dateFrom.getFullYear(), dateFrom.getMonth(), 1);
+      const last = new Date(dateTo.getFullYear(), dateTo.getMonth(), 1);
+      while (cursor <= last) {
+        const start = cursor < dateFrom ? new Date(dateFrom) : new Date(cursor);
+        const next = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+        const isLast = cursor.getTime() === last.getTime();
+        buckets.push({
+          start,
+          end: isLast ? endExclusive : next,
+          label: cursor.toLocaleString("en", { month: "short", year: "numeric" }),
+        });
+        cursor = next;
+      }
+      return buckets;
+    }
+
+    // all — yearly buckets from dateFrom through dateTo (or last 24 months if unbounded)
+    const from =
+      dateFrom.getFullYear() < 2000
+        ? new Date(dateTo.getFullYear() - 2, dateTo.getMonth(), dateTo.getDate())
+        : dateFrom;
+    for (let y = from.getFullYear(); y <= dateTo.getFullYear(); y++) {
+      const start =
+        y === from.getFullYear() ? new Date(from) : new Date(y, 0, 1);
+      const end =
+        y === dateTo.getFullYear()
+          ? endExclusive
+          : new Date(y + 1, 0, 1);
+      buckets.push({ start, end, label: String(y) });
+    }
+    return buckets;
+  }
+
   static getDateRanges({
     timeline,
     start_date,
@@ -321,8 +419,10 @@ export class Helpers {
     let prev_date_from: Date | undefined;
     let prev_date_to: Date | undefined;
 
-    if (timeline) {
-      switch (timeline as Timeline) {
+    const timelineKey = Helpers.normalizeTimelineKey(timeline);
+
+    if (timelineKey) {
+      switch (timelineKey as Timeline) {
         case Timeline._1m:
           date_from = new Date(
             now.getFullYear(),
@@ -391,17 +491,46 @@ export class Helpers {
             now.getDate(),
           );
           break;
+        case Timeline.all:
+          // Rolling 24 months so charts still have a finite window ending today.
+          date_from = new Date(
+            now.getFullYear(),
+            now.getMonth() - 24,
+            now.getDate(),
+          );
+          prev_date_from = new Date(
+            now.getFullYear(),
+            now.getMonth() - 48,
+            now.getDate(),
+          );
+          prev_date_to = new Date(
+            now.getFullYear(),
+            now.getMonth() - 24,
+            now.getDate(),
+          );
+          break;
       }
       date_to = now;
     }
 
-    if (start_date) date_from = new Date(start_date);
-    if (end_date) date_to = new Date(end_date);
+    const parseDay = (value: string, endOfDay: boolean) => {
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return d;
+      if (value.trim().length <= 10) {
+        if (endOfDay) d.setHours(23, 59, 59, 999);
+        else d.setHours(0, 0, 0, 0);
+      }
+      return d;
+    };
+
+    if (start_date) date_from = parseDay(start_date, false);
+    if (end_date) date_to = parseDay(end_date, true);
     if (start_date && end_date) {
-      const diff =
-        new Date(end_date).getTime() - new Date(start_date).getTime();
-      prev_date_to = new Date(new Date(start_date).getTime());
-      prev_date_from = new Date(new Date(start_date).getTime() - diff);
+      const from = parseDay(start_date, false);
+      const to = parseDay(end_date, true);
+      const diff = to.getTime() - from.getTime();
+      prev_date_to = new Date(from.getTime());
+      prev_date_from = new Date(from.getTime() - diff);
     }
 
     return { date_from, date_to, prev_date_from, prev_date_to };
