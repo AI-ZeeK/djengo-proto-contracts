@@ -2,6 +2,13 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## Unreleased — Facility place roles
+
+### `facility.proto`
+- `enum FacilitySpaceUsage` — `BOOKABLE` | `DEPARTMENT` | `OPERATIONAL` (plus unspecified)
+- `FacilityNodeMessage.space_usage` (20), `department_id` (21)
+- Create/Update facility node requests accept the same fields (department link for hospital dept places)
+
 ## 1.2.12 — Ledger filters, payment abandon, facility bulk level counts
 
 ### `financials.proto`

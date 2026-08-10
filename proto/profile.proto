@@ -117,6 +117,8 @@ service ProfileService {
   // Public booking (!stay_as_guest): find or create a CLIENT user and ensure CLIENT role.
   rpc ResolveOrCreateClientAccount(ResolveOrCreateClientAccountRequest) returns (ResolveOrCreateClientAccountResponse);
   rpc IncrementGuestVisitCount(IncrementGuestVisitCountRequest) returns (IncrementGuestVisitCountResponse);
+  rpc CreateCrmInteraction(CreateCrmInteractionRequest) returns (CrmInteractionProto);
+  rpc ListGuestInteractions(ListGuestInteractionsRequest) returns (ListGuestInteractionsResponse);
 
   // ── Compliance: HR Audit + GDPR ───────────────────────────────────────────
   rpc AppendHrAuditLog(AppendHrAuditLogRequest) returns (AppendHrAuditLogResponse);
@@ -1888,6 +1890,49 @@ message ListGuestsRequest {
 
 message ListGuestsResponse {
   repeated GuestProto guests = 1;
+  int32 total = 2;
+}
+
+message CrmInteractionProto {
+  string interaction_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string guest_id = 4;
+  string channel = 5;
+  string direction = 6;
+  optional string subject = 7;
+  optional string body = 8;
+  optional string related_type = 9;
+  optional string related_id = 10;
+  optional string created_by = 11;
+  string occurred_at = 12;
+  string created_at = 13;
+}
+
+message CreateCrmInteractionRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string guest_id = 3;
+  string channel = 4;
+  string direction = 5;
+  optional string subject = 6;
+  optional string body = 7;
+  optional string related_type = 8;
+  optional string related_id = 9;
+  optional string created_by = 10;
+  optional string occurred_at = 11;
+}
+
+message ListGuestInteractionsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string guest_id = 3;
+  optional int32 page = 4;
+  optional int32 page_size = 5;
+}
+
+message ListGuestInteractionsResponse {
+  repeated CrmInteractionProto interactions = 1;
   int32 total = 2;
 }
 

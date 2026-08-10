@@ -1621,6 +1621,11 @@ service FacilityAssetService {
   rpc RegisterAsset               (RegisterFacilityAssetRequest)    returns (FacilityAssetRecord);
   rpc UpdateAsset                 (UpdateFacilityAssetRequest)      returns (FacilityAssetRecord);
   rpc GetDepreciationSchedule     (GetDepreciationScheduleRequest)  returns (AssetDepreciationSchedule);
+  rpc ListPmSchedules             (ListFacilityPmSchedulesRequest) returns (ListFacilityPmSchedulesResponse);
+  rpc CreatePmSchedule            (CreateFacilityPmScheduleRequest) returns (FacilityPmScheduleRecord);
+  rpc UpdatePmSchedule            (UpdateFacilityPmScheduleRequest) returns (FacilityPmScheduleRecord);
+  rpc CompletePmOccurrence        (CompleteFacilityPmOccurrenceRequest) returns (FacilityPmScheduleRecord);
+  rpc ListMaintenanceLogs         (ListFacilityMaintenanceLogsRequest) returns (ListFacilityMaintenanceLogsResponse);
 }
 
 message ListFacilityAssetsRequest {
@@ -1664,6 +1669,10 @@ message FacilityAssetRecord {
   int64           accumulated_depreciation_minor = 14;
   int64           net_book_value_minor           = 15;
   optional string last_depreciation_at           = 16;
+  optional string purchase_date                  = 17; // yyyy-MM-dd
+  optional string warranty_expires_at            = 18; // yyyy-MM-dd
+  optional string warranty_provider              = 19;
+  optional string warranty_terms                 = 20;
 }
 
 message UpdateFacilityAssetRequest {
@@ -1672,6 +1681,10 @@ message UpdateFacilityAssetRequest {
   optional int32  useful_life_months   = 3;
   optional int64  salvage_value_minor  = 4;
   optional string depreciation_method  = 5; // STRAIGHT_LINE | DECLINING_BALANCE
+  optional string purchase_date        = 6;
+  optional string warranty_expires_at  = 7;
+  optional string warranty_provider    = 8;
+  optional string warranty_terms       = 9;
 }
 
 message GetDepreciationScheduleRequest {
@@ -1697,6 +1710,83 @@ message AssetDepreciationSchedule {
   int64  accumulated_depreciation_minor  = 7;
   int64  net_book_value_minor            = 8;
   repeated DepreciationLine schedule     = 9;
+}
+
+message ListFacilityPmSchedulesRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string asset_id = 3;
+  optional string status = 4;
+}
+
+message FacilityPmScheduleRecord {
+  string schedule_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string asset_id = 4;
+  string title = 5;
+  int32 cadence_days = 6;
+  string next_due_at = 7;
+  string status = 8;
+  string created_at = 9;
+}
+
+message ListFacilityPmSchedulesResponse {
+  repeated FacilityPmScheduleRecord schedules = 1;
+}
+
+message CreateFacilityPmScheduleRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string asset_id = 3;
+  string title = 4;
+  int32 cadence_days = 5;
+  string next_due_at = 6;
+}
+
+message UpdateFacilityPmScheduleRequest {
+  string schedule_id = 1;
+  string company_id = 2;
+  optional string title = 3;
+  optional int32 cadence_days = 4;
+  optional string next_due_at = 5;
+  optional string status = 6;
+}
+
+message CompleteFacilityPmOccurrenceRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string schedule_id = 3;
+  optional string performed_at = 4;
+  optional string performed_by = 5;
+  optional string title = 6;
+  optional string notes = 7;
+  int64 cost_minor = 8;
+}
+
+message ListFacilityMaintenanceLogsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string asset_id = 3;
+}
+
+message FacilityMaintenanceLogRecord {
+  string log_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string asset_id = 4;
+  string schedule_id = 5;
+  string performed_at = 6;
+  string performed_by = 7;
+  string kind = 8;
+  string title = 9;
+  string notes = 10;
+  int64 cost_minor = 11;
+  string created_at = 12;
+}
+
+message ListFacilityMaintenanceLogsResponse {
+  repeated FacilityMaintenanceLogRecord logs = 1;
 }
 
 // ── Budget Variance Report ────────────────────────────────────────────────

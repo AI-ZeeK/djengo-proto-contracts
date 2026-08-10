@@ -1770,3 +1770,142 @@ message TableMeta {
   int32 next_page   = 5;
   int32 prev_page   = 6;
 }
+// ── Facility ops workflows (work orders / housekeeping / duty roster) ────────
+service FacilityOpsService {
+  rpc CreateWorkOrder (CreateWorkOrderRequest) returns (WorkOrderRecord);
+  rpc ListWorkOrders (ListWorkOrdersRequest) returns (ListWorkOrdersResponse);
+  rpc UpdateWorkOrderStatus (UpdateWorkOrderStatusRequest) returns (WorkOrderRecord);
+  rpc CreateHousekeepingTask (CreateHousekeepingTaskRequest) returns (HousekeepingTaskRecord);
+  rpc ListHousekeepingTasks (ListHousekeepingTasksRequest) returns (ListHousekeepingTasksResponse);
+  rpc UpdateHousekeepingTaskStatus (UpdateHousekeepingTaskStatusRequest) returns (HousekeepingTaskRecord);
+  rpc CreateDutyRosterAssignment (CreateDutyRosterAssignmentRequest) returns (DutyRosterAssignmentRecord);
+  rpc ListDutyRosterAssignments (ListDutyRosterAssignmentsRequest) returns (ListDutyRosterAssignmentsResponse);
+}
+
+message WorkOrderRecord {
+  string work_order_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  optional string branch_id = 4;
+  optional string facility_node_id = 5;
+  optional string asset_id = 6;
+  string title = 7;
+  optional string description = 8;
+  string status = 9;
+  int32 priority = 10;
+  string source = 11;
+  optional string assigned_to = 12;
+  optional string due_at = 13;
+  string created_at = 14;
+  string updated_at = 15;
+}
+
+message CreateWorkOrderRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  optional string facility_node_id = 4;
+  optional string asset_id = 5;
+  string title = 6;
+  optional string description = 7;
+  int32 priority = 8;
+  string source = 9;
+  optional string assigned_to = 10;
+  optional string due_at = 11;
+  optional string created_by = 12;
+}
+
+message ListWorkOrdersRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string status = 3;
+  optional string branch_id = 4;
+}
+
+message ListWorkOrdersResponse {
+  repeated WorkOrderRecord work_orders = 1;
+}
+
+message UpdateWorkOrderStatusRequest {
+  string work_order_id = 1;
+  string company_id = 2;
+  string status = 3;
+  optional string assigned_to = 4;
+}
+
+message HousekeepingTaskRecord {
+  string task_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  optional string branch_id = 4;
+  string facility_node_id = 5;
+  string status = 6;
+  optional string assigned_to = 7;
+  optional string due_at = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message CreateHousekeepingTaskRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  string facility_node_id = 4;
+  optional string assigned_to = 5;
+  optional string due_at = 6;
+}
+
+message ListHousekeepingTasksRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string status = 3;
+  optional string branch_id = 4;
+}
+
+message ListHousekeepingTasksResponse {
+  repeated HousekeepingTaskRecord tasks = 1;
+}
+
+message UpdateHousekeepingTaskStatusRequest {
+  string task_id = 1;
+  string company_id = 2;
+  string status = 3;
+  optional string assigned_to = 4;
+}
+
+message DutyRosterAssignmentRecord {
+  string assignment_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  optional string branch_id = 4;
+  string duty_date = 5;
+  string staff_id = 6;
+  string role_code = 7;
+  optional string station_or_zone = 8;
+  optional string facility_node_id = 9;
+  string status = 10;
+  string created_at = 11;
+}
+
+message CreateDutyRosterAssignmentRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  string duty_date = 4;
+  string staff_id = 5;
+  string role_code = 6;
+  optional string station_or_zone = 7;
+  optional string facility_node_id = 8;
+}
+
+message ListDutyRosterAssignmentsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string duty_date = 3;
+  optional string branch_id = 4;
+  optional string role_code = 5;
+}
+
+message ListDutyRosterAssignmentsResponse {
+  repeated DutyRosterAssignmentRecord assignments = 1;
+}
