@@ -409,6 +409,8 @@ enum Timeline {
   _6m = 2;
   _1y = 3;
   all = 4;
+  _today = 5;
+  _7d = 6;
 }
   
  enum TransactionCategory {
