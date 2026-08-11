@@ -112,6 +112,11 @@ message NotificationRichPayload {
   repeated NotificationAttachment attachments = 6;
   repeated NotificationAction actions = 7;
   bool allow_reply = 8;
+  /** Display name when sender is a guest / not a resolvable user id. */
+  string actor_name = 9;
+  string actor_avatar = 10;
+  /** Optional line under the name (e.g. guest location / branch). */
+  string actor_subtitle = 11;
 }
 
 message CreateInAppNotificationRequest {
