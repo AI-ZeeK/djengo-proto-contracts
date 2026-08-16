@@ -1830,6 +1830,10 @@ message AcknowledgeEngagementDocumentRequest {
   // When set, status becomes SIGNED (drawn/uploaded signature).
   string signature_file_id = 4;
   string signature_file_url = 5;
+  // Staff OrgAuth path: when company_id is set, authorize by company/org
+  // (CLIENT + STAFF visibility) instead of guest_user_id match.
+  string company_id = 6;
+  string organization_id = 7;
 }
 
 message GetEngagementDocumentChecklistRequest {
