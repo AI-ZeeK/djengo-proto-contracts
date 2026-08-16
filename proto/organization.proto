@@ -67,6 +67,8 @@ service CompanyRoleService {
   rpc CreateRole(CreateRoleRequest) returns (UtilitiesResponse);
   rpc UpdateRole(UpdateRoleRequest) returns (UtilitiesResponse);
   rpc GetCompanyRoles(CompanyRolesRequest) returns (FetchRolesResponse);
+  /// Company + staff roles that hold a given approve_* permission (for approval chains).
+  rpc GetApproverRoles(GetApproverRolesRequest) returns (FetchRolesResponse);
   rpc GetCompanyRole(CompanyRoleRequest) returns (FetchRoleResponse);
   rpc GetCompanyRoleStaff(CompanyRoleRequest) returns (GetCompanyRoleStaffResponse);
   rpc GetCompanyRoleBusinessUsers(CompanyRoleRequest) returns (GetCompanyRoleBusinessUsersResponse);
@@ -370,6 +372,15 @@ message CompanyRolesRequest {
   string company_id = 1;
   optional string branch_id = 2;
   RoleType role_type = 3;
+}
+
+/// Find STAFF_ROLE + BUSINESS_USER_ROLE rows that hold an approve_* grant.
+/// Prefer entity_type_slug (mapped server-side); permission_name overrides when set.
+message GetApproverRolesRequest {
+  string company_id = 1;
+  optional string branch_id = 2;
+  optional string entity_type_slug = 3;
+  optional string permission_name = 4;
 }
 
 message UpdateCompanyDetailsRequest {

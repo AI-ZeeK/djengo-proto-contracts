@@ -749,6 +749,13 @@ service OrderService {
   rpc GetKitchenAnalyticsOverview (GetKitchenAnalyticsOverviewRequest) returns (GetKitchenAnalyticsOverviewResponse);
 }
 
+/// Branch food delivery coverage (radius / cities / nation-wide).
+service DeliveryCoverageService {
+  rpc GetDeliveryCoverage   (GetDeliveryCoverageRequest)   returns (DeliveryCoverageProto);
+  rpc UpsertDeliveryCoverage(UpsertDeliveryCoverageRequest) returns (DeliveryCoverageProto);
+  rpc CheckDeliveryCoverage (CheckDeliveryCoverageRequest) returns (CheckDeliveryCoverageResponse);
+}
+
 message OrderItemProto {
   string order_item_id     = 1;
   string order_id          = 2;
@@ -759,6 +766,18 @@ message OrderItemProto {
   int64  total_minor       = 7;
   optional string special_instructions = 8;
   optional string catalog_kind = 9; // MENU | COMBO
+}
+
+/// Resolved CRM guest or client user for order detail UIs.
+message OrderProfileProto {
+  string profile_id = 1;
+  string profile_type = 2; // GUEST | CLIENT_USER
+  optional string first_name = 3;
+  optional string last_name = 4;
+  optional string email = 5;
+  optional string phone_number = 6;
+  optional string display_name = 7;
+  optional string avatar_url = 8;
 }
 
 message OrderProto {
@@ -791,6 +810,8 @@ message OrderProto {
   /// GUEST | CLIENT_USER
   optional string profile_type = 26;
   optional string facility_node_id = 27;
+  /// Filled on GetOrder (and place) when profile_id is set.
+  optional OrderProfileProto profile = 28;
 }
 
 message PlaceOrderRequest {
@@ -808,6 +829,74 @@ message PlaceOrderRequest {
   /// GUEST | CLIENT_USER — required when profile_id is set
   optional string profile_type = 12;
   optional string facility_node_id = 13;
+  /// Branch fulfilling the order (required for DELIVERY coverage checks).
+  optional string branch_id = 14;
+  optional double delivery_latitude = 15;
+  optional double delivery_longitude = 16;
+  optional string delivery_city = 17;
+  optional string delivery_country_code = 18;
+}
+
+message DeliveryCoverageCityProto {
+  string city = 1;
+  optional string state = 2;
+  optional string country_code = 3;
+}
+
+message DeliveryCoverageProto {
+  string policy_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string branch_id = 4;
+  bool delivery_enabled = 5;
+  /// RADIUS | CITIES | COUNTRY
+  string coverage_mode = 6;
+  optional double radius_km = 7;
+  optional string country_code = 8;
+  repeated DeliveryCoverageCityProto cities = 9;
+  optional string notes = 10;
+  optional double origin_latitude = 11;
+  optional double origin_longitude = 12;
+  string updated_at = 13;
+}
+
+message GetDeliveryCoverageRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+}
+
+message UpsertDeliveryCoverageRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  bool delivery_enabled = 4;
+  string coverage_mode = 5;
+  optional double radius_km = 6;
+  optional string country_code = 7;
+  repeated DeliveryCoverageCityProto cities = 8;
+  optional string notes = 9;
+  optional double origin_latitude = 10;
+  optional double origin_longitude = 11;
+}
+
+message CheckDeliveryCoverageRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  double latitude = 4;
+  double longitude = 5;
+  optional string city = 6;
+  optional string country_code = 7;
+}
+
+message CheckDeliveryCoverageResponse {
+  bool allowed = 1;
+  string reason = 2;
+  string coverage_mode = 3;
+  optional double distance_km = 4;
+  optional string notes = 5;
+  bool delivery_enabled = 6;
 }
 
 message GetOrderRequest           { string order_id = 1; }
@@ -1618,6 +1707,8 @@ message EngagementDocumentRequirementProto {
   bool is_required = 9;
   string instructions = 10;
   string template_file_id = 11;
+  // Public URL for company-uploaded PDF/image (guest preview).
+  string template_file_url = 12;
 }
 
 message EngagementDocumentTemplateProto {
@@ -1673,6 +1764,8 @@ message EngagementDocumentInstanceProto {
   string acknowledged_at = 19;
   string acknowledged_by_name = 20;
   string created_at = 21;
+  string signature_file_id = 22;
+  string signature_file_url = 23;
 }
 
 message ListEngagementDocumentInstancesRequest {
@@ -1686,6 +1779,8 @@ message ListEngagementDocumentInstancesRequest {
 
 message ListMyEngagementDocumentsRequest {
   string guest_user_id = 1;
+  // Optional: filter guest inbox to one stay (tenancy deep-link).
+  string occupancy_stay_id = 2;
 }
 
 message ListEngagementDocumentInstancesResponse {
@@ -1732,6 +1827,9 @@ message AcknowledgeEngagementDocumentRequest {
   string instance_id = 1;
   string guest_user_id = 2;
   string acknowledged_by_name = 3;
+  // When set, status becomes SIGNED (drawn/uploaded signature).
+  string signature_file_id = 4;
+  string signature_file_url = 5;
 }
 
 message GetEngagementDocumentChecklistRequest {
