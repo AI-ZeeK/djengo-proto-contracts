@@ -2643,6 +2643,12 @@ message HospitalityBillingPolicyProto {
   string updated_at = 18;
   // COMPANY | BRANCH — meaningful on company-wide row (branch_id empty)
   string billing_scope = 19;
+  // Tax / VAT applied to every guest invoice when enabled
+  bool tax_enabled = 20;
+  string tax_label = 21; // e.g. VAT
+  double tax_rate_percent = 22;
+  bool prices_include_tax = 23;
+  optional string tax_registration_number = 24;
 }
 
 message GetHospitalityBillingPolicyRequest {
@@ -2669,6 +2675,11 @@ message UpsertHospitalityBillingPolicyRequest {
   bool is_active = 15;
   // COMPANY | BRANCH — set on company-wide upsert
   string billing_scope = 16;
+  bool tax_enabled = 17;
+  string tax_label = 18;
+  double tax_rate_percent = 19;
+  bool prices_include_tax = 20;
+  optional string tax_registration_number = 21;
 }
 
 message ListHospitalityBillingPoliciesRequest {
@@ -2698,6 +2709,13 @@ message ComputeHospitalityDepositResponse {
   bool require_deposit_before_confirm = 8;
   bool invoice_on_public_booking = 9;
   HospitalityBillingPolicyProto policy = 10;
+  // Tax preview for public booking / checkout (deposit still based on stay total)
+  bool tax_enabled = 11;
+  string tax_label = 12;
+  double tax_rate_percent = 13;
+  bool prices_include_tax = 14;
+  int64 tax_minor = 15;
+  int64 invoice_total_minor = 16;
 }
 
 // ── Statutory Remittances ─────────────────────────────────────────────────
