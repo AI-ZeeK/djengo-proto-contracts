@@ -1900,6 +1900,8 @@ message WorkOrderRecord {
   optional string due_at = 13;
   string created_at = 14;
   string updated_at = 15;
+  optional string stay_id = 16;
+  optional string created_by = 17;
 }
 
 message CreateWorkOrderRequest {
@@ -1915,6 +1917,7 @@ message CreateWorkOrderRequest {
   optional string assigned_to = 10;
   optional string due_at = 11;
   optional string created_by = 12;
+  optional string stay_id = 13;
 }
 
 message ListWorkOrdersRequest {
@@ -1922,6 +1925,9 @@ message ListWorkOrdersRequest {
   string company_id = 2;
   optional string status = 3;
   optional string branch_id = 4;
+  optional string stay_id = 5;
+  optional string source = 6;
+  optional string created_by = 7;
 }
 
 message ListWorkOrdersResponse {
@@ -1946,6 +1952,9 @@ message HousekeepingTaskRecord {
   optional string due_at = 8;
   string created_at = 9;
   string updated_at = 10;
+  optional string stay_id = 11;
+  optional string created_by = 12;
+  string source = 13;
 }
 
 message CreateHousekeepingTaskRequest {
@@ -1955,6 +1964,10 @@ message CreateHousekeepingTaskRequest {
   string facility_node_id = 4;
   optional string assigned_to = 5;
   optional string due_at = 6;
+  optional string stay_id = 7;
+  optional string created_by = 8;
+  optional string source = 9;
+  optional string checklist_result_json = 10;
 }
 
 message ListHousekeepingTasksRequest {
@@ -1962,6 +1975,9 @@ message ListHousekeepingTasksRequest {
   string company_id = 2;
   optional string status = 3;
   optional string branch_id = 4;
+  optional string stay_id = 5;
+  optional string source = 6;
+  optional string created_by = 7;
 }
 
 message ListHousekeepingTasksResponse {

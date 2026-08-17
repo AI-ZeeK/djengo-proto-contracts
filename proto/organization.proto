@@ -165,6 +165,10 @@ service SaasBillingService {
   rpc ListAvailableSaasPlans(EmptyRequest) returns (ListSaasPlansResponse);
   rpc RequestOrganizationPlanChange(AssignOrganizationPlanRequest) returns (OrganizationSubscriptionResponse);
   rpc CheckStaffSeatAvailability(CheckStaffSeatAvailabilityRequest) returns (CheckStaffSeatAvailabilityResponse);
+  rpc ListOrganizationPaymentMethods(OrganizationIdRequest) returns (ListOrganizationPaymentMethodsResponse);
+  rpc AddOrganizationPaymentMethod(AddOrganizationPaymentMethodRequest) returns (OrganizationPaymentMethodResponse);
+  rpc RemoveOrganizationPaymentMethod(RemoveOrganizationPaymentMethodRequest) returns (OrganizationPaymentMethodResponse);
+  rpc ListOrganizationBillingInvoices(OrganizationIdRequest) returns (ListOrganizationBillingInvoicesResponse);
 }
 
 /// Staff self-service: resolve active staff via profile (user_id), then query org by staff_id.
@@ -1949,4 +1953,61 @@ message CheckStaffSeatAvailabilityResponse {
   int32 staff_count = 4;
   int32 included_staff_seats = 5;
   string status = 6;
+}
+
+message OrganizationPaymentMethodProto {
+  string payment_method_id = 1;
+  string organization_id = 2;
+  string brand = 3;
+  string last4 = 4;
+  int32 exp_month = 5;
+  int32 exp_year = 6;
+  string cardholder_name = 7;
+  bool is_default = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message ListOrganizationPaymentMethodsResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated OrganizationPaymentMethodProto payment_methods = 3;
+}
+
+message AddOrganizationPaymentMethodRequest {
+  string organization_id = 1;
+  string card_number = 2;
+  int32 exp_month = 3;
+  int32 exp_year = 4;
+  string cvv = 5;
+  string cardholder_name = 6;
+  optional bool is_default = 7;
+}
+
+message RemoveOrganizationPaymentMethodRequest {
+  string organization_id = 1;
+  string payment_method_id = 2;
+}
+
+message OrganizationPaymentMethodResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional OrganizationPaymentMethodProto payment_method = 3;
+}
+
+message OrganizationBillingInvoiceProto {
+  string invoice_id = 1;
+  string number = 2;
+  string status = 3;
+  int64 amount_minor = 4;
+  string currency_code = 5;
+  optional string period_start = 6;
+  optional string period_end = 7;
+  string created_at = 8;
+}
+
+message ListOrganizationBillingInvoicesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated OrganizationBillingInvoiceProto invoices = 3;
 }

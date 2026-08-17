@@ -218,6 +218,18 @@ service FinancialsService {
 
   // ── Budget Variance Report ────────────────────────────────────────────────
   rpc GetBudgetVarianceReport (GetBudgetVarianceReportRequest) returns (BudgetVarianceReport);
+
+  // ── Platform SaaS plans / org subscriptions (admin + org callers) ─────────
+  rpc ListSaasPlans (ListSaasPlansRequest) returns (ListSaasPlansResponse);
+  rpc UpsertSaasPlan (UpsertSaasPlanRequest) returns (SaasPlanResponse);
+  rpc GetPlatformBillingSettings (EmptyRequest) returns (PlatformBillingSettingsResponse);
+  rpc UpsertPlatformBillingSettings (UpsertPlatformBillingSettingsRequest) returns (PlatformBillingSettingsResponse);
+  rpc ListOrganizationSubscriptions (ListOrganizationSubscriptionsRequest) returns (ListOrganizationSubscriptionsResponse);
+  rpc AssignOrganizationPlan (AssignOrganizationPlanRequest) returns (OrganizationSubscriptionResponse);
+  rpc GetSaasSubscriptionAnalytics (GetSaasSubscriptionAnalyticsRequest) returns (SaasSubscriptionAnalyticsResponse);
+  rpc GetOrganizationSubscription (GetOrganizationSubscriptionRequest) returns (OrganizationSubscriptionResponse);
+  rpc AttachOrganizationTrial (AttachOrganizationTrialRequest) returns (OrganizationSubscriptionResponse);
+  rpc CheckStaffSeatAvailability (CheckStaffSeatAvailabilityRequest) returns (CheckStaffSeatAvailabilityResponse);
 }
 
   // --- Bulk Export Payroll Schedules ---
@@ -2874,3 +2886,188 @@ message ListRfqsResponse {
   TableMeta meta = 2;
 }
 
+
+// ── Platform SaaS billing ───────────────────────────────────────────────────
+message SaasPlanPriceProto {
+  string currency_code = 1;
+  int64 price_monthly_minor = 2;
+  int64 price_yearly_minor = 3;
+}
+
+message SaasPlanProto {
+  string plan_id = 1;
+  string code = 2;
+  string name = 3;
+  string description = 4;
+  int64 price_monthly_minor = 5;
+  int64 price_yearly_minor = 6;
+  string currency_code = 7;
+  int32 included_staff_seats = 8;
+  bool is_active = 9;
+  int32 sort_order = 10;
+  string created_at = 11;
+  string updated_at = 12;
+  repeated SaasPlanPriceProto prices = 13;
+}
+
+message ListSaasPlansRequest {
+  bool active_only = 1;
+  optional string preferred_currency = 2;
+}
+
+message ListSaasPlansResponse {
+  bool success = 1;
+  repeated SaasPlanProto plans = 2;
+  string error = 3;
+}
+
+message UpsertSaasPlanRequest {
+  optional string plan_id = 1;
+  string code = 2;
+  string name = 3;
+  string description = 4;
+  int64 price_monthly_minor = 5;
+  int64 price_yearly_minor = 6;
+  string currency_code = 7;
+  int32 included_staff_seats = 8;
+  bool is_active = 9;
+  int32 sort_order = 10;
+  repeated SaasPlanPriceProto prices = 11;
+}
+
+message SaasPlanResponse {
+  bool success = 1;
+  SaasPlanProto plan = 2;
+  string error = 3;
+}
+
+message PlatformBillingSettingsProto {
+  string settings_id = 1;
+  int32 default_trial_days = 2;
+  int32 grace_days_after_trial = 3;
+  optional string default_plan_id = 4;
+  optional SaasPlanProto default_plan = 5;
+  string updated_at = 6;
+}
+
+message PlatformBillingSettingsResponse {
+  bool success = 1;
+  PlatformBillingSettingsProto settings = 2;
+  string error = 3;
+}
+
+message UpsertPlatformBillingSettingsRequest {
+  int32 default_trial_days = 1;
+  int32 grace_days_after_trial = 2;
+  optional string default_plan_id = 3;
+}
+
+message OrganizationSubscriptionProto {
+  string subscription_id = 1;
+  string organization_id = 2;
+  optional string organization_name = 3;
+  string plan_id = 4;
+  optional SaasPlanProto plan = 5;
+  string status = 6;
+  optional string trial_starts_at = 7;
+  optional string trial_ends_at = 8;
+  optional string current_period_starts_at = 9;
+  optional string current_period_ends_at = 10;
+  bool cancel_at_period_end = 11;
+  int32 staff_count = 12;
+  int32 seats_remaining = 13;
+  string created_at = 14;
+  string updated_at = 15;
+}
+
+message ListOrganizationSubscriptionsRequest {
+  optional string status = 1;
+  optional string plan_id = 2;
+}
+
+message ListOrganizationSubscriptionsResponse {
+  bool success = 1;
+  repeated OrganizationSubscriptionProto subscriptions = 2;
+  string error = 3;
+}
+
+message AssignOrganizationPlanRequest {
+  string organization_id = 1;
+  string plan_id = 2;
+  optional string status = 3;
+}
+
+message OrganizationSubscriptionResponse {
+  bool success = 1;
+  OrganizationSubscriptionProto subscription = 2;
+  string error = 3;
+}
+
+message GetSaasSubscriptionAnalyticsRequest {
+  optional string start_date = 1;
+  optional string end_date = 2;
+}
+
+message SaasAnalyticsCard {
+  string title = 1;
+  double total = 2;
+  string trend = 3;
+  double percentage = 4;
+  string description = 5;
+  repeated SaasChartPoint chart_data = 6;
+}
+
+message SaasChartPoint {
+  string name = 1;
+  double value = 2;
+}
+
+message SaasAnalyticsChart {
+  string title = 1;
+  string type = 2;
+  string data_key = 3;
+  string color = 4;
+  repeated SaasChartPoint data = 5;
+  string trend = 6;
+  double percentage = 7;
+}
+
+message SaasSubscriptionAnalyticsResponse {
+  bool success = 1;
+  bool available = 2;
+  int32 trialing = 3;
+  int32 active = 4;
+  int32 past_due = 5;
+  int32 expired = 6;
+  int32 canceled = 7;
+  int64 mrr_minor = 8;
+  string currency_code = 9;
+  repeated SaasAnalyticsCard cards = 10;
+  repeated SaasAnalyticsChart charts = 11;
+  string error = 12;
+}
+
+message GetOrganizationSubscriptionRequest {
+  string organization_id = 1;
+  optional int32 staff_count = 2;
+}
+
+message AttachOrganizationTrialRequest {
+  string organization_id = 1;
+}
+
+message CheckStaffSeatAvailabilityRequest {
+  string organization_id = 1;
+  int32 additional_seats = 2;
+  int32 current_staff_count = 3;
+}
+
+message CheckStaffSeatAvailabilityResponse {
+  bool success = 1;
+  bool allowed = 2;
+  string status = 3;
+  int32 included_staff_seats = 4;
+  int32 staff_count = 5;
+  int32 seats_remaining = 6;
+  string error = 7;
+}
