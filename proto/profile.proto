@@ -43,6 +43,9 @@ service ProfileService {
   rpc ChangePassword(ChangePasswordRequest) returns (SendOtpResponse);
   /// Authenticated user: update sign-in OTP preference (and related flags).
   rpc UpdateSecurityPreferences(UpdateSecurityPreferencesRequest) returns (UpdateSecurityPreferencesResponse);
+  rpc EnableTotp(EnableTotpRequest) returns (EnableTotpResponse);
+  rpc ConfirmTotp(ConfirmTotpRequest) returns (ConfirmTotpResponse);
+  rpc DisableTotp(DisableTotpRequest) returns (DisableTotpResponse);
   
   rpc GetRoles(EmptyRequest) returns (GetRolesResponse);
   
@@ -100,6 +103,9 @@ service ProfileService {
   rpc StaffProbationHistory(StaffProbationHistoryRequest) returns (StaffProbationHistoryResponse);
   // ── HR: Termination ───────────────────────────────────────────────────────
   rpc TerminateStaff(TerminateStaffRequest) returns (TerminateStaffResponse);
+  rpc FinalizeStaffTermination(FinalizeStaffTerminationRequest) returns (TerminateStaffResponse);
+  rpc RejectStaffTermination(RejectStaffTerminationRequest) returns (TerminateStaffResponse);
+  rpc LinkStaffTerminationApproval(LinkStaffTerminationApprovalRequest) returns (TerminateStaffResponse);
   rpc TransferStaffBranch(TransferStaffBranchRequest) returns (TransferStaffBranchResponse);
   rpc CreateStaffBranchAssignment(CreateStaffBranchAssignmentRequest) returns (StaffBranchAssignmentResponse);
   rpc ListStaffBranchAssignments(ListStaffBranchAssignmentsRequest) returns (ListStaffBranchAssignmentsResponse);
@@ -117,6 +123,8 @@ service ProfileService {
   // Public booking (!stay_as_guest): find or create a CLIENT user and ensure CLIENT role.
   rpc ResolveOrCreateClientAccount(ResolveOrCreateClientAccountRequest) returns (ResolveOrCreateClientAccountResponse);
   rpc IncrementGuestVisitCount(IncrementGuestVisitCountRequest) returns (IncrementGuestVisitCountResponse);
+  rpc EarnGuestLoyaltyPoints(EarnGuestLoyaltyPointsRequest) returns (EarnGuestLoyaltyPointsResponse);
+  rpc BurnGuestLoyaltyPoints(BurnGuestLoyaltyPointsRequest) returns (BurnGuestLoyaltyPointsResponse);
   rpc CreateCrmInteraction(CreateCrmInteractionRequest) returns (CrmInteractionProto);
   rpc ListGuestInteractions(ListGuestInteractionsRequest) returns (ListGuestInteractionsResponse);
 
@@ -1063,6 +1071,8 @@ message LoginRequest {
   /// Used when sign-in OTP is opted out — creates the session directly.
   optional string device_info = 4;
   optional SessionSource source = 5;
+  /// Required when user.totp_enabled — 6-digit authenticator code.
+  optional string totp_code = 6;
 }
 
 message SendOtpRequest {
@@ -1143,6 +1153,8 @@ message AuthInitialResponse {
   optional User user = 7;
   /// Defaults to true. When false, access_token/refresh_token are set instead of auth_token.
   optional bool otp_required = 8;
+  /// When true, password succeeded but TOTP is still required (or was validated).
+  optional bool totp_required = 9;
 }
 
 message RequestPasswordResetRequest {
@@ -1600,6 +1612,29 @@ message TerminateStaffResponse {
   bool success = 1;
   optional string error = 2;
   optional string message = 3;
+  optional string termination_id = 4;
+  optional string status = 5; // PENDING | APPROVED | REJECTED
+  optional bool approval_required = 6;
+  optional string approval_instance_id = 7;
+}
+
+message FinalizeStaffTerminationRequest {
+  string termination_id = 1;
+  string company_id = 2;
+  string finalized_by = 3;
+}
+
+message RejectStaffTerminationRequest {
+  string termination_id = 1;
+  string company_id = 2;
+  string rejected_by = 3;
+  optional string reason = 4;
+}
+
+message LinkStaffTerminationApprovalRequest {
+  string termination_id = 1;
+  string company_id = 2;
+  string approval_instance_id = 3;
 }
 
 message TransferStaffBranchRequest {
@@ -1837,6 +1872,8 @@ message GuestProto {
   optional string notes = 21;
   string created_at = 22;
   string updated_at = 23;
+  /// GUEST | PATIENT | TENANT
+  string guest_type = 24;
 }
 
 message CreateGuestRequest {
@@ -1848,6 +1885,8 @@ message CreateGuestRequest {
   optional string phone_number = 6;
   optional string nationality = 7;
   optional string notes = 8;
+  /// GUEST | PATIENT | TENANT
+  optional string guest_type = 9;
 }
 
 message GetGuestRequest {
@@ -1867,6 +1906,8 @@ message UpdateGuestRequest {
   optional string notes = 8;
   optional bool is_blacklisted = 9;
   optional string blacklist_reason = 10;
+  /// GUEST | PATIENT | TENANT
+  optional string guest_type = 11;
 }
 
 message DeleteGuestRequest {
@@ -1999,6 +2040,7 @@ message IncrementGuestVisitCountResponse {
 }
 
 // ── Compliance: HR Audit Logs ────────────────────────────────────────────────
+
 
 message AppendHrAuditLogRequest {
   optional string organization_id = 1;
@@ -2173,5 +2215,70 @@ message CompleteStaffSelfProfileResponse {
   bool success = 1;
   optional string error = 2;
   optional Staff staff = 3;
+}
+
+message EarnGuestLoyaltyPointsRequest {
+  string guest_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  int32 points = 4;
+  string reason = 5;
+  optional string related_type = 6;
+  optional string related_id = 7;
+}
+
+message EarnGuestLoyaltyPointsResponse {
+  int32 loyalty_points = 1;
+  string loyalty_tier = 2;
+  bool applied = 3;
+}
+
+message BurnGuestLoyaltyPointsRequest {
+  string guest_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  int32 points = 4;
+  string reason = 5;
+}
+
+message BurnGuestLoyaltyPointsResponse {
+  int32 loyalty_points = 1;
+  string loyalty_tier = 2;
+  bool applied = 3;
+}
+
+message EnableTotpRequest {
+  string user_id = 1;
+}
+
+message EnableTotpResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string otpauth_uri = 3;
+  optional string secret = 4;
+}
+
+message ConfirmTotpRequest {
+  string user_id = 1;
+  string totp_code = 2;
+}
+
+message ConfirmTotpResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
+  optional bool totp_enabled = 4;
+}
+
+message DisableTotpRequest {
+  string user_id = 1;
+  string totp_code = 2;
+  optional string password = 3;
+}
+
+message DisableTotpResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
 }
 

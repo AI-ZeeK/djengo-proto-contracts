@@ -808,7 +808,7 @@ message GetPayrollYtdReportRequest {
   string organization_id = 2;
   int32 year = 3;
   optional string staff_id = 4;
-  optional string export_format = 5; // "json" | "csv"
+  optional string export_format = 5; // "json" | "csv" | "pdf"
 }
 
 message PayrollYtdStaffRow {
@@ -2321,6 +2321,7 @@ message ListGuestInvoicesRequest {
   string company_id        = 1;
   string organization_id   = 2;
   optional string guest_id = 3;
+  /// Exact status, or UNPAID (DRAFT|ISSUED|PARTIALLY_PAID|OVERDUE).
   optional string status   = 4;
   optional int32 page      = 5;
   optional int32 page_size = 6;
@@ -2328,6 +2329,9 @@ message ListGuestInvoicesRequest {
   optional string facility_node_id = 8;
   optional string purpose = 9;
   optional string branch_id = 10;
+  optional string search = 11;
+  optional string sort_by = 12;
+  optional string sort_order = 13;
 }
 
 message ListGuestInvoicesResponse {

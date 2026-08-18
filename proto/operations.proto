@@ -1420,6 +1420,33 @@ service ReservationService {
   /// (covers stay_as_guest / stay_anonymous bookings made with the same contact).
   rpc ListMyBookings (ListMyBookingsRequest) returns (ListReservationsResponse);
   rpc GetMyBooking   (GetMyBookingRequest)   returns (ReservationProto);
+  rpc GetOpsOccupancyReport (GetOpsOccupancyReportRequest) returns (OpsOccupancyReport);
+}
+
+
+message GetOpsOccupancyReportRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string branch_id = 3;
+  optional string start_date = 4;
+  optional string end_date = 5;
+  optional int32 available_units = 6;
+}
+
+message OpsOccupancyReport {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string branch_id = 3;
+  string period_start = 4;
+  string period_end = 5;
+  int32 confirmed_reservations = 6;
+  double room_nights = 7;
+  int32 available_units = 8;
+  double available_unit_nights = 9;
+  double occupancy_rate = 10;
+  int64 room_revenue_minor = 11;
+  string currency_code = 12;
+  double revpar_minor = 13;
 }
 
 message ReservationProto {

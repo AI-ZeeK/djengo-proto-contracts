@@ -1574,6 +1574,7 @@ enum ApprovalEntityType {
   GOODS_RECEIPT = 7;
   RESERVATION = 8;
   WALLET_WITHDRAWAL = 9;
+  STAFF_TERMINATION = 10;
 }
 
 message TableMeta {

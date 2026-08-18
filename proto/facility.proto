@@ -764,16 +764,44 @@ message GetFacilityReceptionAnalyticsRequest {
   string branch_id = 3;
   // HOSPITAL | ESTATE | HOSPITALITY | RESTAURANT (default HOSPITAL)
   optional string reception_mode = 4;
-  // _1m | _3m | _6m | _1y | all — filters ended_count
+  // today | 7d | 1m | 3m | 6m | 1y | all (also _1m …) — filters ended/check-in series
   optional string timeline = 5;
   optional string start_date = 6;
   optional string end_date = 7;
+}
+
+message ReceptionAnalyticsChartPoint {
+  string name = 1;
+  double value = 2;
+}
+
+message ReceptionAnalyticsCard {
+  string title = 1;
+  double total = 2;
+  string trend = 3;
+  double percentage = 4;
+  string description = 5;
+  repeated ReceptionAnalyticsChartPoint chart_data = 6;
+  optional string formatted_value = 7;
+}
+
+message ReceptionAnalyticsChart {
+  string title = 1;
+  string type = 2;
+  string data_key = 3;
+  string color = 4;
+  string trend = 5;
+  double percentage = 6;
+  repeated ReceptionAnalyticsChartPoint data = 7;
 }
 
 message GetFacilityReceptionAnalyticsResponse {
   bool success = 1;
   optional string error = 2;
   HospitalReceptionStatsMessage stats = 3;
+  repeated ReceptionAnalyticsCard cards = 4;
+  repeated ReceptionAnalyticsChart charts = 5;
+  optional string period_label = 6;
 }
 
 // Resolved platform user linked via profile_id or partner record.

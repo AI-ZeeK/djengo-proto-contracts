@@ -129,6 +129,12 @@ message CreateInAppNotificationRequest {
   NotificationCategory category = 7;
   NotificationPresentation presentation = 8;
   NotificationRichPayload payload = 9;
+  /** Stable cross-app navigation key (e.g. order.guest.status). Prefer over link_url. */
+  string action = 10;
+  string resource_type = 11;
+  string resource_id = 12;
+  /** Optional JSON bag: company_id, invoice_id, branch_id, actor_user_id, actor_name, audience. */
+  string context_json = 13;
 }
 
 message CreateInAppNotificationResponse {
@@ -149,6 +155,12 @@ message BatchNotificationRequest {
   NotificationCategory category = 9;
   NotificationPresentation presentation = 10;
   NotificationRichPayload payload = 11;
+  /** Stable cross-app navigation key (e.g. order.status_updated). Prefer over link_url. */
+  string action = 12;
+  string resource_type = 13;
+  string resource_id = 14;
+  /** Optional JSON bag: company_id, invoice_id, branch_id, actor_user_id, actor_name, audience. */
+  string context_json = 15;
 }
 
 message BatchNotificationResponse {
