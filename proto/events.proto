@@ -2427,3 +2427,48 @@ service AttendanceCodeService {
   rpc VerifyAndStartBreak (VerifyAttendanceCodeRequest) returns (VerifyAttendanceCodeResponse);
   rpc RegenerateSecret    (GetAttendanceCodeRequest)    returns (AttendanceCodeResponse);
 }
+
+// ─── Report Schedule Service (recurring HR report emails) ────────────────────
+
+message ReportScheduleMsg {
+  string schedule_id     = 1;
+  string company_id      = 2;
+  string organization_id = 3;
+  string report_type     = 4;  // CONTRACT_EXPIRY | PROBATION | CUSTOM
+  string cadence         = 5;  // DAILY | WEEKLY | MONTHLY
+  string recipient_email = 6;
+  bool   enabled         = 7;
+  string last_run_at     = 8;
+  string created_at      = 9;
+  string updated_at      = 10;
+}
+
+message ListReportSchedulesRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+}
+
+message ListReportSchedulesResponse {
+  repeated ReportScheduleMsg schedules = 1;
+}
+
+message CreateReportScheduleRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string report_type     = 3;
+  string cadence         = 4;
+  string recipient_email = 5;
+  bool   enabled         = 6;
+}
+
+message UpdateReportScheduleEnabledRequest {
+  string schedule_id = 1;
+  string company_id  = 2;
+  bool   enabled     = 3;
+}
+
+service ReportScheduleService {
+  rpc ListReportSchedules          (ListReportSchedulesRequest)         returns (ListReportSchedulesResponse);
+  rpc CreateReportSchedule         (CreateReportScheduleRequest)        returns (ReportScheduleMsg);
+  rpc UpdateReportScheduleEnabled  (UpdateReportScheduleEnabledRequest) returns (ReportScheduleMsg);
+}
