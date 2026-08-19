@@ -230,6 +230,20 @@ service FinancialsService {
   rpc GetOrganizationSubscription (GetOrganizationSubscriptionRequest) returns (OrganizationSubscriptionResponse);
   rpc AttachOrganizationTrial (AttachOrganizationTrialRequest) returns (OrganizationSubscriptionResponse);
   rpc CheckStaffSeatAvailability (CheckStaffSeatAvailabilityRequest) returns (CheckStaffSeatAvailabilityResponse);
+
+  // ── Revenue streams (hospitality taxonomy) ────────────────────────────────
+  rpc RecordRevenueStream (RecordRevenueStreamRequest) returns (RevenueStreamProto);
+  rpc ListRevenueStreams (ListRevenueStreamsRequest) returns (ListRevenueStreamsResponse);
+
+  // ── Staff salary structures (versioned compensation components) ───────────
+  rpc ListStaffSalaryStructures (ListStaffSalaryStructuresRequest) returns (ListStaffSalaryStructuresResponse);
+  rpc UpsertStaffSalaryStructure (UpsertStaffSalaryStructureRequest) returns (StaffSalaryStructureProto);
+  rpc ListCompanySalaryComponentTemplates (ListCompanySalaryComponentTemplatesRequest) returns (ListCompanySalaryComponentTemplatesResponse);
+  rpc UpsertCompanySalaryComponentTemplate (UpsertCompanySalaryComponentTemplateRequest) returns (CompanySalaryComponentTemplateProto);
+  rpc DeleteCompanySalaryComponentTemplate (DeleteCompanySalaryComponentTemplateRequest) returns (DeleteCompanySalaryComponentTemplateResponse);
+  rpc RequestSalaryAdvance (RequestSalaryAdvanceRequest) returns (SalaryAdvanceProto);
+  rpc ListSalaryAdvances (ListSalaryAdvancesRequest) returns (ListSalaryAdvancesResponse);
+  rpc SyncSalaryAdvanceApproval (SyncSalaryAdvanceApprovalRequest) returns (SalaryAdvanceProto);
 }
 
   // --- Bulk Export Payroll Schedules ---
@@ -556,6 +570,8 @@ message BudgetAllocation {
   optional string cost_center_name = 13;
   optional string cost_center_code = 14;
   optional string entity_name = 15;
+  /// OPEX | CAPEX | REVENUE. Inferred from name/description when omitted on write.
+  optional string category = 16;
 }
 
 /// Lookup row for allocation entity / cost-center display (id → label).
@@ -2092,6 +2108,7 @@ message PurchaseOrderProto {
   string updated_at         = 20;
   optional string approval_instance_id = 21;
   optional string cost_center_id = 22;
+  optional int64 invoice_amount_minor = 23;
 }
 
 message CreatePurchaseOrderRequest {
@@ -2896,6 +2913,9 @@ message SaasPlanPriceProto {
   string currency_code = 1;
   int64 price_monthly_minor = 2;
   int64 price_yearly_minor = 3;
+  /// Optional sale / promo amounts. Omit or leave 0 for no sale.
+  optional int64 sale_price_monthly_minor = 4;
+  optional int64 sale_price_yearly_minor = 5;
 }
 
 message SaasPlanProto {
@@ -2982,6 +3002,15 @@ message OrganizationSubscriptionProto {
   int32 seats_remaining = 13;
   string created_at = 14;
   string updated_at = 15;
+  string billing_interval = 16;
+  optional string pending_plan_id = 17;
+  optional SaasPlanProto pending_plan = 18;
+  optional string pending_billing_interval = 19;
+  // Due today for immediate upgrades (prorated). Informational for clients.
+  optional int64 amount_due_minor = 20;
+  optional int64 unused_credit_minor = 21;
+  optional string charge_currency_code = 22;
+  optional string change_timing_applied = 23;
 }
 
 message ListOrganizationSubscriptionsRequest {
@@ -2999,6 +3028,11 @@ message AssignOrganizationPlanRequest {
   string organization_id = 1;
   string plan_id = 2;
   optional string status = 3;
+  // MONTHLY | YEARLY
+  optional string billing_interval = 4;
+  // IMMEDIATE | AT_PERIOD_END | AUTO
+  optional string change_timing = 5;
+  optional string payment_method_id = 6;
 }
 
 message OrganizationSubscriptionResponse {
@@ -3074,4 +3108,177 @@ message CheckStaffSeatAvailabilityResponse {
   int32 staff_count = 5;
   int32 seats_remaining = 6;
   string error = 7;
+}
+
+// ── Revenue streams ─────────────────────────────────────────────────────────
+message RecordRevenueStreamRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string kind = 3; // ROOM | FNB | EVENTS | SPA | PARKING | OTHER
+  string name = 4;
+  int64 amount_minor = 5;
+  int32 year = 6;
+  int32 month = 7;
+  optional string currency_code = 8;
+  optional string notes = 9;
+}
+
+message ListRevenueStreamsRequest {
+  string company_id = 1;
+  optional string organization_id = 2;
+  optional int32 year = 3;
+  optional int32 month = 4;
+  int32 page_size = 5;
+}
+
+message RevenueStreamProto {
+  string stream_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string kind = 4;
+  string name = 5;
+  int64 amount_minor = 6;
+  int32 year = 7;
+  int32 month = 8;
+  string currency_code = 9;
+  string notes = 10;
+  string created_at = 11;
+}
+
+message ListRevenueStreamsResponse {
+  repeated RevenueStreamProto streams = 1;
+}
+
+// ── Staff salary structures ─────────────────────────────────────────────────
+message ListStaffSalaryStructuresRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string staff_id = 3;
+  int32 page_size = 4;
+}
+
+message SalaryStructureExtraComponent {
+  string code = 1;
+  string label = 2;
+  int64 amount_minor = 3;
+}
+
+message UpsertStaffSalaryStructureRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  /// ISO-8601 date or date-time the structure takes effect.
+  string effective_from = 4;
+  /// Empty = open-ended (current structure).
+  optional string effective_to = 5;
+  int64 base_minor = 6;
+  int64 housing_minor = 7;
+  int64 transport_minor = 8;
+  /// When set, updates that row instead of inserting a new version.
+  optional string structure_id = 9;
+  /// Extra components from company template (cash, meal, …). Housing/transport
+  /// may also appear here; columns stay mirrored for payroll compatibility.
+  repeated SalaryStructureExtraComponent extras = 10;
+}
+
+message StaffSalaryStructureProto {
+  string structure_id = 1;
+  string staff_id = 2;
+  string company_id = 3;
+  string organization_id = 4;
+  string effective_from = 5;
+  string effective_to = 6;
+  int64 base_minor = 7;
+  int64 housing_minor = 8;
+  int64 transport_minor = 9;
+  string created_at = 10;
+  string updated_at = 11;
+  repeated SalaryStructureExtraComponent extras = 12;
+}
+
+message ListStaffSalaryStructuresResponse {
+  repeated StaffSalaryStructureProto structures = 1;
+}
+
+message CompanySalaryComponentTemplateProto {
+  string component_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string code = 4;
+  string label = 5;
+  int32 sort_order = 6;
+  bool is_active = 7;
+}
+
+message ListCompanySalaryComponentTemplatesRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  bool include_inactive = 3;
+}
+
+message ListCompanySalaryComponentTemplatesResponse {
+  repeated CompanySalaryComponentTemplateProto components = 1;
+}
+
+message UpsertCompanySalaryComponentTemplateRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string component_id = 3;
+  string code = 4;
+  string label = 5;
+  int32 sort_order = 6;
+  bool is_active = 7;
+}
+
+message DeleteCompanySalaryComponentTemplateRequest {
+  string company_id = 1;
+  string component_id = 2;
+}
+
+message DeleteCompanySalaryComponentTemplateResponse {
+  bool success = 1;
+  string error = 2;
+}
+
+message RequestSalaryAdvanceRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string staff_id = 3;
+  int64 amount_minor = 4;
+  string notes = 5;
+  string requested_by_user_id = 6;
+}
+
+message SalaryAdvanceProto {
+  string advance_id = 1;
+  string staff_id = 2;
+  string company_id = 3;
+  string organization_id = 4;
+  int64 amount_minor = 5;
+  int64 remaining_minor = 6;
+  string status = 7;
+  string notes = 8;
+  string requested_by_user_id = 9;
+  string approval_instance_id = 10;
+  string created_at = 11;
+  string updated_at = 12;
+}
+
+message ListSalaryAdvancesRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string staff_id = 3;
+  optional string status = 4;
+  int32 page = 5;
+  int32 page_size = 6;
+}
+
+message ListSalaryAdvancesResponse {
+  repeated SalaryAdvanceProto advances = 1;
+  int32 total = 2;
+}
+
+message SyncSalaryAdvanceApprovalRequest {
+  string company_id = 1;
+  string advance_id = 2;
 }
