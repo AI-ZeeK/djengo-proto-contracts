@@ -1819,7 +1819,7 @@ message ListPendingApprovalsForUserRequest {
   string company_id       = 2;
   string organization_id  = 3;
   /// When true, only items where it is this user's turn to act.
-  bool   my_turn_only     = 4;
+  int32  filter           = 4;
   int32  page             = 5;
   int32  page_size        = 6;
 }
