@@ -431,6 +431,10 @@ message UpdateCompanyDetailsRequest {
   optional int32 payroll_payout_day_of_month = 22;
   optional string payroll_payout_time = 23;
   optional bool require_payroll_verification_before_send = 24;
+  /// 0=UNSPECIFIED, 1=MANUAL (paper trail / external bank), 2=IN_APP (company wallet).
+  optional int32 payroll_payout_mode = 25;
+  /// JSON: { profile, location, policies, food_refund, billing, documents, hours } booleans.
+  optional string settings_steps_json = 26;
 }
 
 message OrganizationRoleIdRequest {
@@ -828,6 +832,7 @@ message CreateCompanyRequest {
   optional int32 payroll_payout_day_of_month = 20;
   optional string payroll_payout_time = 21;
   optional bool require_payroll_verification_before_send = 22;
+  optional int32 payroll_payout_mode = 23;
 }
 
 message CreateDepartmentRequest {  string organization_id = 1;
@@ -1269,6 +1274,9 @@ message CompanyMetaData {
   optional int32 payroll_payout_day_of_month = 16;
   optional string payroll_payout_time = 17;
   optional bool require_payroll_verification_before_send = 18;
+  optional int32 payroll_payout_mode = 19;
+  /// JSON: { profile, location, policies, food_refund, billing, documents, hours } booleans.
+  optional string settings_steps_json = 20;
 }
 
 message Branch {
