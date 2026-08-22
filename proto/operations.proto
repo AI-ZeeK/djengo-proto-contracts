@@ -929,6 +929,8 @@ message ListOrdersRequest {
   optional string profile_type = 10; // GUEST | CLIENT_USER
   optional string start_date = 11; // yyyy-MM-dd (inclusive, UTC day)
   optional string end_date   = 12; // yyyy-MM-dd (inclusive, UTC day)
+  optional string sort_by    = 13; // placed_at | order_number | status | payment_status | total_minor | order_type
+  optional string sort_order = 14; // asc | desc (default desc for placed_at)
 }
 
 message ListOrdersResponse {
