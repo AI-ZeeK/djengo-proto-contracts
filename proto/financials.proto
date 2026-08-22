@@ -113,6 +113,7 @@ service FinancialsService {
   rpc Debit (WalletTransactionRequest) returns (WalletReply);
   rpc Transfer (WalletTransferRequest) returns (WalletReply);
 
+
   rpc GetCountries(EmptyRequest) returns (GetCountriesResponse);
   rpc GetCountry(GetCountryRequest) returns (GetCountryResponse);
 
@@ -158,6 +159,7 @@ service FinancialsService {
   rpc ReturnPayrollToDraft(ReturnPayrollToDraftRequest) returns (Payroll);
   rpc RunPayroll(RunPayrollRequest) returns (Payroll);
   rpc MarkPayrollPaid(MarkPayrollPaidRequest) returns (Payroll);
+  rpc MarkPayrollApproved(MarkPayrollApprovedRequest) returns (MarkPayrollApprovedResponse);
   rpc GetPayroll(GetPayrollRequest) returns (Payroll);
   rpc ListPayrolls(ListPayrollsRequest) returns (ListPayrollsResponse);
   rpc GetPayslipPdf(GetPayslipPdfRequest) returns (PayslipPdfResponse);
@@ -267,6 +269,16 @@ service FinancialsService {
   //   string file_name = 4;
   // }
 
+  message MarkPayrollApprovedRequest {
+    string payroll_id = 1;
+    string company_id = 2;
+    string organization_id = 3;
+    string user_id = 4;
+  }
+  message MarkPayrollApprovedResponse {
+    bool success = 1;
+    string message = 2;
+  }  
 
 // --- Bulk Export Payroll Schedules ---
 message ExportPayrollSchedulesRequest {
