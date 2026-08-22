@@ -1253,6 +1253,20 @@ message Company {
   optional string phone_dial_code = 20;
 }
 
+enum PageCompletionScope {
+  COMPANY = 0;
+  BRANCH = 1;
+}
+
+message PageCompletion {
+  string page_completion_id = 1;
+  string company_id = 2;
+  PageCompletionScope scope = 3;
+  optional string scope_id = 4;
+  string key = 5;
+  string completed_at = 6;
+}
+
 
 message CompanyMetaData {
   string company_id = 1;
@@ -1276,7 +1290,7 @@ message CompanyMetaData {
   optional bool require_payroll_verification_before_send = 18;
   optional int32 payroll_payout_mode = 19;
   /// JSON: { profile, location, policies, food_refund, billing, documents, hours } booleans.
-  optional string settings_steps_json = 20;
+  repeated PageCompletion page_completions = 20;
 }
 
 message Branch {
