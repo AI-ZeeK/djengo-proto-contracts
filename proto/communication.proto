@@ -35,10 +35,26 @@ service CommunicationService {
   rpc SendBookingMail(SendBookingMailRequest) returns (SendBookingMailResponse);
   rpc SendOpsAlertMail(SendOpsAlertMailRequest) returns (SendOpsAlertMailResponse);
   rpc SendUserPush(SendUserPushRequest) returns (SendUserPushResponse);
+  rpc SendPayrollApprovedMail(SendPayrollApprovedMailRequest) returns (SendPayrollApprovedMailResponse);
 
   // Push Notifications
   rpc ClearUserPushSubscriptions(ClearUserPushSubscriptionsRequest) returns (ClearUserPushSubscriptionsResponse);
 
+}
+
+message SendPayrollApprovedMailRequest {
+  string email = 1;
+  string name = 2;
+  string pay_period_label = 3;
+  string pay_date = 4;
+  string amount = 5;
+  string approver_name = 6;
+  string payslip_url = 7;
+}
+
+message SendPayrollApprovedMailResponse {
+  bool success = 1;
+  optional string error = 2;
 }
 
 // 📝 REQUEST MESSAGES
