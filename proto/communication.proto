@@ -43,13 +43,14 @@ service CommunicationService {
 }
 
 message SendPayrollApprovedMailRequest {
-  string email = 1;
-  string name = 2;
+  string recipient_email = 1;
+  string recipient_name = 2;
   string pay_period_label = 3;
   string pay_date = 4;
-  string amount = 5;
-  string approver_name = 6;
-  string payslip_url = 7;
+  optional string amount = 5;
+  optional string approver_name = 6;
+  optional string payslip_url = 7;
+  string company_name = 8;
 }
 
 message SendPayrollApprovedMailResponse {
