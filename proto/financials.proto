@@ -160,6 +160,7 @@ service FinancialsService {
   rpc RunPayroll(RunPayrollRequest) returns (Payroll);
   rpc MarkPayrollPaid(MarkPayrollPaidRequest) returns (Payroll);
   rpc MarkPayrollApproved(MarkPayrollApprovedRequest) returns (MarkPayrollApprovedResponse);
+  rpc MarkPayrollRejected(MarkPayrollRejectedRequest) returns (MarkPayrollRejectedResponse);
   rpc GetPayroll(GetPayrollRequest) returns (Payroll);
   rpc ListPayrolls(ListPayrollsRequest) returns (ListPayrollsResponse);
   rpc GetPayslipPdf(GetPayslipPdfRequest) returns (PayslipPdfResponse);
@@ -276,6 +277,17 @@ service FinancialsService {
     string user_id = 4;
   }
   message MarkPayrollApprovedResponse {
+    bool success = 1;
+    string message = 2;
+  }
+  message MarkPayrollRejectedRequest {
+    string payroll_id = 1;
+    string company_id = 2;
+    string organization_id = 3;
+    string user_id = 4;
+    string reason = 5;
+  }
+  message MarkPayrollRejectedResponse {
     bool success = 1;
     string message = 2;
   }  
