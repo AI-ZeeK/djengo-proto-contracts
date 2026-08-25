@@ -2063,7 +2063,7 @@ message UpdateComplaintCategoryRequest {
 // ── Employment Contracts ──────────────────────────────────────────────────────
 
 service EmploymentContractService {
-  rpc CreateContract       (EmploymentContractMsg)     returns (EmploymentContractId);
+  rpc CreateContract       (CreateEmploymentContractRequest) returns (EmploymentContractId);
   rpc GetContract          (EmploymentContractId)      returns (EmploymentContractMsg);
   rpc ListStaffContracts   (StaffRequest)              returns (EmploymentContractList);
   rpc ListCompanyContracts (GetCompanyStaffRequest)    returns (GetCompanyContractsResponse);
@@ -2078,6 +2078,29 @@ service EmploymentContractService {
 message GetCompanyContractsResponse{
   repeated EmploymentContractMsg contracts = 1;
   TableMeta meta = 2;
+}
+
+/// Create-only input — do not reuse EmploymentContractMsg (response / list shape).
+message CreateEmploymentContractRequest {
+  string staff_id             = 1;  // optional if invitation_id set
+  string invitation_id        = 2;  // optional if staff_id set
+  string company_id           = 3;
+  string organization_id      = 4;
+  string issued_by            = 5;
+  string employment_type      = 6;
+  string job_title            = 7;
+  double salary               = 8;
+  string currency_code        = 9;
+  string start_date           = 10;
+  string end_date             = 11; // empty = open-ended
+  double hours_per_week       = 12;
+  string probation_end_date   = 13;
+  string terms_url            = 14;
+  string terms_file_id        = 15;
+  string designation_id       = 16;
+  string designation_name     = 17;
+  string notes                = 18;
+  bool   send_now             = 19;
 }
 
 message EmploymentContractMsg {

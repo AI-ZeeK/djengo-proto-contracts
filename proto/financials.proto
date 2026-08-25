@@ -157,6 +157,11 @@ service FinancialsService {
    * Rejected once any approval step has been approved.
    */
   rpc ReturnPayrollToDraft(ReturnPayrollToDraftRequest) returns (Payroll);
+  /**
+   * After the latest revision is rejected (FAILED), create Version N+1 as DRAFT
+   * with a copy of the prior staff roster so HR can revise and re-finalize.
+   */
+  rpc CreatePayrollVersion(CreatePayrollVersionRequest) returns (Payroll);
   rpc RunPayroll(RunPayrollRequest) returns (Payroll);
   rpc MarkPayrollPaid(MarkPayrollPaidRequest) returns (Payroll);
   rpc MarkPayrollApproved(MarkPayrollApprovedRequest) returns (MarkPayrollApprovedResponse);
@@ -810,6 +815,13 @@ message FinalizePayrollRequest {
 }
 
 message ReturnPayrollToDraftRequest {
+  string payroll_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string user_id = 4;
+}
+
+message CreatePayrollVersionRequest {
   string payroll_id = 1;
   string organization_id = 2;
   string company_id = 3;

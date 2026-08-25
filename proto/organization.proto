@@ -436,6 +436,8 @@ message UpdateCompanyDetailsRequest {
   optional int32 payroll_payout_mode = 25;
   /// JSON: { profile, location, policies, food_refund, billing, documents, hours } booleans.
   optional string settings_steps_json = 26;
+  /// Settings step keys to mark complete (COMPANY scope). Prefer over settings_steps_json.
+  repeated string page_completion_keys = 27;
 }
 
 message OrganizationRoleIdRequest {
