@@ -148,6 +148,8 @@ service FinancialsService {
    * so finance can revise and re-submit. Does not change older revisions.
    */
   rpc CreateBudgetVersion(CreateBudgetVersionRequest) returns (MonthlyBudget);
+  /** Lock allocations and start the budget approval chain (draft → pending approval). */
+  rpc FinalizeBudget(FinalizeBudgetRequest) returns (MonthlyBudget);
   rpc UpdateMonthlyBudget(UpdateMonthlyBudgetRequest) returns (MonthlyBudget);
   rpc ListMonthlyBudgets(ListMonthlyBudgetsRequest) returns (ListMonthlyBudgetsResponse);
   rpc CreateBudgetAllocation(CreateBudgetAllocationRequest) returns (BudgetAllocation);
@@ -219,6 +221,9 @@ service FinancialsService {
   // ── Budget Approval Chain ─────────────────────────────────────────────────
   rpc ApproveBudget (ApproveBudgetRequest) returns (MonthlyBudget);
   rpc RejectBudget  (RejectBudgetRequest)  returns (MonthlyBudget);
+  /** Called by events service when a budget approval chain reaches a terminal state. */
+  rpc MarkBudgetApproved(MarkBudgetApprovedRequest) returns (MarkBudgetApprovedResponse);
+  rpc MarkBudgetRejected(MarkBudgetRejectedRequest) returns (MarkBudgetRejectedResponse);
 
   // ── Financial Audit Log (admin) ───────────────────────────────────────────
   rpc ListFinancialAuditLogs (ListFinancialAuditLogsRequest) returns (ListFinancialAuditLogsResponse);
@@ -663,6 +668,13 @@ message BudgetVersionSummary {
 }
 
 message CreateBudgetVersionRequest {
+  string budget_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string user_id = 4;
+}
+
+message FinalizeBudgetRequest {
   string budget_id = 1;
   string organization_id = 2;
   string company_id = 3;
@@ -1524,6 +1536,31 @@ message RejectBudgetRequest {
   string comment            = 3;
   string approver_role_id   = 4;
   string approver_role_type = 5;
+}
+
+message MarkBudgetApprovedRequest {
+  string budget_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string user_id = 4;
+}
+
+message MarkBudgetApprovedResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message MarkBudgetRejectedRequest {
+  string budget_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string user_id = 4;
+  string reason = 5;
+}
+
+message MarkBudgetRejectedResponse {
+  bool success = 1;
+  string message = 2;
 }
 
 // ── Financial Audit Log messages ──────────────────────────────────────────
