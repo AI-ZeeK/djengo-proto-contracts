@@ -2109,6 +2109,8 @@ message EmploymentContractMsg {
   string signed_at            = 26;
   string signed_by_user_id    = 27;
   bool   send_now             = 28;
+  // Populated on get/list — staff this contract belongs to (from profile).
+  Staff  staff                = 29;
 }
 
 message EmploymentContractId {
