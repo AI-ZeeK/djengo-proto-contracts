@@ -123,6 +123,9 @@ service FinancialsService {
   // Upsert payroll staff for a payroll period (add/remove staff in bulk)
   rpc CreateOrUpdatePayrollStaff (CreateOrUpdatePayrollStaffRequest) returns (CreateOrUpdatePayrollStaffResponse);
 
+  // Period-level schedule datetime + optional payout-mode exception (does not change company policy).
+  rpc UpdatePayrollPeriodSettings (UpdatePayrollPeriodSettingsRequest) returns (UpdatePayrollPeriodSettingsResponse);
+
 
   rpc GetBanks (GetBanksRequest) returns (GetBanksResponse);
 
@@ -140,6 +143,11 @@ service FinancialsService {
   rpc GetMonthlyBudget(GetMonthlyBudgetRequest) returns (MonthlyBudget);
   /** Single budget for month/year (+ optional branch) with allocations — for create/edit upsert UI. */
   rpc GetMonthlyBudgetByPeriod(GetMonthlyBudgetByPeriodRequest) returns (GetMonthlyBudgetByPeriodResponse);
+  /**
+   * After the latest revision is rejected, create Version N+1 with a copy of allocations
+   * so finance can revise and re-submit. Does not change older revisions.
+   */
+  rpc CreateBudgetVersion(CreateBudgetVersionRequest) returns (MonthlyBudget);
   rpc UpdateMonthlyBudget(UpdateMonthlyBudgetRequest) returns (MonthlyBudget);
   rpc ListMonthlyBudgets(ListMonthlyBudgetsRequest) returns (ListMonthlyBudgetsResponse);
   rpc CreateBudgetAllocation(CreateBudgetAllocationRequest) returns (BudgetAllocation);
@@ -636,6 +644,29 @@ message MonthlyBudget {
   BudgetState budget_state = 9;
   optional PayrollSummary payroll_summary = 10;
   optional string branch_id = 11;
+  /** Revision number for this period (starts at 1). */
+  int32 version = 12;
+  /** PENDING | APPROVED | REJECTED */
+  string approval_status = 13;
+  optional string approval_instance_id = 14;
+  int32 latest_version = 15;
+  bool can_create_version = 16;
+  bool can_edit = 17;
+}
+
+message BudgetVersionSummary {
+  string budget_id = 1;
+  int32 version = 2;
+  string status = 3;
+  string created_at = 4;
+  optional string approval_instance_id = 5;
+}
+
+message CreateBudgetVersionRequest {
+  string budget_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string user_id = 4;
 }
 
 // Payroll resource
@@ -651,6 +682,9 @@ message Payroll {
   PayrollState payroll_state = 8;
   repeated PayrollStaff staff = 9;
   string schedule_id = 10;
+  int32 version = 11;
+  string payroll_reference = 12;
+  string schedule_reference = 13;
 }
 
 // Payroll staff resource
@@ -694,11 +728,17 @@ message GetMonthlyBudgetByPeriodRequest {
   /** Empty = company-wide (BranchId null); otherwise match branch. */
   string branch_id = 5;
   string budget_type = 6;
+  /** When > 0, load that revision; otherwise the latest for the period. */
+  optional int32 version = 7;
 }
 
 message GetMonthlyBudgetByPeriodResponse {
   bool budget_found = 1;
   MonthlyBudget budget = 2;
+  int32 version = 3;
+  int32 latest_version = 4;
+  bool can_create_version = 5;
+  repeated BudgetVersionSummary versions = 6;
 }
 
 // Update
@@ -993,6 +1033,11 @@ message GetPayrollAnalyticsResponse {
     int32 staff_count = 13;
     string created_at = 14;
     string updated_at = 15;
+    int32 version = 16;
+    int32 version_count = 17;
+    string payroll_id = 18;
+    string schedule_reference = 19;
+    string payroll_reference = 20;
   }
 
   message ListPayrollSchedulesResponse {
@@ -1017,6 +1062,7 @@ message ListStaffPayrollForPeriodRequest {
   string sort_by = 7;
   string sort_order = 8 ;
   optional string branch_id = 9;
+  optional int32 version = 10; // Payroll revision to view (default = latest)
 }
 
 message StaffPayrollRow {
@@ -1029,6 +1075,14 @@ message StaffPayrollRow {
   int64 base_salary_minor = 6;
   int64 total_adjustment_minor = 7;
   // Optionally: repeated PayrollAdjustment adjustments = 8;
+}
+
+message PayrollVersionSummary {
+  string payroll_id = 1;
+  int32 version = 2;
+  string status = 3;
+  string created_at = 4;
+  optional string approval_instance_id = 5;
 }
 
 message ListStaffPayrollForPeriodResponse {
@@ -1044,6 +1098,35 @@ message ListStaffPayrollForPeriodResponse {
   string payroll_status = 10; // DRAFT | PENDING | PROCESSING | APPROVED | PAID | CLOSED | FAILED
   optional string approval_instance_id = 11;
   bool can_edit_staff = 12; // true only while DRAFT and approval has not started
+  int32 version = 13;
+  int32 latest_version = 14;
+  bool can_create_version = 15;
+  string schedule_reference = 16;
+  string payroll_reference = 17;
+  repeated PayrollVersionSummary versions = 18;
+  // Effective payout mode for this period: 0=unset, 1=manual, 2=in-app.
+  int32 payout_mode = 19;
+  // True when schedule stores an override (else payout_mode mirrors company policy when resolved client-side).
+  bool payout_mode_override = 20;
+}
+
+message UpdatePayrollPeriodSettingsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string user_id = 3;
+  string payroll_schedule_id = 4;
+  optional string scheduled_at = 5; // ISO-8601; empty clears to company-derived default when supported
+  // When set: 0 clears override (follow company policy); 1=manual; 2=in-app.
+  optional int32 payout_mode = 6;
+}
+
+message UpdatePayrollPeriodSettingsResponse {
+  bool success = 1;
+  string error = 2;
+  string message = 3;
+  string schedule_scheduled_at = 4;
+  int32 payout_mode = 5;
+  bool payout_mode_override = 6;
 }
 
 // --- Upsert Payroll Staff for a Payroll Period ---

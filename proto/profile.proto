@@ -844,6 +844,26 @@ message ManyStaffDetailsResponse {
 
 // Staff Invitation Messages
 
+// Optional pre-hire package. Created in events as DRAFT keyed by invitation_id;
+// Bound to staff_id when the invite is accepted (profile → BindInviteContract).
+message InviteContractPackage {
+  string employment_type = 1;
+  string job_title = 2;
+  double salary = 3;
+  string currency_code = 4;
+  string start_date = 5;
+  string end_date = 6;
+  double hours_per_week = 7;
+  string probation_end_date = 8;
+  string terms_url = 9;       // optional — salary-only drafts allowed
+  string terms_file_id = 10;
+  string designation_id = 11;
+  string designation_name = 12;
+  string notes = 13;
+  double housing = 14;
+  double transport = 15;
+}
+
 message StaffInvitationItem {
   string email = 1;
   string role_id = 2;
@@ -851,6 +871,7 @@ message StaffInvitationItem {
   optional string branch_id = 4;
   optional string department_id = 6;
   InvitationType type = 7;
+  optional InviteContractPackage contract = 8;
 }
 
 message SendStaffInvitationsRequest {
@@ -861,8 +882,10 @@ message SendStaffInvitationsRequest {
 }
 
 message InvitationResult {
+  string email = 1;
   bool success = 2;
   string message = 3;
+  string invitation_id = 4;
 }
 
 message SendStaffInvitationsResponse {
