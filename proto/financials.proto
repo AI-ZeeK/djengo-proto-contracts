@@ -270,6 +270,11 @@ service FinancialsService {
   rpc RequestSalaryAdvance (RequestSalaryAdvanceRequest) returns (SalaryAdvanceProto);
   rpc ListSalaryAdvances (ListSalaryAdvancesRequest) returns (ListSalaryAdvancesResponse);
   rpc SyncSalaryAdvanceApproval (SyncSalaryAdvanceApprovalRequest) returns (SalaryAdvanceProto);
+
+  // Events calls these when an approval chain is first set up / updated so pre-existing
+  // budgets and salary advances without an instance get wired into the new chain.
+  rpc ListApprovalBackfillCandidates (ListApprovalBackfillCandidatesRequest) returns (ListApprovalBackfillCandidatesResponse);
+  rpc AttachApprovalInstance (AttachApprovalInstanceRequest) returns (AttachApprovalInstanceResponse);
 }
 
   // --- Bulk Export Payroll Schedules ---
@@ -3478,4 +3483,36 @@ message ListSalaryAdvancesResponse {
 message SyncSalaryAdvanceApprovalRequest {
   string company_id = 1;
   string advance_id = 2;
+}
+
+message ListApprovalBackfillCandidatesRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  /** "budget" | "salary_advance" */
+  string entity_type = 3;
+}
+
+message ApprovalBackfillCandidate {
+  string entity_id = 1;
+  string initiator_user_id = 2;
+}
+
+message ListApprovalBackfillCandidatesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated ApprovalBackfillCandidate candidates = 3;
+}
+
+message AttachApprovalInstanceRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  /** "budget" | "salary_advance" */
+  string entity_type = 3;
+  string entity_id = 4;
+  string approval_instance_id = 5;
+}
+
+message AttachApprovalInstanceResponse {
+  bool success = 1;
+  optional string error = 2;
 }
