@@ -144,6 +144,11 @@ service FinancialsService {
   /** Single budget for month/year (+ optional branch) with allocations — for create/edit upsert UI. */
   rpc GetMonthlyBudgetByPeriod(GetMonthlyBudgetByPeriodRequest) returns (GetMonthlyBudgetByPeriodResponse);
   /**
+   * Payroll-period budget context: resolves branch vs company-wide (legacy) budget for a period,
+   * with currency + linkage for the payroll setup UI.
+   */
+  rpc GetPayrollPeriodBudgetContext(GetPayrollPeriodBudgetContextRequest) returns (GetPayrollPeriodBudgetContextResponse);
+  /**
    * After the latest revision is rejected, create Version N+1 with a copy of allocations
    * so finance can revise and re-submit. Does not change older revisions.
    */
@@ -753,6 +758,33 @@ message GetMonthlyBudgetByPeriodResponse {
   repeated BudgetVersionSummary versions = 6;
 }
 
+message GetPayrollPeriodBudgetContextRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  int32 month = 3;
+  int32 year = 4;
+  /** Preferred branch. Empty = resolve main/sole branch from company. */
+  string branch_id = 5;
+}
+
+message GetPayrollPeriodBudgetContextResponse {
+  bool budget_found = 1;
+  MonthlyBudget budget = 2;
+  /** BRANCH | COMPANY | LEGACY_COMPANY */
+  string scope = 3;
+  string resolved_branch_id = 4;
+  bool fallback_used = 5;
+  /// ISO 4217 — branch override or company base_currency.
+  string currency_code = 6;
+  /// Company/branch payroll_budget_linkage as int (0–4).
+  int32 linkage = 7;
+  int64 salary_cap_minor = 8;
+  int32 version = 9;
+  int32 latest_version = 10;
+  bool can_create_version = 11;
+  repeated BudgetVersionSummary versions = 12;
+}
+
 // Update
 message UpdateMonthlyBudgetRequest {
   string budget_id = 1;
@@ -779,6 +811,8 @@ message BudgetFilter {
   optional string company_id = 2;
   optional int32 year = 3;
   optional int32 month = 4;
+  /** Empty = no branch filter; otherwise match that branch (or company-wide when "__company__"). */
+  optional string branch_id = 5;
 }
 
 message ListMonthlyBudgetsResponse {
@@ -913,6 +947,7 @@ message GetPayrollYtdReportRequest {
   int32 year = 3;
   optional string staff_id = 4;
   optional string export_format = 5; // "json" | "csv" | "pdf"
+  optional string branch_id = 6;
 }
 
 message PayrollYtdStaffRow {
@@ -922,6 +957,12 @@ message PayrollYtdStaffRow {
   int64 net_minor = 4;
   int64 adjustment_minor = 5;
   int32 periods_paid = 6;
+  string staff_name = 7;
+  string branch_id = 8;
+  string branch_name = 9;
+  int32 year = 10;
+  int32 month = 11;
+  string payroll_status = 12;
 }
 
 message GetPayrollYtdReportResponse {

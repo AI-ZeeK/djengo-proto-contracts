@@ -309,7 +309,7 @@ message GenerateEmployeeNumberRequest {
 message GenerateEmployeeNumberResponse {
   bool success = 1;
   optional string error = 2;
-  optional string employee_number = 3; // e.g. "ACME-2025-0042"
+  optional string employee_number = 3; // e.g. "ACME-250826-K9M2X1"
 }
 
 /// Find users/staff who currently hold a permission for notifications / fan-out.
@@ -364,6 +364,13 @@ enum CompanyBudgetGranularity {
   BUDGET_MONTHLY = 1;
   BUDGET_QUARTERLY = 2;
   BUDGET_ANNUAL = 3;
+}
+
+/// Multi-branch: whether budgets/payroll schedules are keyed per branch or company-wide (main branch).
+enum BudgetPayrollScope {
+  BUDGET_PAYROLL_SCOPE_UNSPECIFIED = 0;
+  BUDGET_PAYROLL_SCOPE_BRANCH = 1;
+  BUDGET_PAYROLL_SCOPE_COMPANY = 2;
 }
 
   // Branch Analytics Messages
@@ -438,6 +445,8 @@ message UpdateCompanyDetailsRequest {
   optional string settings_steps_json = 26;
   /// Settings step keys to mark complete (COMPANY scope). Prefer over settings_steps_json.
   repeated string page_completion_keys = 27;
+  /// BRANCH (default) | COMPANY — only meaningful when is_multi_branch.
+  optional BudgetPayrollScope budget_payroll_scope = 28;
 }
 
 message OrganizationRoleIdRequest {
@@ -843,6 +852,7 @@ message CreateCompanyRequest {
   optional string payroll_payout_time = 21;
   optional bool require_payroll_verification_before_send = 22;
   optional int32 payroll_payout_mode = 23;
+  optional BudgetPayrollScope budget_payroll_scope = 24;
 }
 
 message CreateDepartmentRequest {  string organization_id = 1;
@@ -1301,6 +1311,8 @@ message CompanyMetaData {
   optional int32 payroll_payout_mode = 19;
   /// JSON: { profile, location, policies, food_refund, billing, documents, hours } booleans.
   repeated PageCompletion page_completions = 20;
+  /// BRANCH (default) | COMPANY — multi-branch budget/payroll schedule scoping.
+  BudgetPayrollScope budget_payroll_scope = 21;
 }
 
 message Branch {
