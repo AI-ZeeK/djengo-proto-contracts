@@ -1096,6 +1096,7 @@ message GetPayrollAnalyticsResponse {
     string payroll_id = 18;
     string schedule_reference = 19;
     string payroll_reference = 20;
+    optional string approval_instance_id = 21;
   }
 
   message ListPayrollSchedulesResponse {
