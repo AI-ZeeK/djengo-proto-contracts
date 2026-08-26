@@ -2,6 +2,13 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## Unreleased — Budget currency_code
+
+### `financials.proto`
+- `MonthlyBudget.currency_code` (18) — ISO 4217 from branch override or company base (same resolution as payroll)
+- `GetBudgetAnalyticsRequest.branch_id` (3) — optional branch scope
+- `GetBudgetAnalyticsResponse.currency_code` (4) — display currency for analytics cards/charts
+
 ## Unreleased — Facility place roles
 
 ### `facility.proto`

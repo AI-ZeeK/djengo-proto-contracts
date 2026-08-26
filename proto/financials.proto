@@ -667,6 +667,14 @@ message MonthlyBudget {
   int32 latest_version = 15;
   bool can_create_version = 16;
   bool can_edit = 17;
+  /// ISO 4217 — branch override or company base (same resolution as payroll wallets).
+  string currency_code = 18;
+  /// ISO-8601 UTC created timestamp (plain string for HTTP clients).
+  string created_at = 19;
+  /// Resolved branch display name (empty when company-wide / unknown).
+  string branch_name = 20;
+  /// Detail summary cards for the budget page (total / allocated / remaining / …).
+  repeated BudgetAnalyticsCard cards = 21;
 }
 
 message BudgetVersionSummary {
@@ -1392,6 +1400,8 @@ message GetInventoryAnalyticsResponse {
 message GetBudgetAnalyticsRequest {
   string company_id      = 1;
   string organization_id = 2;
+  /** When set, analytics + currency resolve for this branch. */
+  optional string branch_id = 3;
 }
 
 message BudgetAnalyticsCard {
@@ -1402,6 +1412,8 @@ message BudgetAnalyticsCard {
   double growth      = 5;
   int32  count       = 6;
   string description = 7;
+  /// money | percent | count | text
+  string value_type  = 8;
 }
 
 message BudgetAnalyticsChart {
@@ -1421,6 +1433,8 @@ message GetBudgetAnalyticsResponse {
   repeated BudgetAnalyticsCard  cards  = 1;
   repeated BudgetAnalyticsChart charts = 2;
   optional string alert = 3;
+  /// ISO 4217 display currency for cards/charts (branch or company base).
+  string currency_code = 4;
 }
 
 // ── Company Financial Overview (period-aware, cards with sparklines) ───────────
@@ -1439,6 +1453,10 @@ message FinancialOverviewCard {
   string description        = 5;
   string status             = 6;
   repeated ChartData chart_data = 7;
+  /// money | percent | count — clients must not assume every total is currency.
+  string value_type         = 8;
+  /// Stable id for the card (e.g. financial_allocation_rate).
+  string slug               = 9;
 }
 
 message FinancialOverviewChart {
