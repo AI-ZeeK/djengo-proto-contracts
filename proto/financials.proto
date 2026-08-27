@@ -688,7 +688,7 @@ message MonthlyBudget {
   string branch_name = 20;
   /// Detail summary cards for the budget page (total / allocated / remaining / …).
   repeated BudgetAnalyticsCard cards = 21;
-  /// Entity lifecycle: PENDING | ACTIVE | CLOSED | ARCHIVED (BudgetStatus), distinct from approval_status.
+  /// Entity lifecycle: PENDING | ACTIVE | CLOSED | CANCELLED (BudgetStatus), distinct from approval_status.
   string lifecycle_status = 22;
   /// Human-readable document ref (e.g. BUD-260827-A3K9X).
   string budget_reference = 23;
