@@ -2,6 +2,14 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## Unreleased — Revenue stream kinds + source_ref
+
+### `financials.proto`
+- `rpc ListAvailableRevenueStreamKinds` — resolve ROOM/FNB/EVENTS/SPA/PARKING/OTHER from facility operation keys
+- `ListAvailableRevenueStreamKindsRequest` / `ListAvailableRevenueStreamKindsResponse` / `RevenueStreamKindOption`
+- `RecordRevenueStreamRequest.source_ref` (10) — optional idempotency key for auto-mapped payments
+- `RevenueStreamProto.source_ref` (12) — echo of auto-map / idempotency key
+
 ## Unreleased — Manual bank deposit (CDEP)
 
 ### `financials.proto` — GuestBillingService

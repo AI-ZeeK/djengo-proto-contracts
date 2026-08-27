@@ -257,9 +257,12 @@ service FinancialsService {
   rpc AttachOrganizationTrial (AttachOrganizationTrialRequest) returns (OrganizationSubscriptionResponse);
   rpc CheckStaffSeatAvailability (CheckStaffSeatAvailabilityRequest) returns (CheckStaffSeatAvailabilityResponse);
 
-  // ── Revenue streams (hospitality taxonomy) ────────────────────────────────
+  // ── Revenue streams (hospitality taxonomy) — FinancialsService only ───────
   rpc RecordRevenueStream (RecordRevenueStreamRequest) returns (RevenueStreamProto);
   rpc ListRevenueStreams (ListRevenueStreamsRequest) returns (ListRevenueStreamsResponse);
+  /// Resolve ROOM/FNB/EVENTS/SPA/PARKING/OTHER from facility operation keys.
+  /// OTHER is always included. Implemented by the financials service (not profile/org).
+  rpc ListAvailableRevenueStreamKinds (ListAvailableRevenueStreamKindsRequest) returns (ListAvailableRevenueStreamKindsResponse);
 
   // ── Staff salary structures (versioned compensation components) ───────────
   rpc ListStaffSalaryStructures (ListStaffSalaryStructuresRequest) returns (ListStaffSalaryStructuresResponse);
@@ -3465,6 +3468,8 @@ message RecordRevenueStreamRequest {
   int32 month = 7;
   optional string currency_code = 8;
   optional string notes = 9;
+  /// Idempotency key for auto-mapped ops (e.g. guest_payment:{payment_id}).
+  optional string source_ref = 10;
 }
 
 message ListRevenueStreamsRequest {
@@ -3487,10 +3492,31 @@ message RevenueStreamProto {
   string currency_code = 9;
   string notes = 10;
   string created_at = 11;
+  /// Empty when manually recorded; set for auto-mapped guest payments / orders.
+  string source_ref = 12;
 }
 
 message ListRevenueStreamsResponse {
   repeated RevenueStreamProto streams = 1;
+}
+
+message ListAvailableRevenueStreamKindsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  /// Optional facility site-operation keys (hotel, restaurant, spa, …).
+  /// When empty, only OTHER is returned. Gateway typically fills these from
+  /// FacilityService.GetCompanyFacilitySiteOperations.
+  repeated string operation_keys = 3;
+}
+
+message RevenueStreamKindOption {
+  string id = 1;   // ROOM | FNB | EVENTS | SPA | PARKING | OTHER
+  string name = 2; // display label
+  repeated string operation_keys = 3;
+}
+
+message ListAvailableRevenueStreamKindsResponse {
+  repeated RevenueStreamKindOption kinds = 1;
 }
 
 // ── Staff salary structures ─────────────────────────────────────────────────
