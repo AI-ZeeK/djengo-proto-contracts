@@ -102,8 +102,8 @@ service FinancialsService {
 
   // ...existing rpcs...
   rpc GetStaffPaymentDetails (GetStaffPaymentDetailsRequest) returns (GetStaffPaymentDetailsResponse);
-
-
+  /// Preference only: 0 = company default, 1 = bank, 2 = in-app wallet.
+  rpc SetStaffPayoutDestination (SetStaffPayoutDestinationRequest) returns (CreatePaymentDetailsResponse);
 
   rpc ListPayrollSchedules (ListPayrollSchedulesRequest) returns (ListPayrollSchedulesResponse);
   rpc CreateWallet (CreateWalletRequest) returns (WalletReply);
@@ -397,6 +397,8 @@ message StaffPaymentDetails {
   string base_salary = 8;
   string sort_code = 9;
   string created_at = 10;
+  /// 0 = company default, 1 = bank/manual, 2 = in-app wallet
+  int32 preferred_payout_destination = 11;
 }
 
 enum PAYMENT_FREQUENCY_ENUM {
@@ -416,11 +418,19 @@ message CreatePaymentDetailsRequest {
   string base_salary = 9;
   string account_name = 10;
   optional string sort_code = 11;
+  optional int32 preferred_payout_destination = 12;
 }
 
 message CreatePaymentDetailsResponse {
   bool success = 1;
   string message = 2;
+}
+
+message SetStaffPayoutDestinationRequest {
+  string staff_id = 1;
+  string company_id = 2;
+  /// 0 = company default, 1 = bank/manual, 2 = in-app wallet
+  int32 preferred_payout_destination = 3;
 }
 message GetBanksRequest {
   string country_code = 1;
@@ -1145,6 +1155,9 @@ message StaffPayrollRow {
   int64 base_salary_minor = 6;
   int64 total_adjustment_minor = 7;
   // Optionally: repeated PayrollAdjustment adjustments = 8;
+  /// 0 = company default, 1 = bank/manual, 2 = in-app wallet
+  int32 preferred_payout_destination = 9;
+  bool has_bank_details = 10;
 }
 
 message PayrollVersionSummary {

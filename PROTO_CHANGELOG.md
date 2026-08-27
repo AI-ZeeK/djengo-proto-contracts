@@ -2,6 +2,14 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## Unreleased — Admin today hourly + password reveal
+
+### helpers (proto-contracts)
+- `Helpers.normalizeTimelineKey` / `getDateRanges` / `buildFilledTimelineBuckets` support `today` (hourly 00:00→current hour) and `7d`
+
+### Gateway admin
+- `POST /admin/users/:user_id/password/request-reveal` + `confirm-reveal` (super admin) — OTP then issue temporary password (bcrypt cannot decrypt)
+
 ## Unreleased — Revenue stream kinds + source_ref
 
 ### `financials.proto`
