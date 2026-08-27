@@ -2,6 +2,18 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## Unreleased — Manual bank deposit (CDEP)
+
+### `financials.proto` — GuestBillingService
+- `GetWalletCollectionAccount` — platform collection bank account details
+- `SubmitManualWalletDeposit` — proof URL + signature + note
+- `GetManualWalletDeposit` — deposit + two-way timeline
+- `PostManualWalletDepositMessage` — client/admin timeline messages
+- `ReviewManualWalletDeposit` — APPROVE | REJECT | NEEDS_INFO
+- `ListManualWalletDeposits` / `ListManualWalletDepositsAwaitingAdmin`
+- Messages: `WalletCollectionAccountProto`, `ManualWalletDepositProto`, `WalletDepositTimelineEvent`, related request/response types
+- `InitializeCompanyWalletFundRequest.channel` documents `manual_deposit` (bank routes to manual deposit flow)
+
 ## Unreleased — Admin org financials, wallet balance, USD txn fields, payroll reference
 
 ### `organization.proto`
@@ -16,6 +28,10 @@ All `.proto` files in `proto/` are the **single source of truth**. Run `npm run 
 - `AdminPlatformTransaction.exchange_rate` (25), `usd_amount` (26) — USD equivalent persisted at transaction write time
 - `AdminPlatformPayroll.payroll_reference` (18) — human-readable payroll ref for admin tables/search
 - `GetAdminPlatformPayrollAnalyticsResponse.average_payroll` — denominator is settled payroll count (documented)
+
+### `financials.proto` — wallet bank transfer instructions
+- `InitializeCompanyWalletFundResponse.transfer_instructions` (8)
+- `WalletFundTransferInstructions` — platform collection account or Paystack transfer URL + steps
 
 ## Unreleased — Budget currency_code
 
