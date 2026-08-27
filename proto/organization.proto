@@ -147,6 +147,15 @@ service AdminOrganizationService {
   /// Company people: business users, staff, partners, and deduplicated user table.
   rpc GetCompanyUsersOverview(GetCompanyUsersOverviewRequest) returns (GetCompanyUsersOverviewResponse);
 
+  /// Admin financial snapshot for one organization (all companies).
+  rpc GetOrganizationFinancials(GetOrganizationFinancialsRequest) returns (GetOrganizationFinancialsResponse);
+
+  /// Admin financial snapshot for one company workspace.
+  rpc GetCompanyFinancials(GetCompanyFinancialsRequest) returns (GetCompanyFinancialsResponse);
+
+  /// Platform-wide financial summary for admin organization dashboards.
+  rpc GetPlatformFinancialSummary(GetPlatformFinancialSummaryRequest) returns (GetPlatformFinancialSummaryResponse);
+
   /// Platform support enables this after a location-change request; company may update branch address once.
   rpc SetBranchLocationUpdateAllowance(SetBranchLocationUpdateAllowanceRequest) returns (UtilitiesResponse);
 
@@ -1142,6 +1151,79 @@ message GetCompanyUsersOverviewResponse {
   CompanyUsersTableMeta meta = 8;
 }
 
+// ── Admin organization financial snapshots ──────────────────────────────────
+
+message AdminChartPoint {
+  string name = 1;
+  double value = 2;
+}
+
+message AdminCompanyFinancialSnapshot {
+  string company_id = 1;
+  string organization_id = 2;
+  double revenue = 3;
+  double expenses = 4;
+  int32 transactions = 5;
+  double wallet_balance = 6;
+  string wallet_currency = 7;
+  repeated AdminChartPoint revenue_chart = 8;
+  repeated AdminChartPoint expense_chart = 9;
+}
+
+message AdminOrganizationFinancialSnapshot {
+  string organization_id = 1;
+  double revenue = 2;
+  double expenses = 3;
+  int32 transactions = 4;
+  double wallet_balance = 5;
+  string wallet_currency = 6;
+  repeated AdminCompanyFinancialSnapshot companies = 7;
+}
+
+message GetOrganizationFinancialsRequest {
+  string organization_id = 1;
+  /// Timeline token: _today | _7d | _1m | _3m | _6m | _1y | all
+  string timeline = 2;
+}
+
+message GetOrganizationFinancialsResponse {
+  AdminOrganizationFinancialSnapshot snapshot = 1;
+}
+
+message GetCompanyFinancialsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string timeline = 3;
+}
+
+message GetCompanyFinancialsResponse {
+  AdminCompanyFinancialSnapshot snapshot = 1;
+}
+
+message AdminPlatformFinancialTrend {
+  double percentage = 1;
+  string trend = 2; // increase | decrease | neutral
+}
+
+message GetPlatformFinancialSummaryRequest {
+  string timeline = 1;
+}
+
+message GetPlatformFinancialSummaryResponse {
+  double total_revenue = 1;
+  double total_expenses = 2;
+  double net_position = 3;
+  int32 total_transactions = 4;
+  double average_transactions_per_org = 5;
+  int32 high_revenue_organizations_count = 6;
+  AdminPlatformFinancialTrend revenue_trend = 7;
+  AdminPlatformFinancialTrend expense_trend = 8;
+  AdminPlatformFinancialTrend transaction_trend = 9;
+  repeated AdminChartPoint revenue_chart = 10;
+  repeated AdminChartPoint expense_chart = 11;
+  repeated AdminOrganizationFinancialSnapshot organizations = 12;
+}
+
 message GetOrganizationOverviewResponse {
   bool success = 1;
   optional string message = 2;
@@ -1473,6 +1555,12 @@ message OrganizationMeta {
   optional string primary_company_id = 9;
   int32 branches_count = 10;
   int32 multi_branch_companies_count = 11;
+  /// Recorded spend for the selected timeline (admin table enrichment).
+  optional double total_expenses = 12;
+  /// Combined branch wallet balance across all companies.
+  optional double wallet_balance = 13;
+  /// ISO 4217 code for wallet_balance.
+  optional string wallet_currency = 14;
 }
 
 message OrganizationDetail {
@@ -1491,6 +1579,13 @@ message OrganizationDetail {
   OrganizationMeta meta = 13;
   int32 revenue = 14;
   int32 transactions = 15;
+  /// Combined branch wallet balance (admin table enrichment).
+  optional double wallet_balance = 16;
+  /// ISO 4217 code for wallet_balance.
+  optional string wallet_currency = 17;
+  /// Recorded spend for the selected timeline.
+  optional double expenses = 18;
+  optional double total_expense = 19;
 }
 
 message PaginationMeta {

@@ -1795,6 +1795,7 @@ message AdminPlatformPayroll {
   string scheduled_at       = 15;
   string completed_at       = 16;
   string created_at         = 17;
+  string payroll_reference  = 18;
 }
 
 message ListAdminPlatformPayrollsRequest {
@@ -1836,6 +1837,7 @@ message GetAdminPlatformPayrollAnalyticsResponse {
   AdminPayrollAnalytic total_volume     = 1;
   AdminPayrollAnalytic active_payrolls  = 2;
   AdminPayrollAnalytic monthly_payroll  = 3;
+  /// Average payroll amount; denominator is settled payroll count (not org count).
   AdminPayrollAnalytic average_payroll  = 4;
   AdminPayrollAnalytic on_time_rate     = 5;
   AdminPayrollAnalytic pending_payrolls = 6;
@@ -2072,6 +2074,10 @@ message BudgetVarianceReport {
   repeated BudgetVarianceLine lines = 9;
   string  generated_at           = 10;
   bool    budget_found           = 11;
+  repeated BudgetAnalyticsCard  cards  = 12;
+  repeated BudgetAnalyticsChart charts = 13;
+  /// ISO 4217 display currency (branch or company base).
+  string  currency_code          = 14;
 }
 
 // ── Payslip PDF ───────────────────────────────────────────────────────────
