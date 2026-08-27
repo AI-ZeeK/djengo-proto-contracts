@@ -2,6 +2,21 @@
 
 All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
 
+## Unreleased — Admin org financials, wallet balance, USD txn fields, payroll reference
+
+### `organization.proto`
+- `OrganizationMeta.total_expenses` (12), `wallet_balance` (13), `wallet_currency` (14) — admin org table enrichment
+- `OrganizationDetail.wallet_balance` (16), `wallet_currency` (17), `expenses` (18), `total_expense` (19)
+- `AdminOrganizationService.GetOrganizationFinancials` — org-wide revenue/expense/wallet snapshot
+- `AdminOrganizationService.GetCompanyFinancials` — single-company admin financial snapshot
+- `AdminOrganizationService.GetPlatformFinancialSummary` — platform-wide admin financial rollup
+- Messages: `AdminChartPoint`, `AdminCompanyFinancialSnapshot`, `AdminOrganizationFinancialSnapshot`, `GetOrganizationFinancialsRequest/Response`, `GetCompanyFinancialsRequest/Response`, `GetPlatformFinancialSummaryRequest/Response`, `AdminPlatformFinancialTrend`
+
+### `financials.proto`
+- `AdminPlatformTransaction.exchange_rate` (25), `usd_amount` (26) — USD equivalent persisted at transaction write time
+- `AdminPlatformPayroll.payroll_reference` (18) — human-readable payroll ref for admin tables/search
+- `GetAdminPlatformPayrollAnalyticsResponse.average_payroll` — denominator is settled payroll count (documented)
+
 ## Unreleased — Budget currency_code
 
 ### `financials.proto`
