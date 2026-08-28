@@ -1122,6 +1122,8 @@ message GetPayrollAnalyticsResponse {
     string schedule_reference = 19;
     string payroll_reference = 20;
     optional string approval_instance_id = 21;
+    /** Sum of current payroll staff net amounts (minor units). */
+    int64 total_amount_minor = 22;
   }
 
   message ListPayrollSchedulesResponse {
