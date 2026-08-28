@@ -1,6 +1,38 @@
-# Proto changelog
+## Unreleased — Staff bank details OTP + email confirm
 
-All `.proto` files in `proto/` are the **single source of truth**. Run `npm run sync:services` from this package (or the shell script) to copy them into each microservice before building.
+### `financials.proto`
+- Split staff bank-details into per-action RPCs: `GetStaffBankDetails`, `RequestStaffBankDetailsOtp`, `SubmitStaffBankDetails`, `ConfirmStaffBankDetails`, `CancelStaffBankDetailsPending`
+- `rpc GetStaffPayrollPayoutDestination` — masked bank + preferred payout destination for the signed-in staff user
+- Messages: `StaffBankDetailsContext`, `SubmitStaffBankDetailsRequest`, `ConfirmStaffBankDetailsRequest`, `StaffPayrollPayoutDestinationResponse`
+
+## Unreleased — Per-staff payroll payment status
+
+### `financials.proto`
+- `PayrollStaff.failure_reason` (6), `payment_reference` (7)
+- `StaffPayrollRow.payroll_line_status` (11), `failure_reason` (12), `payment_reference` (13)
+
+## Unreleased — Personal wallet fund & withdraw
+
+### `financials.proto`
+- `InitializeCompanyWalletFundRequest.personal` (11) — credit the initiated user's personal wallet
+- `CreateWalletWithdrawalRequest.personal` (11) — debit that user's personal wallet (skip company approval chain)
+- `ListWalletWithdrawalsRequest.requested_by` (6), `personal_only` (7)
+
+## Unreleased — Payslip PDF attachment on payroll mail
+
+### `communication.proto`
+- `SendPayrollApprovedMailRequest.payslip_pdf` (9), `payslip_filename` (10) — optional PDF attachment
+
+## Unreleased — Payroll lookup, payslip register, schedule totals, budget refs
+
+### `financials.proto`
+- `GetPayrollRequest.name` — payroll UUID **or** `payroll_reference` (e.g. `PAY-2608-A6K24CE`)
+- `GetPayslipPdfRequest.staff_id` — empty / omitted generates the payroll **register** PDF for every staff line; a staff UUID still returns that person’s payslip
+- `PayrollScheduleTableRow.total_amount_minor` (22) — sum of current payroll staff net amounts (minor units)
+- `MonthlyBudget.lifecycle_status` (22), `budget_reference` (23)
+
+### `facility.proto`
+- `PublicBookableListing.listing_offer` comment — `RENT | LEASE | BUY | BNB | SHORT_STAY`
 
 ## Unreleased — Admin today hourly + password reveal
 

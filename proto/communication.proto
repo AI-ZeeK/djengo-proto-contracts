@@ -51,6 +51,8 @@ message SendPayrollApprovedMailRequest {
   optional string approver_name = 6;
   optional string payslip_url = 7;
   string company_name = 8;
+  optional bytes payslip_pdf = 9;
+  optional string payslip_filename = 10;
 }
 
 message SendPayrollApprovedMailResponse {

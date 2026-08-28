@@ -104,6 +104,12 @@ service FinancialsService {
   rpc GetStaffPaymentDetails (GetStaffPaymentDetailsRequest) returns (GetStaffPaymentDetailsResponse);
   /// Preference only: 0 = company default, 1 = bank, 2 = in-app wallet.
   rpc SetStaffPayoutDestination (SetStaffPayoutDestinationRequest) returns (CreatePaymentDetailsResponse);
+  rpc GetStaffBankDetails (StaffBankDetailsContext) returns (StaffBankDetailsChangeResponse);
+  rpc RequestStaffBankDetailsOtp (StaffBankDetailsContext) returns (StaffBankDetailsChangeResponse);
+  rpc SubmitStaffBankDetails (SubmitStaffBankDetailsRequest) returns (StaffBankDetailsChangeResponse);
+  rpc ConfirmStaffBankDetails (ConfirmStaffBankDetailsRequest) returns (StaffBankDetailsChangeResponse);
+  rpc CancelStaffBankDetailsPending (StaffBankDetailsContext) returns (StaffBankDetailsChangeResponse);
+  rpc GetStaffPayrollPayoutDestination (StaffBankDetailsContext) returns (StaffPayrollPayoutDestinationResponse);
 
   rpc ListPayrollSchedules (ListPayrollSchedulesRequest) returns (ListPayrollSchedulesResponse);
   rpc CreateWallet (CreateWalletRequest) returns (WalletReply);
@@ -432,6 +438,60 @@ message SetStaffPayoutDestinationRequest {
   /// 0 = company default, 1 = bank/manual, 2 = in-app wallet
   int32 preferred_payout_destination = 3;
 }
+
+message StaffBankDetailsContext {
+  string company_id = 1;
+  string organization_id = 2;
+  string staff_id = 3;
+  string user_id = 4;
+}
+
+message SubmitStaffBankDetailsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string staff_id = 3;
+  string user_id = 4;
+  string otp = 5;
+  string bank_name = 6;
+  string account_number = 7;
+  string account_name = 8;
+  string sort_code = 9;
+  string confirm_base_url = 10;
+}
+
+message ConfirmStaffBankDetailsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string staff_id = 3;
+  string user_id = 4;
+  string confirm_token = 5;
+}
+
+message StaffBankDetailsChangeResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  string pending_status = 4;
+  string bank_name = 5;
+  string account_number_masked = 6;
+  string account_name_masked = 7;
+  string pending_bank_name = 8;
+  string pending_account_masked = 9;
+  bool has_live_bank_details = 10;
+  int32 preferred_payout_destination = 11;
+}
+
+message StaffPayrollPayoutDestinationResponse {
+  int32 preferred_payout_destination = 1;
+  bool has_payment_details = 2;
+  bool has_bank_details = 3;
+  bool has_staff_profile = 4;
+  string bank_name = 5;
+  string account_name_masked = 6;
+  string account_number_masked = 7;
+  string message = 8;
+}
+
 message GetBanksRequest {
   string country_code = 1;
 }
@@ -741,6 +801,8 @@ message PayrollStaff {
   string payroll_id = 3;
   int64 amount_minor = 4;
   PayrollState payroll_state = 5;
+  string failure_reason = 6;
+  string payment_reference = 7;
 }
 
 // --- Requests/Responses ---
@@ -1005,6 +1067,7 @@ message GetPayrollYtdReportResponse {
 }
 
 message GetPayrollRequest {
+  /// Payroll UUID or payroll_reference (e.g. PAY-2608-A6K24CE).
   string name = 1;
 }
 message ListPayrollsRequest {
@@ -1164,6 +1227,10 @@ message StaffPayrollRow {
   /// 0 = company default, 1 = bank/manual, 2 = in-app wallet
   int32 preferred_payout_destination = 9;
   bool has_bank_details = 10;
+  /// DRAFT | PENDING | PROCESSING | APPROVED | PAID | CLOSED | FAILED (empty if not on this payroll)
+  string payroll_line_status = 11;
+  string failure_reason = 12;
+  string payment_reference = 13;
 }
 
 message PayrollVersionSummary {
@@ -2105,6 +2172,7 @@ message BudgetVarianceReport {
 // ── Payslip PDF ───────────────────────────────────────────────────────────
 message GetPayslipPdfRequest {
   string payroll_id = 1;
+  /// Staff UUID for a single payslip. Empty / omitted → payroll register PDF for the whole run.
   string staff_id = 2;
   string company_id = 3;
 }
@@ -2787,6 +2855,8 @@ message InitializeCompanyWalletFundRequest {
   // card | bank | manual_deposit
   optional string channel = 9;
   optional string branch_id = 10;
+  // When true, credit the initiated_by user's personal wallet (not the company/branch wallet).
+  optional bool personal = 11;
 }
 
 message InitializeCompanyWalletFundResponse {
@@ -2955,6 +3025,8 @@ message CreateWalletWithdrawalRequest {
   optional string branch_id = 8;
   optional string note = 9;
   optional string requested_by = 10;
+  // When true, debit the requested_by user's personal wallet (skip company approval chain).
+  optional bool personal = 11;
 }
 
 message CompanyWalletWithdrawalProto {
@@ -2996,6 +3068,8 @@ message ListWalletWithdrawalsRequest {
   optional string status = 3;
   int32 page = 4;
   int32 page_size = 5;
+  optional string requested_by = 6;
+  optional bool personal_only = 7;
 }
 
 message ListWalletWithdrawalsResponse {

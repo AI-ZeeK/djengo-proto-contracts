@@ -1445,7 +1445,7 @@ message PublicBookableNodeMessage {
   repeated PublicBookableListingImageMessage listing_images = 21;
   optional int32 window_count = 22;
   optional bool has_balcony = 23;
-  // Estate / unit offer: RENT | LEASE | BUY (from node metadata_json.listing_offer).
+  // Estate / unit offer: RENT | LEASE | BUY | BNB | SHORT_STAY (from node metadata_json.listing_offer).
   optional string listing_offer = 24;
   /// Floor-plan placement JSON: { grid_x, grid_z, rotation_deg, placed }.
   optional string spatial_position_json = 25;
