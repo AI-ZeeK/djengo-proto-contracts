@@ -1136,6 +1136,8 @@ message SendOtpResponse {
   bool success = 1;
   optional string error = 2;
   optional string message = 3;
+  /// Set only outside production so local clients can auto-fill.
+  optional string dev_otp = 4;
 }
 
 message GetOtpExpiryRequest {
@@ -1178,6 +1180,8 @@ message AuthInitialResponse {
   optional bool otp_required = 8;
   /// When true, password succeeded but TOTP is still required (or was validated).
   optional bool totp_required = 9;
+  /// Set only outside production so local clients can auto-fill.
+  optional string dev_otp = 10;
 }
 
 message RequestPasswordResetRequest {

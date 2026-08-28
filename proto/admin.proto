@@ -321,6 +321,8 @@ message SendOtpResponse {
   bool success = 1;
   optional string error = 2;
   optional string message = 3;
+  /// Set only outside production so local clients can auto-fill.
+  optional string dev_otp = 4;
 }
 
 message RefreshTokenResponse {
@@ -337,6 +339,8 @@ message AuthInitialResponse {
   optional string error = 2;
   optional string message = 3;
   optional string auth_token = 4;
+  /// Set only outside production so local clients can auto-fill.
+  optional string dev_otp = 5;
 }
   
 message AdminRegisterRequest {

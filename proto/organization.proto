@@ -2048,6 +2048,11 @@ message AssignOrganizationPlanRequest {
   string organization_id = 1;
   string plan_id = 2;
   optional string status = 3;
+  // MONTHLY | YEARLY
+  optional string billing_interval = 4;
+  // IMMEDIATE | AT_PERIOD_END | AUTO
+  optional string change_timing = 5;
+  optional string payment_method_id = 6;
 }
 
 message SaasSubscriptionAnalyticsResponse {

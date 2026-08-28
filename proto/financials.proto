@@ -479,6 +479,8 @@ message StaffBankDetailsChangeResponse {
   string pending_account_masked = 9;
   bool has_live_bank_details = 10;
   int32 preferred_payout_destination = 11;
+  /// Set only outside production so local clients can auto-fill.
+  optional string dev_otp = 12;
 }
 
 message StaffPayrollPayoutDestinationResponse {
