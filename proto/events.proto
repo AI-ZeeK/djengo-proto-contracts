@@ -1396,7 +1396,10 @@ message LeaveRequest {
   Staff staff = 17; // populated on list/get, links to the StaffEvent for this leave request
 }
 
-message LeaveRequestId          { string leave_request_id = 1; }
+message LeaveRequestId {
+  string leave_request_id = 1;
+  optional string company_id = 2;
+}
 message LeaveRequestListResponse { repeated LeaveRequest requests = 1; int32 total = 2; TableMeta meta = 3; }
 message CreateLeaveRequestRequest {
   string staff_id        = 1;
@@ -1410,9 +1413,11 @@ message CreateLeaveRequestRequest {
 }
 message ReviewLeaveInput {
   string leave_request_id = 1;
+  // Actor user_id — gateway overwrites from JWT; never trust the client.
   string reviewed_by      = 2;
   string action           = 3; // "APPROVED" or "REJECTED"
   string rejection_reason = 4;
+  optional string company_id = 5;
 }
 message GetLeaveRequestsRequest {
   string organization_id = 1;
@@ -1576,6 +1581,7 @@ enum ApprovalEntityType {
   WALLET_WITHDRAWAL = 9;
   STAFF_TERMINATION = 10;
   SALARY_ADVANCE = 11;
+  ASSET_DISPOSAL = 12;
 }
 
 message TableMeta {

@@ -143,6 +143,10 @@ service FinancialsService {
 
   // Company-wide financial overview (period-aware: expenses, budget, payroll, inventory)
   rpc GetCompanyFinancialOverview (GetCompanyFinancialOverviewRequest) returns (GetCompanyFinancialOverviewResponse);
+  rpc GetProfitAndLossStatement (GetFinancialStatementRequest) returns (ProfitAndLossStatement);
+  rpc GetCashFlowStatement (GetFinancialStatementRequest) returns (CashFlowStatement);
+  rpc GetBudgetControlSettings (GetBudgetControlSettingsRequest) returns (BudgetControlSettingsProto);
+  rpc UpsertBudgetControlSettings (UpsertBudgetControlSettingsRequest) returns (BudgetControlSettingsProto);
 
   // Budget
   rpc CreateMonthlyBudget(CreateMonthlyBudgetRequest) returns (MonthlyBudget);
@@ -279,6 +283,7 @@ service FinancialsService {
   rpc RequestSalaryAdvance (RequestSalaryAdvanceRequest) returns (SalaryAdvanceProto);
   rpc ListSalaryAdvances (ListSalaryAdvancesRequest) returns (ListSalaryAdvancesResponse);
   rpc SyncSalaryAdvanceApproval (SyncSalaryAdvanceApprovalRequest) returns (SalaryAdvanceProto);
+  rpc SyncAssetDisposalApproval (SyncAssetDisposalApprovalRequest) returns (FacilityAssetRecord);
 
   // Events calls these when an approval chain is first set up / updated so pre-existing
   // budgets and salary advances without an instance get wired into the new chain.
@@ -405,6 +410,8 @@ message StaffPaymentDetails {
   string created_at = 10;
   /// 0 = company default, 1 = bank/manual, 2 = in-app wallet
   int32 preferred_payout_destination = 11;
+  int64 base_salary_minor = 12;
+  optional int64 overtime_hourly_rate_minor = 13;
 }
 
 enum PAYMENT_FREQUENCY_ENUM {
@@ -754,6 +761,9 @@ message MonthlyBudget {
   string lifecycle_status = 22;
   /// Human-readable document ref (e.g. BUD-260827-A3K9X).
   string budget_reference = 23;
+  /// Inclusive fiscal-year envelope (yyyy-MM-dd) stored on the budget row.
+  optional string fiscal_year_start = 24;
+  optional string fiscal_year_end = 25;
 }
 
 message BudgetVersionSummary {
@@ -1570,6 +1580,61 @@ message GetCompanyFinancialOverviewResponse {
   optional double exchange_rate = 5;
 }
 
+message GetFinancialStatementRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  Timeline timeline      = 3;
+}
+
+message FinancialStatementLine {
+  string label = 1;
+  string section = 2;
+  double amount = 3;
+  string value_type = 4;
+}
+
+message ProfitAndLossStatement {
+  repeated FinancialStatementLine lines = 1;
+  double total_revenue = 2;
+  double total_expenses = 3;
+  double net_income = 4;
+  optional string currency_code = 5;
+  string period_from = 6;
+  string period_to = 7;
+}
+
+message CashFlowStatement {
+  repeated FinancialStatementLine lines = 1;
+  double operating = 2;
+  double investing = 3;
+  double financing = 4;
+  double net_change = 5;
+  optional string currency_code = 6;
+  string period_from = 7;
+  string period_to = 8;
+}
+
+message BudgetControlSettingsProto {
+  string organization_id = 1;
+  string company_id = 2;
+  double warning_utilization_pct = 3;
+  double breach_utilization_pct = 4;
+  double variance_tolerance_pct = 5;
+}
+
+message GetBudgetControlSettingsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+}
+
+message UpsertBudgetControlSettingsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  double warning_utilization_pct = 3;
+  double breach_utilization_pct = 4;
+  double variance_tolerance_pct = 5;
+}
+
 // Cost Center messages
 
 message CostCenterProto {
@@ -1584,6 +1649,7 @@ message CostCenterProto {
   string created_at            = 9;
   string updated_at            = 10;
   repeated CostCenterProto children = 11;
+  optional string department_id = 12;
 }
 
 message CreateCostCenterRequest {
@@ -1593,6 +1659,7 @@ message CreateCostCenterRequest {
   string code                  = 4;
   string parent_cost_center_id = 5;
   string owner_staff_id        = 6;
+  optional string department_id = 7;
 }
 
 message GetCostCenterRequest {
@@ -1646,6 +1713,8 @@ message OpenFinancialPeriodRequest {
   int32  month           = 4;
   /** Required when reopening a LOCKED period (LOCKED → OPEN). */
   string reopened_by_staff_id = 5;
+  /** Distinct from open: LOCKED → OPEN requires this flag (and reopen permission). */
+  bool allow_reopen = 6;
 }
 
 message LockFinancialPeriodRequest {
@@ -1970,6 +2039,11 @@ service FacilityAssetService {
   rpc UpdatePmSchedule            (UpdateFacilityPmScheduleRequest) returns (FacilityPmScheduleRecord);
   rpc CompletePmOccurrence        (CompleteFacilityPmOccurrenceRequest) returns (FacilityPmScheduleRecord);
   rpc ListMaintenanceLogs         (ListFacilityMaintenanceLogsRequest) returns (ListFacilityMaintenanceLogsResponse);
+  rpc PostDepreciation            (PostDepreciationRequest) returns (AssetDepreciationSchedule);
+  rpc DisposeAsset                (DisposeAssetRequest) returns (FacilityAssetRecord);
+  rpc RecordUtilityReading        (RecordUtilityReadingRequest) returns (FacilityUtilityReadingRecord);
+  rpc ListUtilityReadings         (ListUtilityReadingsRequest) returns (ListUtilityReadingsResponse);
+  rpc ListAssetAudit              (ListAssetAuditRequest) returns (ListAssetAuditResponse);
 }
 
 message ListFacilityAssetsRequest {
@@ -2017,6 +2091,7 @@ message FacilityAssetRecord {
   optional string warranty_expires_at            = 18; // yyyy-MM-dd
   optional string warranty_provider              = 19;
   optional string warranty_terms                 = 20;
+  optional string approval_instance_id           = 21;
 }
 
 message UpdateFacilityAssetRequest {
@@ -2131,6 +2206,76 @@ message FacilityMaintenanceLogRecord {
 
 message ListFacilityMaintenanceLogsResponse {
   repeated FacilityMaintenanceLogRecord logs = 1;
+}
+
+message PostDepreciationRequest {
+  string asset_id = 1;
+  string company_id = 2;
+  optional int32 period_year = 3;
+  optional int32 period_month = 4;
+  optional string posted_by = 5;
+}
+
+message DisposeAssetRequest {
+  string asset_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string disposed_by = 4;
+  optional string reason = 5;
+  optional int64 proceeds_minor = 6;
+}
+
+message FacilityUtilityReadingRecord {
+  string reading_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  optional string branch_id = 4;
+  string meter_code = 5;
+  double value = 6;
+  string read_at = 7;
+  string source = 8;
+}
+
+message RecordUtilityReadingRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  string meter_code = 4;
+  double value = 5;
+  optional string read_at = 6;
+  optional string source = 7;
+}
+
+message ListUtilityReadingsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string meter_code = 3;
+  optional string branch_id = 4;
+}
+
+message ListUtilityReadingsResponse {
+  repeated FacilityUtilityReadingRecord readings = 1;
+}
+
+message ListAssetAuditRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string asset_id = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+}
+
+message AssetAuditEntry {
+  string log_id = 1;
+  string asset_id = 2;
+  string action = 3;
+  string actor_user_id = 4;
+  string description = 5;
+  string created_at = 6;
+}
+
+message ListAssetAuditResponse {
+  repeated AssetAuditEntry logs = 1;
 }
 
 // ── Budget Variance Report ────────────────────────────────────────────────
@@ -2577,6 +2722,20 @@ service GuestBillingService {
   rpc ListWalletWithdrawalsAwaitingAdmin (ListWalletWithdrawalsRequest) returns (ListWalletWithdrawalsResponse);
   rpc AdminApproveWalletWithdrawal (AdminReviewWalletWithdrawalRequest) returns (CreateWalletWithdrawalResponse);
   rpc AdminRejectWalletWithdrawal (AdminReviewWalletWithdrawalRequest) returns (CreateWalletWithdrawalResponse);
+  rpc GetGuestOutstandingBalance (GetGuestOutstandingBalanceRequest) returns (GuestOutstandingBalanceResponse);
+}
+
+message GetGuestOutstandingBalanceRequest {
+  string guest_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+}
+
+message GuestOutstandingBalanceResponse {
+  string guest_id = 1;
+  int64 outstanding_minor = 2;
+  int32 open_invoice_count = 3;
+  string currency_code = 4;
 }
 
 message GuestInvoiceLineItemProto {
@@ -3673,6 +3832,7 @@ message CompanySalaryComponentTemplateProto {
   string label = 5;
   int32 sort_order = 6;
   bool is_active = 7;
+  string kind = 8; // EARNING | STATUTORY | DEDUCTION
 }
 
 message ListCompanySalaryComponentTemplatesRequest {
@@ -3693,6 +3853,7 @@ message UpsertCompanySalaryComponentTemplateRequest {
   string label = 5;
   int32 sort_order = 6;
   bool is_active = 7;
+  optional string kind = 8; // EARNING | STATUTORY | DEDUCTION
 }
 
 message DeleteCompanySalaryComponentTemplateRequest {
@@ -3746,6 +3907,11 @@ message ListSalaryAdvancesResponse {
 message SyncSalaryAdvanceApprovalRequest {
   string company_id = 1;
   string advance_id = 2;
+}
+
+message SyncAssetDisposalApprovalRequest {
+  string company_id = 1;
+  string asset_id = 2;
 }
 
 message ListApprovalBackfillCandidatesRequest {

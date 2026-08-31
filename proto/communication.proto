@@ -40,6 +40,8 @@ service CommunicationService {
   // Push Notifications
   rpc ClearUserPushSubscriptions(ClearUserPushSubscriptionsRequest) returns (ClearUserPushSubscriptionsResponse);
 
+  rpc ListNotificationTemplates(ListNotificationTemplatesRequest) returns (ListNotificationTemplatesResponse);
+  rpc UpsertNotificationTemplate(UpsertNotificationTemplateRequest) returns (NotificationTemplateRecord);
 }
 
 message SendPayrollApprovedMailRequest {
@@ -431,4 +433,34 @@ enum MessageStatus {
   MESSAGE_STATUS_DELIVERED = 2;
   MESSAGE_STATUS_READ = 3;
   MESSAGE_STATUS_FAILED = 4;
-} 
+}
+
+message NotificationTemplateRecord {
+  string template_id = 1;
+  optional string organization_id = 2;
+  string code = 3;
+  string channel = 4;
+  string locale = 5;
+  optional string subject = 6;
+  string body = 7;
+  bool is_active = 8;
+}
+
+message ListNotificationTemplatesRequest {
+  optional string organization_id = 1;
+  optional string channel = 2;
+}
+
+message ListNotificationTemplatesResponse {
+  repeated NotificationTemplateRecord templates = 1;
+}
+
+message UpsertNotificationTemplateRequest {
+  optional string organization_id = 1;
+  string code = 2;
+  string channel = 3;
+  optional string locale = 4;
+  optional string subject = 5;
+  string body = 6;
+  bool is_active = 7;
+}

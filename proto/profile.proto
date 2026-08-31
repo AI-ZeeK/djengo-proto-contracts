@@ -134,6 +134,9 @@ service ProfileService {
   rpc RecordPrivacyConsent(RecordPrivacyConsentRequest) returns (PrivacyConsentResponse);
   rpc CreateDataSubjectRequest(CreateDataSubjectRequestInput) returns (DataSubjectRequestResponse);
   rpc ListDataSubjectRequests(ListDataSubjectRequestsRequest) returns (ListDataSubjectRequestsResponse);
+  rpc UpsertDataRetentionPolicy(UpsertDataRetentionPolicyRequest) returns (DataRetentionPolicyRecord);
+  rpc ListDataRetentionPolicies(ListDataRetentionPoliciesRequest) returns (ListDataRetentionPoliciesResponse);
+  rpc EnforceDataRetention(EnforceDataRetentionRequest) returns (EnforceDataRetentionResponse);
   
 }
 
@@ -1614,6 +1617,8 @@ message PayrollStaff {
   optional string employment_start = 7;
   optional string employment_end = 8;
   bool payroll_active = 9;
+  int32 overtime_minutes = 10;
+  double overtime_amount = 11;
 }
 
 
@@ -2181,6 +2186,52 @@ message ListDataSubjectRequestsResponse {
   optional string error = 2;
   repeated DataSubjectRequestEntry requests = 3;
   TableMeta meta = 4;
+}
+
+message DataRetentionPolicyRecord {
+  string policy_id = 1;
+  string organization_id = 2;
+  optional string company_id = 3;
+  string entity_type = 4;
+  int32 retain_days = 5;
+  string action = 6;
+  optional string legal_basis = 7;
+  bool is_active = 8;
+  string created_at = 9;
+}
+
+message UpsertDataRetentionPolicyRequest {
+  string organization_id = 1;
+  optional string company_id = 2;
+  string entity_type = 3;
+  int32 retain_days = 4;
+  string action = 5;
+  optional string legal_basis = 6;
+  bool is_active = 7;
+}
+
+message ListDataRetentionPoliciesRequest {
+  string organization_id = 1;
+  optional string company_id = 2;
+}
+
+message ListDataRetentionPoliciesResponse {
+  bool success = 1;
+  repeated DataRetentionPolicyRecord policies = 2;
+}
+
+message EnforceDataRetentionRequest {
+  string organization_id = 1;
+  optional string company_id = 2;
+  optional string entity_type = 3;
+}
+
+message EnforceDataRetentionResponse {
+  bool success = 1;
+  int32 processed = 2;
+  int32 purged = 3;
+  int32 anonymized = 4;
+  optional string error = 5;
 }
 
 // ── Staff designations (job title taxonomy — separate from permission roles) ─
