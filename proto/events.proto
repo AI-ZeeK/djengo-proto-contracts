@@ -394,6 +394,7 @@ service ShiftTemplateService {
   rpc GetStaffShift         (StaffShiftRequest)     returns (StaffShiftAssignment);
   rpc ListStaffShifts       (StaffRequest)          returns (StaffShiftListResponse);
   rpc ListCompanyShiftAssignments (CompanyRequest)  returns (StaffShiftListResponse);
+  rpc FindOnShiftStaff      (FindOnShiftStaffRequest) returns (FindOnShiftStaffResponse);
 }
 
 service DailyEventService {
@@ -476,6 +477,30 @@ message CompanyRequest {
   string organization_id = 2;
   optional string branch_id = 3;
   optional string department_id = 4;
+}
+
+message FindOnShiftStaffRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string branch_id = 3;
+  optional string at_iso = 4;
+  optional string duty_date = 5;
+  repeated string staff_ids = 6;
+  optional string organization_role_id = 7;
+}
+
+message OnShiftStaffMatch {
+  string staff_id = 1;
+  string shift_assignment_id = 2;
+  string shift_template_id = 3;
+  string shift_name = 4;
+  string scheduled_start = 5;
+  string scheduled_end = 6;
+  bool in_window = 7;
+}
+
+message FindOnShiftStaffResponse {
+  repeated OnShiftStaffMatch matches = 1;
 }
 message StaffRequest        { string staff_id = 1; string company_id = 2; string organization_id = 3; }
 message CustomerRequest     { string customer_id = 1; string company_id = 2; string organization_id = 3; }

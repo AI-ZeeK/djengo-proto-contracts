@@ -1965,6 +1965,10 @@ message CreateWorkOrderRequest {
   optional string due_at = 11;
   optional string created_by = 12;
   optional string stay_id = 13;
+  optional string organization_role_id = 14;
+  optional string assignment_target = 15;
+  optional string fulfillment = 16;
+  optional string at_iso = 17;
 }
 
 message ListWorkOrdersRequest {
@@ -2017,6 +2021,10 @@ message CreateHousekeepingTaskRequest {
   optional string source = 9;
   optional string checklist_result_json = 10;
   optional string checklist_id = 11;
+  optional string organization_role_id = 12;
+  optional string assignment_target = 13;
+  optional string fulfillment = 14;
+  optional string at_iso = 15;
 }
 
 message ListHousekeepingTasksRequest {
@@ -2063,6 +2071,10 @@ message CreateDutyRosterAssignmentRequest {
   string role_code = 6;
   optional string station_or_zone = 7;
   optional string facility_node_id = 8;
+  optional string organization_role_id = 9;
+  optional string assignment_target = 10;
+  optional string fulfillment = 11;
+  optional string at_iso = 12;
 }
 
 message ListDutyRosterAssignmentsRequest {
