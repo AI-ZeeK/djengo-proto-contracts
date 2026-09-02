@@ -677,6 +677,7 @@ message Wallet {
   string status = 9;
   string created_at = 10;
   string updated_at = 11;
+  int64 balance_minor = 12;
 }
 
 enum WALLET_ENTITY_TYPE_ENUM {
