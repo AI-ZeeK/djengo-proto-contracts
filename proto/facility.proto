@@ -620,6 +620,8 @@ message OccupancyStayMessage {
   string updated_at = 14;
   // For VISIT stays: links to the active TENANCY/ADMISSION stay on the same unit
   optional string host_stay_id = 15;
+  optional string admitting_reason = 16;
+  optional string attending_staff_id = 17;
 }
 
 message OccupancyParticipantInput {
@@ -647,6 +649,8 @@ message CreateOccupancyStayRequest {
   string created_by = 8;
   repeated OccupancyParticipantInput participants = 9;
   optional string host_stay_id = 10;
+  optional string admitting_reason = 11;
+  optional string attending_staff_id = 12;
 }
 
 message EndOccupancyStayRequest {

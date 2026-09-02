@@ -910,6 +910,11 @@ message AttendanceSessionStatus {
   bool has_shift_today = 26;
   string current_shift_work_date = 27; // YYYY-MM-DD
   string next_shift_work_date = 28;    // YYYY-MM-DD
+  bool has_clocked_in_today = 29;
+  bool is_24_hours = 30;
+  bool uses_business_hours = 31;
+  string expected_clock_in_at = 32;
+  string expected_clock_out_at = 33;
 }
 
 message CompanyAttendancePolicyProto {

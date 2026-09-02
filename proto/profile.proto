@@ -137,6 +137,9 @@ service ProfileService {
   rpc UpsertDataRetentionPolicy(UpsertDataRetentionPolicyRequest) returns (DataRetentionPolicyRecord);
   rpc ListDataRetentionPolicies(ListDataRetentionPoliciesRequest) returns (ListDataRetentionPoliciesResponse);
   rpc EnforceDataRetention(EnforceDataRetentionRequest) returns (EnforceDataRetentionResponse);
+  rpc ListComplianceDocuments(ListComplianceDocumentsRequest) returns (ListComplianceDocumentsResponse);
+  rpc UpsertComplianceDocument(UpsertComplianceDocumentRequest) returns (ComplianceDocumentRecord);
+  rpc DeleteComplianceDocument(DeleteComplianceDocumentRequest) returns (DeleteComplianceDocumentResponse);
   
 }
 
@@ -2232,6 +2235,53 @@ message EnforceDataRetentionResponse {
   int32 purged = 3;
   int32 anonymized = 4;
   optional string error = 5;
+}
+
+message ComplianceDocumentRecord {
+  string document_id = 1;
+  string organization_id = 2;
+  string company_id = 3;
+  string doc_type = 4;
+  optional string issuer = 5;
+  optional string document_number = 6;
+  optional string issued_at = 7;
+  optional string expires_at = 8;
+  optional string file_id = 9;
+  optional string notes = 10;
+  string created_at = 11;
+}
+
+message ListComplianceDocumentsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+}
+
+message ListComplianceDocumentsResponse {
+  bool success = 1;
+  repeated ComplianceDocumentRecord documents = 2;
+}
+
+message UpsertComplianceDocumentRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  optional string document_id = 3;
+  string doc_type = 4;
+  optional string issuer = 5;
+  optional string document_number = 6;
+  optional string issued_at = 7;
+  optional string expires_at = 8;
+  optional string file_id = 9;
+  optional string notes = 10;
+}
+
+message DeleteComplianceDocumentRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string document_id = 3;
+}
+
+message DeleteComplianceDocumentResponse {
+  bool success = 1;
 }
 
 // ── Staff designations (job title taxonomy — separate from permission roles) ─

@@ -161,6 +161,8 @@ message BatchNotificationRequest {
   string resource_id = 14;
   /** Optional JSON bag: company_id, invoice_id, branch_id, actor_user_id, actor_name, audience. */
   string context_json = 15;
+  bool send_email = 16;
+  bool force_push = 17;
 }
 
 message BatchNotificationResponse {
