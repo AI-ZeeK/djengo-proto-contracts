@@ -35,6 +35,9 @@ service ProfileService {
   rpc Logout(LogoutRequest) returns (SendOtpResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
   rpc SocialLogin(SocialLoginRequest) returns (SocialLoginResponse);
+  rpc ListSocialIdentities(ListSocialIdentitiesRequest) returns (ListSocialIdentitiesResponse);
+  rpc LinkSocialIdentity(LinkSocialIdentityRequest) returns (LinkSocialIdentityResponse);
+  rpc UnlinkSocialIdentity(UnlinkSocialIdentityRequest) returns (UnlinkSocialIdentityResponse);
   /// Email → OTP flow for first-time password create or forgot-password reset.
   rpc RequestPasswordReset(RequestPasswordResetRequest) returns (AuthInitialResponse);
   /// After OTP verify (FORGOT_PASSWORD), set a new password with the reset token.
@@ -117,6 +120,7 @@ service ProfileService {
   rpc UpdateGuest(UpdateGuestRequest) returns (GuestProto);
   rpc DeleteGuest(DeleteGuestRequest) returns (DeleteGuestResponse);
   rpc ListGuests(ListGuestsRequest) returns (ListGuestsResponse);
+  rpc GetGuestCrmAnalytics(OverviewAnalyticsRequest) returns (OverviewAnalyticsResponse);
   rpc ResolveOrCreateGuest(ResolveOrCreateGuestRequest) returns (ResolveOrCreateGuestResponse);
   // Public booking: lookup Djengo User by email and/or phone (no create).
   rpc FindContactAccount(FindContactAccountRequest) returns (FindContactAccountResponse);
@@ -1136,6 +1140,43 @@ message SocialLoginResponse {
   optional string refresh_token = 5;
   optional User user = 6;
   bool is_new_user = 7;
+}
+
+message SocialIdentity {
+  string provider = 1;          // "GOOGLE" | "APPLE"
+  optional string email = 2;    // last email the provider reported
+  string linked_at = 3;
+}
+
+message ListSocialIdentitiesRequest {
+  string user_id = 1;
+}
+
+message ListSocialIdentitiesResponse {
+  bool success = 1;
+  repeated SocialIdentity identities = 2;
+}
+
+message LinkSocialIdentityRequest {
+  string user_id = 1;
+  string provider = 2;
+  string id_token = 3;
+}
+
+message LinkSocialIdentityResponse {
+  bool success = 1;
+  optional string message = 2;
+  optional SocialIdentity identity = 3;
+}
+
+message UnlinkSocialIdentityRequest {
+  string user_id = 1;
+  string provider = 2;
+}
+
+message UnlinkSocialIdentityResponse {
+  bool success = 1;
+  optional string message = 2;
 }
 
 message SendOtpResponse {

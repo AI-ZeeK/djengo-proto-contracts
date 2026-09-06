@@ -1932,6 +1932,7 @@ service FacilityOpsService {
   rpc OpenFrontDeskShift (OpenFrontDeskShiftRequest) returns (FrontDeskShiftLogRecord);
   rpc CloseFrontDeskShift (CloseFrontDeskShiftRequest) returns (FrontDeskShiftLogRecord);
   rpc ListFrontDeskShiftLogs (ListFrontDeskShiftLogsRequest) returns (ListFrontDeskShiftLogsResponse);
+  rpc GetShiftCoverageAnalyticsOverview (GetShiftCoverageAnalyticsOverviewRequest) returns (GetKitchenAnalyticsOverviewResponse);
   rpc EnsureStayTurnoverHousekeeping (EnsureStayTurnoverHousekeepingRequest) returns (EnsureStayTurnoverHousekeepingResponse);
 }
 
@@ -2175,6 +2176,13 @@ message ListFrontDeskShiftLogsRequest {
 
 message ListFrontDeskShiftLogsResponse {
   repeated FrontDeskShiftLogRecord logs = 1;
+}
+
+message GetShiftCoverageAnalyticsOverviewRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string duty_date = 3;
+  optional string branch_id = 4;
 }
 
 message EnsureStayTurnoverHousekeepingRequest {
