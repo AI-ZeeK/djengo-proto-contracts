@@ -114,6 +114,7 @@ service FinancialsService {
   rpc ListPayrollSchedules (ListPayrollSchedulesRequest) returns (ListPayrollSchedulesResponse);
   rpc CreateWallet (CreateWalletRequest) returns (WalletReply);
   rpc GetWallet (GetWalletRequest) returns (WalletReply);
+  rpc ListWallets (ListWalletsRequest) returns (ListWalletsResponse);
   rpc UpdateWallet (UpdateWalletRequest) returns (WalletReply);
   rpc Credit (WalletTransactionRequest) returns (WalletReply);
   rpc Debit (WalletTransactionRequest) returns (WalletReply);
@@ -612,6 +613,19 @@ message GetWalletRequest {
   // Active / funding branch. Currency is resolved from this branch (main branch
   // supplies the network/company operating currency for multi-branch firms).
   string branch_id = 7;
+}
+
+message ListWalletsRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  string entity_id = 3;
+  string entity_type = 4;
+  repeated string organization_ids = 5;
+  repeated string company_ids = 6;
+}
+
+message ListWalletsResponse {
+  repeated Wallet wallets = 1;
 }
 
 message GetCountryRequest {
@@ -2757,6 +2771,7 @@ service GuestBillingService {
   rpc IssueGuestInvoice   (IssueGuestInvoiceRequest)   returns (GuestInvoiceProto);
   rpc VoidGuestInvoice    (VoidGuestInvoiceRequest)    returns (GuestInvoiceProto);
   rpc RecordGuestPayment  (RecordGuestPaymentRequest)  returns (GuestPaymentProto);
+  rpc DisputeGuestPayment (DisputeGuestPaymentRequest) returns (GuestPaymentProto);
   rpc ListGuestPayments   (ListGuestPaymentsRequest)   returns (ListGuestPaymentsResponse);
   // Issue (if draft), email guest, notify Djengo user, write activity log.
   rpc SendGuestInvoice    (SendGuestInvoiceRequest)    returns (SendGuestInvoiceResponse);
@@ -2936,6 +2951,17 @@ message GuestPaymentProto {
   optional int64 usd_amount_minor = 16;
   // Processing gateway (e.g. PAYSTACK); empty for manual/desk records.
   optional string gateway = 17;
+  optional string disputed_at = 18;
+  optional string dispute_reason = 19;
+  optional string disputed_by = 20;
+}
+
+message DisputeGuestPaymentRequest {
+  string payment_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string reason = 4;
+  optional string disputed_by = 5;
 }
 
 message RecordGuestPaymentRequest {
@@ -3353,6 +3379,9 @@ message HospitalityBillingPolicyProto {
   double tax_rate_percent = 22;
   bool prices_include_tax = 23;
   optional string tax_registration_number = 24;
+  // When true, paid deposits are credited to the guest Djengo wallet if the
+  // request is auto-cleared (competing booking confirmed) or expired unanswered.
+  bool deposit_refundable = 25;
 }
 
 message GetHospitalityBillingPolicyRequest {
@@ -3384,6 +3413,7 @@ message UpsertHospitalityBillingPolicyRequest {
   double tax_rate_percent = 19;
   bool prices_include_tax = 20;
   optional string tax_registration_number = 21;
+  bool deposit_refundable = 22;
 }
 
 message ListHospitalityBillingPoliciesRequest {

@@ -899,7 +899,11 @@ message CheckDeliveryCoverageResponse {
   bool delivery_enabled = 6;
 }
 
-message GetOrderRequest           { string order_id = 1; }
+message GetOrderRequest {
+  string order_id = 1;
+  /// When true, mint a missing pending invoice or fail the RPC (guest Pay now failsafe).
+  bool require_invoice = 2;
+}
 message CancelOrderRequest        { string order_id = 1; string cancelled_by = 2; optional string reason = 3; }
 
 message UpdateOrderPaymentRequest {

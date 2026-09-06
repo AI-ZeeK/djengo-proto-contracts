@@ -1,4 +1,9 @@
-## Unreleased — Staff bank details OTP + email confirm
+## Unreleased — Admin list wallets by org/company/user
+
+### `financials.proto`
+- `rpc ListWallets` — admin listing of wallets filtered by organization, company, or entity (user). Amounts remain `Wallet.balance_minor`.
+
+
 
 ### `financials.proto`
 - Split staff bank-details into per-action RPCs: `GetStaffBankDetails`, `RequestStaffBankDetailsOtp`, `SubmitStaffBankDetails`, `ConfirmStaffBankDetails`, `CancelStaffBankDetailsPending`
