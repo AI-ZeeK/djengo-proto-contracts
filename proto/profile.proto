@@ -2095,6 +2095,8 @@ message ResolveOrCreateClientAccountRequest {
   optional string phone_dial_code = 3;
   optional string first_name = 4;
   optional string last_name = 5;
+  optional string company_id = 6;
+  optional string organization_id = 7;
 }
 
 message ResolveOrCreateClientAccountResponse {

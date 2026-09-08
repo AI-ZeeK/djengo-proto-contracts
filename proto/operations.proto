@@ -1557,6 +1557,9 @@ message ListReservationsRequest {
   optional int32  page             = 8;
   optional int32  page_size        = 9;
   optional string branch_id        = 10;
+  optional bool stay_as_guest      = 11;
+  optional bool stay_anonymous     = 12;
+  optional bool has_djengo_account = 13;
 }
 
 message ListReservationsResponse {

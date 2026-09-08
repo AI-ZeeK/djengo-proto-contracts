@@ -1,3 +1,33 @@
+## Unreleased — Salary advance payout after approval
+
+### `financials.proto`
+- `RequestSalaryAdvanceRequest.payout_method` (7) — 1 bank, 2 in-app wallet, 3 cash
+- `SalaryAdvanceProto` payout fields (13–18)
+- `rpc GetSalaryAdvancePayoutContext` — staff bank/wallet defaults for the request form
+- `rpc DisburseSalaryAdvance` — pay the requesting staff after the chain approves
+- `SyncSalaryAdvanceApprovalRequest.approval_status` (3) — pushed terminal outcome from events
+
+## Unreleased — Payroll & budget analytics windows, chart layout, minor units
+
+### `financials.proto`
+- Wallet/budget money: `UpdateWalletRequest.balance_minor`, `WalletTransactionRequest.amount_minor`, `WalletTransferRequest.amount_minor`, `BudgetAllocation.allocated_amount_minor`, `MonthlyBudget.total_amount_minor` / `allocated_amount_minor`, `UpdateMonthlyBudgetRequest` matching minors, `TransferBudgetAllocationRequest.amount_minor`
+- `BudgetFilter.from_year` / `from_month` / `to_year` / `to_month` — list range
+- `GetPayrollYtdReportResponse.cards` / `charts` / `currency_code`; `PayrollYtdStaffRow.salary_minor`
+- `GetPayrollAnalyticsRequest.timeline` / `staff_id` / `start_date` / `end_date`
+- `PayrollAnalyticsCard.trend` / `percentage` / `chart_data` / `value_type` / `slug`
+- `PayrollAnalyticsChart.col_span` / `data_key_label` / `doughnut_center_caption` / `is_money` / `trend` / `percentage`
+- `ListPayrollSchedulesRequest.staff_id` / `from_month` / `from_year` / `to_month` / `to_year`
+- `PayrollScheduleTableRow.paid_out_minor` / `salary_minor` / `adjustment_minor` (`total_amount_minor` = salary + adjustments)
+- `GetBudgetAnalyticsRequest.timeline` / `start_date` / `end_date`
+- `BudgetAnalyticsCard.trend` / `percentage` / `chart_data` / `slug`
+- `BudgetAnalyticsChart.trend` / `percentage`
+
+### `operations.proto`
+- `ListReservationsRequest.stay_as_guest` (11), `stay_anonymous` (12), `has_djengo_account` (13)
+
+### `profile.proto`
+- `ResolveOrCreateClientAccountRequest.company_id` (6), `organization_id` (7)
+
 ## Unreleased — Admin list wallets by org/company/user
 
 ### `financials.proto`

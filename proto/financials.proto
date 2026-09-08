@@ -102,7 +102,7 @@ service FinancialsService {
 
   // ...existing rpcs...
   rpc GetStaffPaymentDetails (GetStaffPaymentDetailsRequest) returns (GetStaffPaymentDetailsResponse);
-  /// Preference only: 0 = company default, 1 = bank, 2 = in-app wallet.
+  /// Staff receive method: 0 = unset (in-app wallet), 1 = bank, 2 = in-app wallet. Not company send mode.
   rpc SetStaffPayoutDestination (SetStaffPayoutDestinationRequest) returns (CreatePaymentDetailsResponse);
   rpc GetStaffBankDetails (StaffBankDetailsContext) returns (StaffBankDetailsChangeResponse);
   rpc RequestStaffBankDetailsOtp (StaffBankDetailsContext) returns (StaffBankDetailsChangeResponse);
@@ -287,6 +287,8 @@ service FinancialsService {
   rpc RequestSalaryAdvance (RequestSalaryAdvanceRequest) returns (SalaryAdvanceProto);
   rpc ListSalaryAdvances (ListSalaryAdvancesRequest) returns (ListSalaryAdvancesResponse);
   rpc SyncSalaryAdvanceApproval (SyncSalaryAdvanceApprovalRequest) returns (SalaryAdvanceProto);
+  rpc GetSalaryAdvancePayoutContext (GetSalaryAdvancePayoutContextRequest) returns (SalaryAdvancePayoutContext);
+  rpc DisburseSalaryAdvance (DisburseSalaryAdvanceRequest) returns (SalaryAdvanceProto);
   rpc SyncAssetDisposalApproval (SyncAssetDisposalApprovalRequest) returns (FacilityAssetRecord);
 
   // Events calls these when an approval chain is first set up / updated so pre-existing
@@ -412,7 +414,7 @@ message StaffPaymentDetails {
   string base_salary = 8;
   string sort_code = 9;
   string created_at = 10;
-  /// 0 = company default, 1 = bank/manual, 2 = in-app wallet
+  /// Staff receive: 0 = unset (in-app wallet), 1 = bank, 2 = in-app wallet. Independent of company send mode.
   int32 preferred_payout_destination = 11;
   int64 base_salary_minor = 12;
   optional int64 overtime_hourly_rate_minor = 13;
@@ -446,7 +448,7 @@ message CreatePaymentDetailsResponse {
 message SetStaffPayoutDestinationRequest {
   string staff_id = 1;
   string company_id = 2;
-  /// 0 = company default, 1 = bank/manual, 2 = in-app wallet
+  /// Staff receive: 0 = unset (in-app wallet), 1 = bank, 2 = in-app wallet. Independent of company send mode.
   int32 preferred_payout_destination = 3;
 }
 
@@ -637,6 +639,7 @@ message UpdateWalletRequest {
   string entity_type = 2;
   string currency_code = 3;
   double balance = 4;
+  int64 balance_minor = 5;
 }
 
 message WalletTransactionRequest {
@@ -644,6 +647,7 @@ message WalletTransactionRequest {
   double amount = 2;
   string description = 3;
   string kind = 4; // "credit" or "debit"
+  int64 amount_minor = 5;
 }
 
 message WalletTransferRequest {
@@ -654,6 +658,7 @@ message WalletTransferRequest {
   string to_entity_id = 5;
   double amount = 6;
   string description = 7;
+  int64 amount_minor = 8;
 }
 
 message WalletReply {
@@ -724,6 +729,7 @@ message BudgetAllocation {
   optional string entity_name = 15;
   /// OPEX | CAPEX | REVENUE. Inferred from name/description when omitted on write.
   optional string category = 16;
+  int64 allocated_amount_minor = 17;
 }
 
 /// Lookup row for allocation entity / cost-center display (id → label).
@@ -782,6 +788,8 @@ message MonthlyBudget {
   /// Inclusive fiscal-year envelope (yyyy-MM-dd) stored on the budget row.
   optional string fiscal_year_start = 24;
   optional string fiscal_year_end = 25;
+  int64 total_amount_minor = 26;
+  int64 allocated_amount_minor = 27;
 }
 
 message BudgetVersionSummary {
@@ -916,6 +924,8 @@ message UpdateMonthlyBudgetRequest {
   optional double allocated_amount = 5;
   optional BudgetState budget_state = 6;
   string budget_type = 7; // "organization", "company", or "branch"
+  optional int64 total_amount_minor = 8;
+  optional int64 allocated_amount_minor = 9;
 }
 
 // Pagination, filtering, sorting
@@ -935,6 +945,10 @@ message BudgetFilter {
   optional int32 month = 4;
   /** Empty = no branch filter; otherwise match that branch (or company-wide when "__company__"). */
   optional string branch_id = 5;
+  optional int32 from_year = 6;
+  optional int32 from_month = 7;
+  optional int32 to_year = 8;
+  optional int32 to_month = 9;
 }
 
 message ListMonthlyBudgetsResponse {
@@ -962,6 +976,7 @@ message TransferBudgetAllocationRequest {
   string destination_allocation_id = 4;
   double amount = 5;
   optional string reason = 6;
+  int64 amount_minor = 7;
 }
 
 message TransferBudgetAllocationResponse {
@@ -1092,6 +1107,8 @@ message PayrollYtdStaffRow {
   int32 year = 10;
   int32 month = 11;
   string payroll_status = 12;
+  /// Structure gross at payroll run (base + housing + transport + extras). Not live profile.
+  int64 salary_minor = 13;
 }
 
 message GetPayrollYtdReportResponse {
@@ -1101,6 +1118,10 @@ message GetPayrollYtdReportResponse {
   repeated PayrollYtdStaffRow rows = 4;
   optional bytes file_content = 5;
   optional string file_name = 6;
+  repeated FinancialOverviewCard cards = 7;
+  repeated FinancialOverviewChart charts = 8;
+  /// ISO 4217 display currency for card/chart money (minor units).
+  string currency_code = 9;
 }
 
 message GetPayrollRequest {
@@ -1151,6 +1172,11 @@ message GetPayrollAnalyticsRequest {
   string company_id = 1;
   string organization_id = 2;
   optional string branch_id = 3;
+  /// _1m | _last_m | _3m | _6m | _1y | all
+  string timeline = 4;
+  optional string staff_id = 5;
+  optional string start_date = 6;
+  optional string end_date = 7;
 }
 
 message PayrollAnalyticsCard {
@@ -1161,15 +1187,26 @@ message PayrollAnalyticsCard {
   double growth = 5;
   int32 count = 6;
   string description = 7;
+  string trend = 8;
+  double percentage = 9;
+  repeated PayrollAnalyticsChartData chart_data = 10;
+  string value_type = 11;
+  string slug = 12;
 }
 
 message PayrollAnalyticsChart {
   string title = 1;
-  string type = 2; // "line" or "bar"
+  string type = 2; // doughnut | area | line | bar
   repeated PayrollAnalyticsChartData data = 3;
   string data_key = 4;
   string color = 5;
-
+  /** Width in the md:grid-cols-5 analytics row (2, 3, or 5). */
+  int32 col_span = 6;
+  string data_key_label = 7;
+  string doughnut_center_caption = 8;
+  bool is_money = 9;
+  string trend = 10;
+  double percentage = 11;
 }
 
 message PayrollAnalyticsChartData {
@@ -1199,6 +1236,11 @@ message GetPayrollAnalyticsResponse {
     optional int32 year = 10;
     /** Filter by payroll status: DRAFT, PENDING, PROCESSING, APPROVED, PAID, CLOSED, FAILED. Empty / ALL = no filter. */
     optional string payroll_status = 11;
+    optional string staff_id = 12;
+    optional int32 from_month = 13;
+    optional int32 from_year = 14;
+    optional int32 to_month = 15;
+    optional int32 to_year = 16;
   }
 
   message PayrollScheduleTableRow {
@@ -1223,8 +1265,14 @@ message GetPayrollAnalyticsResponse {
     string schedule_reference = 19;
     string payroll_reference = 20;
     optional string approval_instance_id = 21;
-    /** Sum of current payroll staff net amounts (minor units). */
+    /** Salary + adjustments for staff on this payroll (minor units). */
     int64 total_amount_minor = 22;
+    /** Net sent when payroll ran (minor units). Zero until settled. */
+    int64 paid_out_minor = 23;
+    /** Structure gross for selected staff (minor units). */
+    int64 salary_minor = 24;
+    /** Period adjustments for selected staff (minor units). */
+    int64 adjustment_minor = 25;
   }
 
   message ListPayrollSchedulesResponse {
@@ -1262,7 +1310,7 @@ message StaffPayrollRow {
   int64 base_salary_minor = 6;
   int64 total_adjustment_minor = 7;
   // Optionally: repeated PayrollAdjustment adjustments = 8;
-  /// 0 = company default, 1 = bank/manual, 2 = in-app wallet
+  /// Staff receive: 0 = unset (in-app wallet), 1 = bank, 2 = in-app wallet. Independent of company send mode.
   int32 preferred_payout_destination = 9;
   bool has_bank_details = 10;
   /// DRAFT | PENDING | PROCESSING | APPROVED | PAID | CLOSED | FAILED (empty if not on this payroll)
@@ -1577,6 +1625,10 @@ message GetBudgetAnalyticsRequest {
   string organization_id = 2;
   /** When set, analytics + currency resolve for this branch. */
   optional string branch_id = 3;
+  /// _1m | _last_m | _3m | _6m | _1y | all
+  string timeline = 4;
+  optional string start_date = 5;
+  optional string end_date = 6;
 }
 
 message BudgetAnalyticsCard {
@@ -1589,6 +1641,10 @@ message BudgetAnalyticsCard {
   string description = 7;
   /// money | percent | count | text
   string value_type  = 8;
+  string trend       = 9;
+  double percentage  = 10;
+  repeated BudgetAnalyticsChartData chart_data = 11;
+  string slug        = 12;
 }
 
 message BudgetAnalyticsChart {
@@ -1597,6 +1653,8 @@ message BudgetAnalyticsChart {
   repeated BudgetAnalyticsChartData data = 3;
   string data_key = 4;
   string color    = 5;
+  string trend    = 6;
+  double percentage = 7;
 }
 
 message BudgetAnalyticsChartData {
@@ -3973,6 +4031,9 @@ message RequestSalaryAdvanceRequest {
   int64 amount_minor = 4;
   string notes = 5;
   string requested_by_user_id = 6;
+  /// How the requesting staff should receive the advance after approval:
+  /// 1 = bank transfer, 2 = in-app wallet, 3 = cash (proof upload).
+  int32 payout_method = 7;
 }
 
 message SalaryAdvanceProto {
@@ -3988,6 +4049,12 @@ message SalaryAdvanceProto {
   string approval_instance_id = 10;
   string created_at = 11;
   string updated_at = 12;
+  int32 payout_method = 13;
+  string paid_at = 14;
+  string payment_reference = 15;
+  string proof_file_url = 16;
+  string disbursed_by_user_id = 17;
+  bool has_bank_details = 18;
 }
 
 message ListSalaryAdvancesRequest {
@@ -4007,6 +4074,32 @@ message ListSalaryAdvancesResponse {
 message SyncSalaryAdvanceApprovalRequest {
   string company_id = 1;
   string advance_id = 2;
+  // Pushed terminal outcome from events (APPROVED / REJECTED). When set,
+  // financials can open/reject the advance without a GetApproval round-trip.
+  string approval_status = 3;
+}
+
+message GetSalaryAdvancePayoutContextRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string staff_id = 3;
+}
+
+message SalaryAdvancePayoutContext {
+  int32 preferred_payout_destination = 1;
+  bool has_bank_details = 2;
+  string bank_name = 3;
+  /// Suggested receive method: 1 bank (only if details exist), else 2 wallet.
+  int32 suggested_payout_method = 4;
+}
+
+message DisburseSalaryAdvanceRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string advance_id = 3;
+  string actor_user_id = 4;
+  string payment_reference = 5;
+  string proof_file_url = 6;
 }
 
 message SyncAssetDisposalApprovalRequest {
