@@ -1153,6 +1153,7 @@ message MenuCategoryProto {
   string created_at         = 8;
   string updated_at         = 9;
   optional string prep_station = 10; // MAIN | BAR | PASTRY | GRILL | COLD
+  optional string kind = 11;         // ITEM | COMBO
 }
 
 message ListMenuCategoriesRequest {
@@ -1176,6 +1177,7 @@ message CreateMenuCategoryRequest {
   optional int32 sort_order = 6;
   optional bool  is_active  = 7;
   optional string prep_station = 8; // MAIN | BAR | PASTRY | GRILL | COLD
+  optional string kind = 9;         // ITEM | COMBO
 }
 
 message UpdateMenuCategoryRequest {
@@ -1184,6 +1186,7 @@ message UpdateMenuCategoryRequest {
   optional int32  sort_order = 3;
   optional bool   is_active = 4;
   optional string prep_station = 5;
+  optional string kind = 6;         // ITEM | COMBO
 }
 
 message DeleteMenuCategoryRequest { string category_id = 1; }
@@ -1957,6 +1960,8 @@ message WorkOrderRecord {
   string updated_at = 15;
   optional string stay_id = 16;
   optional string created_by = 17;
+  /// Staff who should see the board card (auto-assign pick, or all on-duty for a role request).
+  repeated string assigned_staff_ids = 18;
 }
 
 message CreateWorkOrderRequest {
@@ -2015,6 +2020,7 @@ message HousekeepingTaskRecord {
   optional string created_by = 12;
   string source = 13;
   optional string checklist_id = 14;
+  repeated string assigned_staff_ids = 15;
 }
 
 message CreateHousekeepingTaskRequest {
@@ -2068,6 +2074,7 @@ message DutyRosterAssignmentRecord {
   optional string facility_node_id = 9;
   string status = 10;
   string created_at = 11;
+  repeated string assigned_staff_ids = 12;
 }
 
 message CreateDutyRosterAssignmentRequest {

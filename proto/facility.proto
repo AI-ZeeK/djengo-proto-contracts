@@ -41,6 +41,10 @@ service FacilityService {
   rpc GetActiveOccupancyStay(GetActiveOccupancyStayRequest) returns (OccupancyStayResponse);
   rpc ListOccupancyStays(ListOccupancyStaysRequest) returns (ListOccupancyStaysResponse);
   rpc ListNodeOccupancyStayHistory(ListNodeOccupancyStayHistoryRequest) returns (ListNodeOccupancyStayHistoryResponse);
+  rpc AddOccupancyParticipants(AddOccupancyParticipantsRequest) returns (OccupancyStayResponse);
+  rpc IssueVisitorEntranceCode(IssueVisitorEntranceCodeRequest) returns (VisitorEntranceResponse);
+  rpc VerifyVisitorEntranceCode(VerifyVisitorEntranceCodeRequest) returns (VisitorEntranceResponse);
+  rpc ListVisitorEntrances(ListVisitorEntrancesRequest) returns (ListVisitorEntrancesResponse);
   rpc ListHospitalReception(ListHospitalReceptionRequest) returns (ListHospitalReceptionResponse);
   rpc GetFacilityReceptionAnalytics(GetFacilityReceptionAnalyticsRequest) returns (GetFacilityReceptionAnalyticsResponse);
   rpc GetFacilityReceptionDetail(GetFacilityReceptionDetailRequest) returns (GetFacilityReceptionDetailResponse);
@@ -622,6 +626,15 @@ message OccupancyStayMessage {
   optional string host_stay_id = 15;
   optional string admitting_reason = 16;
   optional string attending_staff_id = 17;
+  // Occupant who hosted / tagged this VISIT (privacy + records).
+  optional string host_participant_id = 18;
+  // When true, other occupants on the unit must not see this visit in their tables.
+  bool is_anonymous_to_occupants = 19;
+  optional string destination_note = 20;
+  optional string entrance_code_hint = 21;
+  optional string entrance_status = 22;
+  optional string node_code = 23;
+  optional string node_name = 24;
 }
 
 message OccupancyParticipantInput {
@@ -651,6 +664,9 @@ message CreateOccupancyStayRequest {
   optional string host_stay_id = 10;
   optional string admitting_reason = 11;
   optional string attending_staff_id = 12;
+  optional string host_participant_id = 13;
+  bool is_anonymous_to_occupants = 14;
+  optional string destination_note = 15;
 }
 
 message EndOccupancyStayRequest {
@@ -698,6 +714,11 @@ message ListOccupancyStaysRequest {
   optional string partner_id = 9;
   optional string stay_kind = 10;
   optional string profile_id = 11;
+  optional string host_stay_id = 12;
+  optional string host_participant_id = 13;
+  // When set, anonymous-to-occupants visits hosted by someone else are omitted.
+  optional string viewer_partner_id = 14;
+  optional string viewer_profile_id = 15;
 }
 
 message ListOccupancyStaysResponse {
@@ -712,6 +733,82 @@ message OccupancyStayResponse {
   bool success = 1;
   optional string error = 2;
   optional OccupancyStayMessage stay = 3;
+  // Plaintext entrance code, returned once on VISIT create / reissue.
+  optional string issued_entrance_code = 4;
+}
+
+message AddOccupancyParticipantsRequest {
+  string stay_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  repeated OccupancyParticipantInput participants = 4;
+}
+
+message VisitorEntranceMessage {
+  string entrance_id = 1;
+  string stay_id = 2;
+  string facility_node_id = 3;
+  string branch_id = 4;
+  string company_id = 5;
+  string organization_id = 6;
+  optional string host_stay_id = 7;
+  optional string host_participant_id = 8;
+  string code_hint = 9;
+  // ISSUED | USED | EXPIRED | REVOKED
+  string status = 10;
+  string issued_at = 11;
+  string expires_at = 12;
+  optional string used_at = 13;
+  bool is_anonymous = 14;
+  optional string visitor_display_name = 15;
+  optional string destination_note = 16;
+  optional string node_code = 17;
+  optional string node_name = 18;
+}
+
+message IssueVisitorEntranceCodeRequest {
+  string stay_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string created_by = 4;
+  optional int32 expires_in_hours = 5;
+}
+
+message VerifyVisitorEntranceCodeRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string code = 3;
+  optional string branch_id = 4;
+}
+
+message VisitorEntranceResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional VisitorEntranceMessage entrance = 3;
+  optional string issued_code = 4;
+  optional OccupancyStayMessage stay = 5;
+}
+
+message ListVisitorEntrancesRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string branch_id = 3;
+  optional string stay_id = 4;
+  optional string facility_node_id = 5;
+  optional string host_stay_id = 6;
+  optional string status = 7;
+  optional string viewer_partner_id = 8;
+  optional string viewer_profile_id = 9;
+  optional int32 page = 10;
+  optional int32 page_size = 11;
+}
+
+message ListVisitorEntrancesResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated VisitorEntranceMessage entrances = 3;
+  int32 total = 4;
+  TableMeta meta = 5;
 }
 
 message ListNodeOccupancyStayHistoryRequest {

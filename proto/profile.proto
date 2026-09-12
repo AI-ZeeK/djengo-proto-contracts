@@ -386,6 +386,9 @@ message StaffProbationHistoryRequest {
 message ProbationPeriod {
   string start = 1; // ISO date string
   string end = 2;   // ISO date string
+  optional string reason = 3;
+  // JSON: salary_kind, salary_percent, salary_amount_minor, restriction flags, notes
+  optional string terms_json = 4;
 }
 
 message StaffProbationHistoryResponse {

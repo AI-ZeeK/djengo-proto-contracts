@@ -924,6 +924,11 @@ message CompanyAttendancePolicyProto {
   int32 min_minutes_before_next_shift_to_start_overtime = 4;
   int32 min_minutes_before_next_shift_during_overtime = 5;
   int32 overtime_threshold_minutes = 6;
+  // Minutes after scheduled/actual shift end during which staff may tap Start overtime.
+  // 0 = no time-box (still blocked by next-shift buffer and daily cap).
+  int32 overtime_start_window_minutes = 7;
+  // When true, staff cannot self-start overtime; a manager must assign it.
+  bool overtime_requires_assignment = 8;
 }
 
 message GetAttendancePolicyRequest {
@@ -978,7 +983,7 @@ message GetStaffTimeManagementRequest {
 }
 
 message TimeManagementTimelineBlock {
-  string block_type = 1; // early | late | shift | break | overtime
+  string block_type = 1; // early | late | shift | break | overtime | missed | leave | leave_pending | early_out
   string start_at   = 2; // ISO-8601
   string end_at     = 3;
 }
@@ -1036,6 +1041,10 @@ message TimeManagementDay {
   repeated TimeManagementBreak breaks = 23;
   repeated TimeManagementEvent events = 24;
   bool has_overtime = 25;
+  bool on_leave = 26;
+  string leave_status = 27; // PENDING | APPROVED | TAKEN
+  string leave_type = 28;   // ANNUAL | SICK | ...
+  string leave_label = 29;  // Annual leave
 }
 
 message StaffTimeManagementSummary {
@@ -1118,6 +1127,7 @@ message CreateShiftTemplateRequest {
   bool   is_active         = 10;
   optional string branch_id = 11;
   optional string department_id = 12;
+  optional string timezone = 13;
 }
 
 message UpdateShiftTemplateRequest {
@@ -1134,6 +1144,7 @@ message UpdateShiftTemplateRequest {
   bool   is_active         = 11;
   optional string branch_id = 12;
   optional string department_id = 13;
+  optional string timezone = 14;
 }
 
 message ShiftTemplate {
@@ -1153,6 +1164,7 @@ message ShiftTemplate {
   bool   is_active         = 14;
   string branch_id       = 15;
   string department_id   = 16;
+  string timezone        = 17;
 }
 
 message ShiftTemplateId            { string shift_template_id = 1; string company_id = 2; string organization_id = 3; }
@@ -2459,10 +2471,23 @@ message GetAttendanceCodeRequest {
   string company_id = 1;
 }
 
+message AttendanceActionCode {
+  string purpose     = 1;  // clock-in | clock-out | break-start
+  string label       = 2;
+  string code        = 3;
+  string qr_payload  = 4;  // "djengo-attendance:{purpose}:{company_id}:{code}"
+}
+
 message AttendanceCodeResponse {
-  string code        = 1;  // 6-digit numeric code
+  string code        = 1;  // clock-in code (compat)
   int32  expires_in  = 2;  // seconds until next rotation
-  string qr_payload  = 3;  // "djengo-clockin:{company_id}:{code}"
+  string qr_payload  = 3;  // clock-in QR (compat)
+  repeated AttendanceActionCode actions = 4;
+  string clock_in_code     = 5;
+  string clock_out_code    = 6;
+  string break_start_code  = 7;
+  string clock_out_qr      = 8;
+  string break_start_qr    = 9;
 }
 
 message VerifyAttendanceCodeRequest {
@@ -2486,6 +2511,7 @@ service AttendanceCodeService {
   rpc VerifyAndClockIn    (VerifyAttendanceCodeRequest) returns (VerifyAttendanceCodeResponse);
   rpc VerifyAndClockOut   (VerifyAttendanceCodeRequest) returns (VerifyAttendanceCodeResponse);
   rpc VerifyAndStartBreak (VerifyAttendanceCodeRequest) returns (VerifyAttendanceCodeResponse);
+  rpc VerifyAndEndOvertime (VerifyAttendanceCodeRequest) returns (VerifyAttendanceCodeResponse);
   rpc RegenerateSecret    (GetAttendanceCodeRequest)    returns (AttendanceCodeResponse);
 }
 

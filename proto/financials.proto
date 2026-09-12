@@ -146,6 +146,7 @@ service FinancialsService {
   rpc GetCompanyFinancialOverview (GetCompanyFinancialOverviewRequest) returns (GetCompanyFinancialOverviewResponse);
   rpc GetProfitAndLossStatement (GetFinancialStatementRequest) returns (ProfitAndLossStatement);
   rpc GetCashFlowStatement (GetFinancialStatementRequest) returns (CashFlowStatement);
+  rpc GetTrialBalanceStatement (GetFinancialStatementRequest) returns (TrialBalanceStatement);
   rpc GetBudgetControlSettings (GetBudgetControlSettingsRequest) returns (BudgetControlSettingsProto);
   rpc UpsertBudgetControlSettings (UpsertBudgetControlSettingsRequest) returns (BudgetControlSettingsProto);
 
@@ -289,6 +290,9 @@ service FinancialsService {
   rpc SyncSalaryAdvanceApproval (SyncSalaryAdvanceApprovalRequest) returns (SalaryAdvanceProto);
   rpc GetSalaryAdvancePayoutContext (GetSalaryAdvancePayoutContextRequest) returns (SalaryAdvancePayoutContext);
   rpc DisburseSalaryAdvance (DisburseSalaryAdvanceRequest) returns (SalaryAdvanceProto);
+  rpc ListStaffDeductionConfigs (ListStaffDeductionConfigsRequest) returns (ListStaffDeductionConfigsResponse);
+  rpc UpsertStaffDeductionConfig (UpsertStaffDeductionConfigRequest) returns (StaffDeductionConfigProto);
+  rpc DeactivateStaffDeductionConfig (DeactivateStaffDeductionConfigRequest) returns (StaffDeductionConfigProto);
   rpc SyncAssetDisposalApproval (SyncAssetDisposalApprovalRequest) returns (FacilityAssetRecord);
 
   // Events calls these when an approval chain is first set up / updated so pre-existing
@@ -1076,6 +1080,8 @@ message ExportPayrollBankFileRequest {
   string organization_id = 2;
   string company_id = 3;
   optional string user_id = 4;
+  /// "csv" (default) or "nibss" for NIBSS-style bulk credit columns.
+  optional string format = 5;
 }
 
 message ExportPayrollBankFileResponse {
@@ -1453,6 +1459,8 @@ message InventoryItemProto {
   double quantity_on_hand           = 18;
   double reorder_point              = 19;
   optional string expiry_date       = 20;
+  optional string lot_number        = 21;
+  optional string batch_code        = 22;
 }
 
 message CreateInventoryRequest {
@@ -1509,6 +1517,8 @@ message UpsertInventoryItemRequest {
   optional double quantity_on_hand = 8;
   optional double reorder_point    = 9;
   optional string expiry_date      = 10;
+  optional string lot_number       = 11;
+  optional string batch_code       = 12;
 }
 
 message ListInventoryItemsRequest {
@@ -1754,6 +1764,18 @@ message CashFlowStatement {
   int64 investing_minor = 10;
   int64 financing_minor = 11;
   int64 net_change_minor = 12;
+}
+
+message TrialBalanceStatement {
+  repeated FinancialStatementLine lines = 1;
+  double total_debit = 2;
+  double total_credit = 3;
+  int64 total_debit_minor = 4;
+  int64 total_credit_minor = 5;
+  bool is_balanced = 6;
+  optional string currency_code = 7;
+  string period_from = 8;
+  string period_to = 9;
 }
 
 message BudgetControlSettingsProto {
@@ -2376,6 +2398,7 @@ message FacilityUtilityReadingRecord {
   double value = 6;
   string read_at = 7;
   string source = 8;
+  optional string asset_id = 9;
 }
 
 message RecordUtilityReadingRequest {
@@ -2386,6 +2409,7 @@ message RecordUtilityReadingRequest {
   double value = 5;
   optional string read_at = 6;
   optional string source = 7;
+  optional string asset_id = 8;
 }
 
 message ListUtilityReadingsRequest {
@@ -2393,6 +2417,7 @@ message ListUtilityReadingsRequest {
   string company_id = 2;
   optional string meter_code = 3;
   optional string branch_id = 4;
+  optional string asset_id = 5;
 }
 
 message ListUtilityReadingsResponse {
@@ -3961,6 +3986,8 @@ message UpsertStaffSalaryStructureRequest {
   /// Extra components from company template (cash, meal, …). Housing/transport
   /// may also appear here; columns stay mirrored for payroll compatibility.
   repeated SalaryStructureExtraComponent extras = 10;
+  /// Unsigned employment contracts park compensation here until the staff signs.
+  optional bool is_pending = 11;
 }
 
 message StaffSalaryStructureProto {
@@ -3976,6 +4003,7 @@ message StaffSalaryStructureProto {
   string created_at = 10;
   string updated_at = 11;
   repeated SalaryStructureExtraComponent extras = 12;
+  bool is_pending = 13;
 }
 
 message ListStaffSalaryStructuresResponse {
@@ -4034,6 +4062,10 @@ message RequestSalaryAdvanceRequest {
   /// How the requesting staff should receive the advance after approval:
   /// 1 = bank transfer, 2 = in-app wallet, 3 = cash (proof upload).
   int32 payout_method = 7;
+  /// How many payrolls to spread recovery over. 1 = recover remaining in full.
+  optional int32 installment_count = 8;
+  /// Cap recovered per run in minor units. 0 = derive from amount/installment_count.
+  optional int64 installment_minor = 9;
 }
 
 message SalaryAdvanceProto {
@@ -4055,6 +4087,8 @@ message SalaryAdvanceProto {
   string proof_file_url = 16;
   string disbursed_by_user_id = 17;
   bool has_bank_details = 18;
+  int32 installment_count = 19;
+  int64 installment_minor = 20;
 }
 
 message ListSalaryAdvancesRequest {
@@ -4137,4 +4171,54 @@ message AttachApprovalInstanceRequest {
 message AttachApprovalInstanceResponse {
   bool success = 1;
   optional string error = 2;
+}
+
+message StaffDeductionConfigProto {
+  string config_id = 1;
+  string staff_id = 2;
+  string company_id = 3;
+  string deduction_type = 4;
+  string calculation_mode = 5;
+  int64 amount_minor = 6;
+  double rate_percent = 7;
+  int64 remaining_minor = 8;
+  int64 installment_minor = 9;
+  string label = 10;
+  bool is_active = 11;
+  string effective_from = 12;
+  string effective_to = 13;
+  string created_at = 14;
+}
+
+message ListStaffDeductionConfigsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  optional string staff_id = 3;
+  optional bool include_inactive = 4;
+}
+
+message ListStaffDeductionConfigsResponse {
+  repeated StaffDeductionConfigProto configs = 1;
+}
+
+message UpsertStaffDeductionConfigRequest {
+  optional string config_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string staff_id = 4;
+  string deduction_type = 5;
+  string calculation_mode = 6;
+  int64 amount_minor = 7;
+  double rate_percent = 8;
+  int64 remaining_minor = 9;
+  int64 installment_minor = 10;
+  string label = 11;
+  optional string effective_from = 12;
+  optional string effective_to = 13;
+  optional bool is_active = 14;
+}
+
+message DeactivateStaffDeductionConfigRequest {
+  string company_id = 1;
+  string config_id = 2;
 }
