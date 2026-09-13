@@ -34,6 +34,9 @@ service ProfileService {
   rpc GetOtpExpiry(GetOtpExpiryRequest) returns (GetOtpExpiryResponse);
   rpc Logout(LogoutRequest) returns (SendOtpResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  /// One-time code so a signed-in user can open the staff or guest app without re-entering credentials.
+  rpc CreateAppHandoff(CreateAppHandoffRequest) returns (CreateAppHandoffResponse);
+  rpc ConsumeAppHandoff(ConsumeAppHandoffRequest) returns (VerifyOtpResponse);
   rpc SocialLogin(SocialLoginRequest) returns (SocialLoginResponse);
   rpc ListSocialIdentities(ListSocialIdentitiesRequest) returns (ListSocialIdentitiesResponse);
   rpc LinkSocialIdentity(LinkSocialIdentityRequest) returns (LinkSocialIdentityResponse);
@@ -993,6 +996,8 @@ message AcceptInvitationRequest {
   optional string country_code = 6;
   string password = 7;
   AddressRequest address = 8;
+  /// ISO 4217 wallet the user chose at onboarding (suggested from address country).
+  optional string wallet_currency = 9;
 }
 
 message AcceptInvitationResponse {
@@ -1206,6 +1211,25 @@ message RefreshTokenResponse {
   User user = 2;
   string access_token = 3;
   optional string refresh_token = 4;
+}
+
+message CreateAppHandoffRequest {
+  string user_id = 1;
+  /// "staff" (suite / client app) or "guest" (forms-ui).
+  string target = 2;
+}
+
+message CreateAppHandoffResponse {
+  bool success = 1;
+  optional string error = 2;
+  string code = 3;
+  int32 expires_in = 4;
+}
+
+message ConsumeAppHandoffRequest {
+  string code = 1;
+  optional string device_info = 2;
+  optional SessionSource source = 3;
 }
 
 
