@@ -1440,6 +1440,9 @@ service ReservationService {
   rpc ListMyBookings (ListMyBookingsRequest) returns (ListReservationsResponse);
   rpc GetMyBooking   (GetMyBookingRequest)   returns (ReservationProto);
   rpc GetOpsOccupancyReport (GetOpsOccupancyReportRequest) returns (OpsOccupancyReport);
+  // Occupancy checkout: push scheduled end, or check the guest out of the unit.
+  rpc ExtendReservation  (ExtendReservationRequest)  returns (ReservationProto);
+  rpc CheckoutReservation (CheckoutReservationRequest) returns (ReservationProto);
 }
 
 
@@ -1514,6 +1517,10 @@ message ReservationProto {
   optional int32 duration_count = 39;
   // Events-service approval chain instance, when the booking requires multi-step approval.
   optional string approval_instance_id = 40;
+  optional string checkout_notified_at = 41;
+  optional string checkout_grace_until = 42;
+  optional string auto_checked_out_at = 43;
+  bool checkout_due = 44;
 }
 
 message CreateReservationRequest {
@@ -1563,6 +1570,7 @@ message ListReservationsRequest {
   optional bool stay_as_guest      = 11;
   optional bool stay_anonymous     = 12;
   optional bool has_djengo_account = 13;
+  optional string occupancy_stay_id = 14;
 }
 
 message ListReservationsResponse {
@@ -1584,6 +1592,19 @@ message GetMyBookingRequest {
   string client_user_id = 2;
   optional string email = 3;
   optional string phone = 4;
+}
+
+message ExtendReservationRequest {
+  string reservation_id = 1;
+  string end_time = 2;
+  optional string actor_user_id = 3;
+  optional string notes = 4;
+}
+
+message CheckoutReservationRequest {
+  string reservation_id = 1;
+  optional string actor_user_id = 2;
+  optional string notes = 3;
 }
 
 message CreatePublicBookingRequest {

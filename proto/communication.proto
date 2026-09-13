@@ -105,6 +105,9 @@ message SendStaffInvitationMailResponse {
 enum BookingMailKind {
   BOOKING_MAIL_GUEST_CONFIRMATION = 0;
   BOOKING_MAIL_COMPANY_ALERT = 1;
+  BOOKING_MAIL_CHECKOUT_DUE = 2;
+  BOOKING_MAIL_CHECKED_OUT = 3;
+  BOOKING_MAIL_STAY_EXTENDED = 4;
 }
 
 message SendBookingMailRequest {

@@ -38,6 +38,7 @@ service FacilityService {
   rpc EvacuateOccupancyStay(EvacuateOccupancyStayRequest) returns (OccupancyStayResponse);
   // Move a future-dated ACTIVE hold (reserved) to in-residence by setting started_at = now.
   rpc CheckInOccupancyStay(CheckInOccupancyStayRequest) returns (OccupancyStayResponse);
+  rpc ExtendOccupancyStay(ExtendOccupancyStayRequest) returns (OccupancyStayResponse);
   rpc GetActiveOccupancyStay(GetActiveOccupancyStayRequest) returns (OccupancyStayResponse);
   rpc ListOccupancyStays(ListOccupancyStaysRequest) returns (ListOccupancyStaysResponse);
   rpc ListNodeOccupancyStayHistory(ListNodeOccupancyStayHistoryRequest) returns (ListNodeOccupancyStayHistoryResponse);
@@ -635,6 +636,9 @@ message OccupancyStayMessage {
   optional string entrance_status = 22;
   optional string node_code = 23;
   optional string node_name = 24;
+  // Booked / scheduled checkout instant (reservation end_time).
+  optional string scheduled_end_at = 25;
+  bool checkout_due = 26;
 }
 
 message OccupancyParticipantInput {
@@ -667,6 +671,7 @@ message CreateOccupancyStayRequest {
   optional string host_participant_id = 13;
   bool is_anonymous_to_occupants = 14;
   optional string destination_note = 15;
+  optional string scheduled_end_at = 16;
 }
 
 message EndOccupancyStayRequest {
@@ -676,6 +681,14 @@ message EndOccupancyStayRequest {
   string ended_at = 4;
   string status = 5;
   optional string notes = 6;
+}
+
+message ExtendOccupancyStayRequest {
+  string stay_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  string scheduled_end_at = 4;
+  optional string notes = 5;
 }
 
 message EvacuateOccupancyStayRequest {
@@ -961,6 +974,8 @@ message HospitalReceptionStayMessage {
   optional string discharged_at = 5;
   optional string evacuated_at = 6;
   optional string notes = 7;
+  optional string scheduled_end_at = 8;
+  bool checkout_due = 9;
 }
 
 message HospitalReceptionRowMessage {
