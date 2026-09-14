@@ -1128,6 +1128,7 @@ message CreateShiftTemplateRequest {
   optional string branch_id = 11;
   optional string department_id = 12;
   optional string timezone = 13;
+  bool adheres_to_company_hours = 14;
 }
 
 message UpdateShiftTemplateRequest {
@@ -1145,6 +1146,7 @@ message UpdateShiftTemplateRequest {
   optional string branch_id = 12;
   optional string department_id = 13;
   optional string timezone = 14;
+  bool adheres_to_company_hours = 15;
 }
 
 message ShiftTemplate {
@@ -1165,6 +1167,7 @@ message ShiftTemplate {
   string branch_id       = 15;
   string department_id   = 16;
   string timezone        = 17;
+  bool adheres_to_company_hours = 18;
 }
 
 message ShiftTemplateId            { string shift_template_id = 1; string company_id = 2; string organization_id = 3; }
