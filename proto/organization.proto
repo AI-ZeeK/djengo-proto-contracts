@@ -158,6 +158,7 @@ service AdminOrganizationService {
 
   /// Platform support enables this after a location-change request; company may update branch address once.
   rpc SetBranchLocationUpdateAllowance(SetBranchLocationUpdateAllowanceRequest) returns (UtilitiesResponse);
+  rpc TransferOrganizationCreator(TransferOrganizationCreatorRequest) returns (OrganizationResponse);
 
   // ── SaaS subscriptions (platform billing) ──────────────────────────────
   rpc ListSaasPlans(ListSaasPlansRequest) returns (ListSaasPlansResponse);
@@ -986,6 +987,12 @@ message CreateOrganizationRequest {
   string email = 4;
   string registration_number = 5;
   string registration_date = 6;
+}
+
+message TransferOrganizationCreatorRequest {
+  string organization_id = 1;
+  string new_creator_id = 2;
+  string transferred_by_user_id = 3;
 }
 
 message CreateDepartmentRoleRequest {
