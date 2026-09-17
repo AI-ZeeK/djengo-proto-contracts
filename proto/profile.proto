@@ -52,6 +52,9 @@ service ProfileService {
   rpc EnableTotp(EnableTotpRequest) returns (EnableTotpResponse);
   rpc ConfirmTotp(ConfirmTotpRequest) returns (ConfirmTotpResponse);
   rpc DisableTotp(DisableTotpRequest) returns (DisableTotpResponse);
+  /// Authenticated user: SMS OTP when setting or changing a phone number.
+  rpc SendPhoneOtp(SendPhoneOtpRequest) returns (SendOtpResponse);
+  rpc VerifyPhoneOtp(VerifyPhoneOtpRequest) returns (UserResponse);
   
   rpc GetRoles(EmptyRequest) returns (GetRolesResponse);
   
@@ -1546,6 +1549,8 @@ message User {
   optional bool require_signin_otp = 21;
   /** ISO timestamp when the user left shared sample data. Empty while still in preview. */
   optional string demo_preview_dismissed_at = 22;
+  /** True after the current phone number passed SMS OTP. */
+  optional bool phone_verified = 23;
 }
 
 // message BasicUser {
@@ -2504,5 +2509,18 @@ message DisableTotpResponse {
   bool success = 1;
   optional string error = 2;
   optional string message = 3;
+}
+
+message SendPhoneOtpRequest {
+  string user_id = 1;
+  string phone_number = 2;
+  string phone_dial_code = 3;
+}
+
+message VerifyPhoneOtpRequest {
+  string user_id = 1;
+  string otp = 2;
+  string phone_number = 3;
+  string phone_dial_code = 4;
 }
 
