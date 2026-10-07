@@ -42,6 +42,10 @@ service CommunicationService {
 
   rpc ListNotificationTemplates(ListNotificationTemplatesRequest) returns (ListNotificationTemplatesResponse);
   rpc UpsertNotificationTemplate(UpsertNotificationTemplateRequest) returns (NotificationTemplateRecord);
+  rpc DeleteNotificationTemplate(DeleteNotificationTemplateRequest) returns (DeleteNotificationTemplateResponse);
+  rpc GetNotificationTemplateCatalog(GetNotificationTemplateCatalogRequest) returns (GetNotificationTemplateCatalogResponse);
+  rpc PreviewNotificationTemplate(PreviewNotificationTemplateRequest) returns (PreviewNotificationTemplateResponse);
+  rpc SendTestNotificationTemplate(SendTestNotificationTemplateRequest) returns (SendTestNotificationTemplateResponse);
 }
 
 message SendPayrollApprovedMailRequest {
@@ -55,6 +59,11 @@ message SendPayrollApprovedMailRequest {
   string company_name = 8;
   optional bytes payslip_pdf = 9;
   optional string payslip_filename = 10;
+  // Tenant scope used to pick the company / organization email template.
+  optional string company_id = 11;
+  optional string organization_id = 12;
+  // Extra template variables (e.g. first_name, phone, avatar_url).
+  map<string, string> variables = 13;
 }
 
 message SendPayrollApprovedMailResponse {
@@ -83,6 +92,7 @@ enum SendOtpType {
 enum InvitationMailKind {
   INVITATION_MAIL_STAFF = 0;
   INVITATION_MAIL_PARTNER = 1;
+  INVITATION_MAIL_GUEST = 2;
 }
 
 message SendStaffInvitationMailRequest {
@@ -95,6 +105,12 @@ message SendStaffInvitationMailRequest {
   optional string partner_type_label = 7;
   InvitationMailKind kind = 8;
   optional string expires_at = 9;
+  optional string guest_name = 10;
+  optional string temp_password = 11;
+  optional string sign_in_url = 12;
+  optional string company_id = 13;
+  optional string organization_id = 14;
+  map<string, string> variables = 15;
 }
 
 message SendStaffInvitationMailResponse {
@@ -121,6 +137,9 @@ message SendBookingMailRequest {
   optional string location_label = 8;
   optional string reservation_id = 9;
   BookingMailKind kind = 10;
+  optional string company_id = 11;
+  optional string organization_id = 12;
+  map<string, string> variables = 13;
 }
 
 message SendBookingMailResponse {
@@ -135,6 +154,8 @@ message SendOpsAlertMailRequest {
   string message = 4;
   string severity = 5;
   map<string, string> details = 6;
+  optional string company_id = 7;
+  optional string organization_id = 8;
 }
 
 message SendOpsAlertMailResponse {
@@ -447,11 +468,25 @@ message NotificationTemplateRecord {
   optional string subject = 6;
   string body = 7;
   bool is_active = 8;
+  optional string company_id = 9;
+  optional string name = 10;
+  optional string description = 11;
+  optional string text_body = 12;
+  // EDITOR | UPLOAD
+  optional string source = 13;
+  // JSON object: { "<variable>": { "fallback": "..." } }
+  optional string variables_json = 14;
+  optional string updated_at = 15;
+  // COMPANY | ORGANIZATION | PLATFORM
+  optional string scope = 16;
+  optional string updated_by = 17;
 }
 
 message ListNotificationTemplatesRequest {
   optional string organization_id = 1;
   optional string channel = 2;
+  optional string company_id = 3;
+  optional string code = 4;
 }
 
 message ListNotificationTemplatesResponse {
@@ -466,4 +501,66 @@ message UpsertNotificationTemplateRequest {
   optional string subject = 5;
   string body = 6;
   bool is_active = 7;
+  optional string company_id = 8;
+  optional string name = 9;
+  optional string description = 10;
+  optional string text_body = 11;
+  optional string source = 12;
+  optional string variables_json = 13;
+  optional string updated_by = 14;
+}
+
+message DeleteNotificationTemplateRequest {
+  string template_id = 1;
+  optional string organization_id = 2;
+  optional string company_id = 3;
+}
+
+message DeleteNotificationTemplateResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
+message GetNotificationTemplateCatalogRequest {
+  optional string channel = 1;
+}
+
+message GetNotificationTemplateCatalogResponse {
+  // JSON array of catalog entries (code, name, category, variables, default subject/body, sample data).
+  string catalog_json = 1;
+}
+
+message PreviewNotificationTemplateRequest {
+  string code = 1;
+  optional string subject = 2;
+  string body = 3;
+  optional string text_body = 4;
+  // JSON object of sample values that override the catalog sample data.
+  optional string sample_json = 5;
+  optional string variables_json = 6;
+}
+
+message PreviewNotificationTemplateResponse {
+  string subject = 1;
+  string html = 2;
+  string text = 3;
+  repeated string unknown_variables = 4;
+  repeated string warnings = 5;
+}
+
+message SendTestNotificationTemplateRequest {
+  string code = 1;
+  string to_email = 2;
+  optional string subject = 3;
+  string body = 4;
+  optional string text_body = 5;
+  optional string sample_json = 6;
+  optional string variables_json = 7;
+  optional string company_id = 8;
+  optional string organization_id = 9;
+}
+
+message SendTestNotificationTemplateResponse {
+  bool success = 1;
+  optional string error = 2;
 }
