@@ -1,3 +1,10 @@
+## Unreleased — Database backups (admin panel)
+
+### `admin.proto`
+- `rpc TriggerDatabaseBackup` / `ListDatabaseBackups` / `DeleteDatabaseBackup` — super-admin backup management
+- `rpc DownloadDatabaseBackup` — server-streams the backup archive in `DatabaseBackupChunk`s
+- `DatabaseBackup` message (status, trigger, size, databases, local/remote storage)
+
 ## Unreleased — Salary advance payout after approval
 
 ### `financials.proto`

@@ -43,6 +43,12 @@ service AdminService {
   rpc GetAdminPermissionGroups(EmptyRequest) returns (GetAdminPermissionGroupsResponse);
   rpc GetAdminRolePermissions(GetAdminRolePermissionsRequest) returns (GetAdminRolePermissionsResponse);
   rpc GetAdminRoleCompanies(GetAdminRoleCompaniesRequest) returns (GetAdminRoleCompaniesResponse);
+
+  // Database backups (super admin only — enforced at the gateway)
+  rpc TriggerDatabaseBackup(TriggerDatabaseBackupRequest) returns (DatabaseBackupResponse);
+  rpc ListDatabaseBackups(ListDatabaseBackupsRequest) returns (ListDatabaseBackupsResponse);
+  rpc DeleteDatabaseBackup(DeleteDatabaseBackupRequest) returns (DeleteDatabaseBackupResponse);
+  rpc DownloadDatabaseBackup(DownloadDatabaseBackupRequest) returns (stream DatabaseBackupChunk);
 }
 
 // Platform admin pages/sections a role may access. Mirrors frontend/admin nav sections.
@@ -568,4 +574,69 @@ message OverviewAnalyticsResponse {
   TopPerformingOrganizationsData top_performing_organizations = 2;
   DailyActiveUsersAnalytics daily_active_users = 3;
   ActiveUsersCountData active_users_count = 4;
+}
+
+// ============================================================================
+// DATABASE BACKUPS
+// ============================================================================
+
+message DatabaseBackup {
+  string backup_id = 1;
+  string file_name = 2;
+  string status = 3;   // RUNNING | SUCCESS | FAILED
+  string trigger = 4;  // SCHEDULED | MANUAL
+  optional string triggered_by = 5;
+  optional string size_bytes = 6; // string: int64 exceeds JS safe integers in JSON
+  repeated string databases = 7;
+  bool stored_locally = 8;
+  optional string remote_key = 9;
+  optional string error = 10;
+  string started_at = 11;
+  optional string finished_at = 12;
+  optional string triggered_by_email = 13;
+}
+
+message TriggerDatabaseBackupRequest {
+  optional string triggered_by = 1; // admin user_id
+}
+
+message DatabaseBackupResponse {
+  bool success = 1;
+  string message = 2;
+  optional DatabaseBackup backup = 3;
+}
+
+message ListDatabaseBackupsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListDatabaseBackupsResponse {
+  bool success = 1;
+  repeated DatabaseBackup backups = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+  bool remote_configured = 6;
+  optional string schedule = 7;
+  int32 local_retention = 8;
+}
+
+message DeleteDatabaseBackupRequest {
+  string backup_id = 1;
+}
+
+message DeleteDatabaseBackupResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message DownloadDatabaseBackupRequest {
+  string backup_id = 1;
+}
+
+message DatabaseBackupChunk {
+  bytes data = 1;
+  string file_name = 2;  // set on the first chunk
+  string size_bytes = 3; // set on the first chunk
 }
