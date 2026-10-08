@@ -1764,6 +1764,10 @@ service EngagementDocumentService {
   rpc SendDocuments (SendEngagementDocumentsRequest) returns (EngagementDocumentInstanceProto);
   rpc CreateClinicalRecord (CreateClinicalDocumentRequest) returns (EngagementDocumentInstanceProto);
   rpc AcknowledgeDocument (AcknowledgeEngagementDocumentRequest) returns (EngagementDocumentInstanceProto);
+  // Client returns a document: their own (REQUEST) or the completed form (EXCHANGE).
+  rpc SubmitDocument (SubmitEngagementDocumentRequest) returns (EngagementDocumentInstanceProto);
+  // Company's part: accept, ask for changes, or return the final copy.
+  rpc ReviewDocument (ReviewEngagementDocumentRequest) returns (EngagementDocumentInstanceProto);
 }
 
 message EngagementDocumentRequirementProto {
@@ -1780,6 +1784,12 @@ message EngagementDocumentRequirementProto {
   string template_file_id = 11;
   // Public URL for company-uploaded PDF/image (guest preview).
   string template_file_url = 12;
+  // SEND (company file → client reads/signs) | REQUEST (client uploads) |
+  // EXCHANGE (company form → client completes → company returns final copy)
+  string flow = 13;
+  bool requires_signature = 14;
+  // The company's own words for what this document is used for.
+  string purpose = 15;
 }
 
 message EngagementDocumentTemplateProto {
@@ -1804,6 +1814,8 @@ message UpsertEngagementDocumentTemplateRequest {
   string name = 6;
   optional bool is_enabled = 7;
   repeated EngagementDocumentRequirementProto requirements = 8;
+  // When true, `requirements` replaces the list even if empty (delete all).
+  bool replace_requirements = 9;
 }
 
 message GetEngagementDocumentTemplateRequest {
@@ -1837,6 +1849,51 @@ message EngagementDocumentInstanceProto {
   string created_at = 21;
   string signature_file_id = 22;
   string signature_file_url = 23;
+  string flow = 24;
+  bool requires_signature = 25;
+  string instructions = 26;
+  // What the client returned, and the company's final copy.
+  string client_file_url = 27;
+  string client_note = 28;
+  string submitted_at = 29;
+  string return_file_url = 30;
+  string company_note = 31;
+  string reviewed_at = 32;
+  // Every step of the back-and-forth, oldest first.
+  repeated EngagementDocumentEventProto events = 33;
+}
+
+message EngagementDocumentEventProto {
+  string event_id = 1;
+  // CLIENT | COMPANY
+  string actor = 2;
+  string actor_name = 3;
+  string action = 4;
+  string note = 5;
+  string file_url = 6;
+  string created_at = 7;
+}
+
+message SubmitEngagementDocumentRequest {
+  string instance_id = 1;
+  string guest_user_id = 2;
+  string file_url = 3;
+  string note = 4;
+  string signature_file_url = 5;
+  string submitted_by_name = 6;
+}
+
+message ReviewEngagementDocumentRequest {
+  string instance_id = 1;
+  string company_id = 2;
+  string organization_id = 3;
+  // ACCEPT | REQUEST_CHANGES | RETURN
+  string action = 4;
+  string note = 5;
+  // Final copy for RETURN (countersigned, stamped, approved…).
+  string return_file_url = 6;
+  string reviewed_by = 7;
+  string reviewed_by_name = 8;
 }
 
 message ListEngagementDocumentInstancesRequest {
@@ -1873,8 +1930,13 @@ message SendEngagementDocumentsRequest {
   string doc_kind = 12;
   string visibility = 13;
   string audience = 14;
-  string file_id = 15;
+    string file_id = 15;
   string file_url = 16;
+  // One-off documents: SEND (default), REQUEST (ask the client for it — title
+  // + instructions, no file) or EXCHANGE.
+  string flow = 17;
+  bool requires_signature = 18;
+  string instructions = 19;
 }
 
 message CreateClinicalDocumentRequest {
@@ -1926,6 +1988,13 @@ message EngagementDocumentChecklistItem {
   string status = 8;
   string instance_id = 9;
   bool satisfied = 10;
+  string flow = 11;
+  bool requires_signature = 12;
+  // Company has uploaded a file (SEND / EXCHANGE).
+  bool has_file = 13;
+  string purpose = 14;
+  string instructions = 15;
+  string template_file_url = 16;
 }
 
 message EngagementDocumentChecklistResponse {
