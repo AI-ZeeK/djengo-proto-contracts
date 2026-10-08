@@ -55,6 +55,11 @@ service ProfileService {
   /// Authenticated user: SMS OTP when setting or changing a phone number.
   rpc SendPhoneOtp(SendPhoneOtpRequest) returns (SendOtpResponse);
   rpc VerifyPhoneOtp(VerifyPhoneOtpRequest) returns (UserResponse);
+  // Company phone changes: SMS code to the new number, then a short-lived
+  // verified marker that the gateway redeems when the company is saved.
+  rpc SendCompanyPhoneOtp(CompanyPhoneOtpRequest) returns (SendOtpResponse);
+  rpc VerifyCompanyPhoneOtp(CompanyPhoneOtpRequest) returns (CompanyPhoneOtpResult);
+  rpc ConsumeCompanyPhoneVerification(CompanyPhoneOtpRequest) returns (CompanyPhoneOtpResult);
   
   rpc GetRoles(EmptyRequest) returns (GetRolesResponse);
   
@@ -145,8 +150,10 @@ service ProfileService {
   rpc AppendHrAuditLog(AppendHrAuditLogRequest) returns (AppendHrAuditLogResponse);
   rpc ListHrAuditLogs(ListHrAuditLogsRequest) returns (ListHrAuditLogsResponse);
   rpc RecordPrivacyConsent(RecordPrivacyConsentRequest) returns (PrivacyConsentResponse);
+  rpc ListPrivacyConsents(ListPrivacyConsentsRequest) returns (ListPrivacyConsentsResponse);
   rpc CreateDataSubjectRequest(CreateDataSubjectRequestInput) returns (DataSubjectRequestResponse);
   rpc ListDataSubjectRequests(ListDataSubjectRequestsRequest) returns (ListDataSubjectRequestsResponse);
+  rpc ReviewDataSubjectRequest(ReviewDataSubjectRequestInput) returns (DataSubjectRequestResponse);
   rpc UpsertDataRetentionPolicy(UpsertDataRetentionPolicyRequest) returns (DataRetentionPolicyRecord);
   rpc ListDataRetentionPolicies(ListDataRetentionPoliciesRequest) returns (ListDataRetentionPoliciesResponse);
   rpc EnforceDataRetention(EnforceDataRetentionRequest) returns (EnforceDataRetentionResponse);
@@ -2251,6 +2258,25 @@ message PrivacyConsentResponse {
   optional string error = 3;
 }
 
+message ListPrivacyConsentsRequest {
+  string user_id = 1;
+}
+
+// Latest decision per consent type for one user.
+message PrivacyConsentRecord {
+  string consent_type = 1;
+  string version = 2;
+  bool granted = 3;
+  string recorded_at = 4;
+  optional string source = 5;
+}
+
+message ListPrivacyConsentsResponse {
+  bool success = 1;
+  repeated PrivacyConsentRecord consents = 2;
+  optional string error = 3;
+}
+
 message CreateDataSubjectRequestInput {
   string user_id = 1;
   optional string organization_id = 2;
@@ -2271,6 +2297,19 @@ message ListDataSubjectRequestsRequest {
   optional string status = 3;
   optional int32 page = 4;
   optional int32 page_size = 5;
+  optional string request_type = 6;
+  // Admin review: matches the requester's name or email.
+  optional string search = 7;
+}
+
+message ReviewDataSubjectRequestInput {
+  string request_id = 1;
+  // APPROVE or REJECT
+  string decision = 2;
+  // Shown to the user; required for REJECT.
+  optional string reason = 3;
+  string reviewed_by = 4;
+  optional string reviewed_by_name = 5;
 }
 
 message DataSubjectRequestEntry {
@@ -2283,6 +2322,15 @@ message DataSubjectRequestEntry {
   optional string handled_by = 7;
   optional string completed_at = 8;
   string created_at = 9;
+  optional string user_name = 10;
+  optional string user_email = 11;
+  optional string user_phone = 12;
+  optional string user_joined_at = 13;
+  optional bool user_deleted = 14;
+  optional string reviewed_by = 15;
+  optional string reviewed_by_name = 16;
+  optional string reviewed_at = 17;
+  optional string decision_reason = 18;
 }
 
 message ListDataSubjectRequestsResponse {
@@ -2522,5 +2570,18 @@ message VerifyPhoneOtpRequest {
   string otp = 2;
   string phone_number = 3;
   string phone_dial_code = 4;
+}
+
+message CompanyPhoneOtpRequest {
+  string user_id = 1;
+  string company_id = 2;
+  string phone_number = 3;
+  string phone_dial_code = 4;
+  optional string otp = 5;
+}
+
+message CompanyPhoneOtpResult {
+  bool success = 1;
+  optional string message = 2;
 }
 

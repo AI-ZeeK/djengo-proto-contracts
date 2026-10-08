@@ -477,7 +477,7 @@ message NotificationTemplateRecord {
   // JSON object: { "<variable>": { "fallback": "..." } }
   optional string variables_json = 14;
   optional string updated_at = 15;
-  // COMPANY | ORGANIZATION | PLATFORM
+  // COMPANY | PLATFORM
   optional string scope = 16;
   optional string updated_by = 17;
 }
