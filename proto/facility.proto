@@ -1319,6 +1319,8 @@ message PublicBrowseAddressMessage {
 message PublicBrowseContactMessage {
   optional string phone = 1;
   optional string email = 2;
+  // International dialling code for phone, digits only (e.g. "234"); phone is national.
+  optional string phone_dial_code = 3;
 }
 
 message PublicBrowsePricePlanMessage {
