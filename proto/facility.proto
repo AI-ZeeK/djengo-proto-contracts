@@ -11,6 +11,8 @@ service FacilityService {
 
   rpc GetCompanyFacilityProfile(GetCompanyFacilityProfileRequest) returns (CompanyFacilityProfileResponse);
   rpc UpsertCompanyFacilityProfile(UpsertCompanyFacilityProfileRequest) returns (CompanyFacilityProfileResponse);
+  // Branch layout settings JSON (e.g. dining room features: entrances, windows).
+  rpc UpdateBranchLayoutSettings(UpdateBranchLayoutSettingsRequest) returns (CompanyFacilityProfileResponse);
 
   rpc GetFacilityTree(GetFacilityTreeRequest) returns (GetFacilityTreeResponse);
   rpc SearchFacilityNodesByCode(SearchFacilityNodesByCodeRequest) returns (SearchFacilityNodesByCodeResponse);
@@ -209,6 +211,14 @@ message GetCompanyFacilityProfileRequest {
   string company_id = 1;
   string organization_id = 2;
   string branch_id = 3;
+}
+
+message UpdateBranchLayoutSettingsRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  string branch_id = 3;
+  // Whole layout settings object; replaces the stored one.
+  string layout_settings_json = 4;
 }
 
 message UpsertCompanyFacilityProfileRequest {
@@ -1594,4 +1604,7 @@ message GetPublicBookingContextResponse {
   optional string company_id = 9;
   optional string organization_id = 10;
   optional string branch_id = 11;
+  // Dining room features per floor ({ "<floor id | __site__>": { features: [...] } })
+  // so guest floor plans show entrances / windows and table locations.
+  optional string dining_layout_json = 12;
 }
