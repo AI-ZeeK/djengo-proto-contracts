@@ -1565,6 +1565,11 @@ message PublicBookableNodeMessage {
   optional string listing_offer = 24;
   /// Floor-plan placement JSON: { grid_x, grid_z, rotation_deg, placed }.
   optional string spatial_position_json = 25;
+  // Dining tables: shape (round | square | rectangular | booth | bar | oval) and
+  // table-top size in metres, so guest floor plans draw the real table.
+  optional string table_shape = 26;
+  optional double table_length_m = 27;
+  optional double table_width_m = 28;
 }
 
 message PublicBookingSectionMessage {
