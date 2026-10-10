@@ -305,6 +305,7 @@ message VerifyOtpResponse {
   optional string message = 3;
   optional string access_token = 4;
   optional User user = 5;
+  optional string refresh_token = 6;
 }
 
 message LoginRequest {
@@ -335,6 +336,7 @@ message RefreshTokenResponse {
   bool success = 1;
   User user = 2;
   string access_token = 3;
+  optional string refresh_token = 4;
 }
 
 
