@@ -2231,6 +2231,27 @@ service StaffDocumentService {
   rpc ListCompanyDocuments(GetCompanyStaffRequest)       returns (GetCompanyStaffDocumentsResponse);
   rpc VerifyDocument      (VerifyDocumentRequest) returns (StaffDocumentId);
   rpc DeleteDocument      (StaffDocumentId)      returns (DeleteResponse);
+  // Card counts for the company HR record pages, computed in the database.
+  rpc GetHrRecordsSummary (HrRecordsSummaryRequest) returns (HrRecordsSummaryResponse);
+}
+
+// section: documents | training | performance | disciplinary | complaints
+message HrRecordsSummaryRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  string section         = 3;
+  repeated string staff_ids = 4;
+  string complainant_id  = 5; // complaints: only this user's complaints
+}
+
+message HrSummaryMetric {
+  string key   = 1;
+  double value = 2;
+}
+
+message HrRecordsSummaryResponse {
+  string section = 1;
+  repeated HrSummaryMetric metrics = 2;
 }
 
 

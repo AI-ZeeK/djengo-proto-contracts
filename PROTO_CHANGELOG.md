@@ -1,3 +1,12 @@
+## Unreleased — Summary cards for HR record pages
+
+### `events.proto`
+- `StaffDocumentService.rpc GetHrRecordsSummary` — database counts for the documents, training, performance, disciplinary and complaints cards (`HrRecordsSummaryRequest` / `HrSummaryMetric` / `HrRecordsSummaryResponse`)
+
+### `profile.proto`
+- `rpc GetHrAuditLogSummary` — created / updated / deleted counts for the HR audit log cards (`HrAuditLogSummaryResponse`)
+- `InvitationType.GUEST_INVITATION = 2` restored (profile-service already sends it)
+
 ## Unreleased — Database backups (admin panel)
 
 ### `admin.proto`
