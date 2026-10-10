@@ -1,3 +1,13 @@
+## Unreleased — Business onboarding flow and admin onboarding reset
+
+### `profile.proto`
+- `User.onboarding_completed_at` (24) — set when onboarding finishes; sample data → onboarding → live
+- `ProfileService.rpc CompleteOnboarding`
+- `AdminProfileService.rpc AdminResetUserOnboarding` (`AdminResetUserOnboardingRequest` / `Response`)
+
+### `organization.proto`
+- `AdminOrganizationService.rpc ResetCompanyPageCompletions` — clear company setup steps (testing)
+
 ## Unreleased — Summary cards for HR record pages
 
 ### `events.proto`

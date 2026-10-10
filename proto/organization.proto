@@ -168,6 +168,14 @@ service AdminOrganizationService {
   rpc ListOrganizationSubscriptions(ListOrganizationSubscriptionsRequest) returns (ListOrganizationSubscriptionsResponse);
   rpc AssignOrganizationPlan(AssignOrganizationPlanRequest) returns (OrganizationSubscriptionResponse);
   rpc GetSaasSubscriptionAnalytics(EmptyRequest) returns (SaasSubscriptionAnalyticsResponse);
+  /// Testing: mark every company setup step incomplete again (onboarding reset).
+  rpc ResetCompanyPageCompletions(FetchCompanyRequest) returns (ResetCompanyPageCompletionsResponse);
+}
+
+message ResetCompanyPageCompletionsResponse {
+  bool success = 1;
+  optional string error = 2;
+  int32 reset_count = 3;
 }
 
 /// Org-facing SaaS billing (subscription status + available plans).

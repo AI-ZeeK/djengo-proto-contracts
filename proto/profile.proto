@@ -73,6 +73,8 @@ service ProfileService {
   rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc DismissDemoPreview(GetUserRequest) returns (UserResponse);
+  /// Finish onboarding: the account leaves the onboarding flow and uses live data.
+  rpc CompleteOnboarding(GetUserRequest) returns (UserResponse);
   rpc FindOrCreateCreatorAccount(FindOrCreateCreatorAccountRequest) returns (UserResponse);
   rpc SyncOrganizationCreator(SyncOrganizationCreatorRequest) returns (BusinessUserResponse);
   rpc GetUserCountForOrganization(GetUserCountForOrganizationRequest) returns (GetUserCountForOrganizationResponse);
@@ -181,6 +183,19 @@ service AdminProfileService {
   /// Platform-wide user retention / survival metrics for admin financial dashboards.
   rpc AdminUserSurvivalAnalytics(AdminUserSurvivalAnalyticsRequest) returns (AdminUserSurvivalAnalyticsResponse);
   rpc AdminUserSurvivalTable(AdminUserSurvivalTableRequest) returns (AdminUserSurvivalTableResponse);
+  /// Put a user back on sample data (testing): clears onboarding started/completed.
+  rpc AdminResetUserOnboarding(AdminResetUserOnboardingRequest) returns (AdminResetUserOnboardingResponse);
+}
+
+message AdminResetUserOnboardingRequest {
+  string user_id = 1;
+}
+
+message AdminResetUserOnboardingResponse {
+  bool success = 1;
+  optional string error = 2;
+  /// Companies this user is linked to as a business user (for resetting company setup).
+  repeated string company_ids = 3;
 }
 
 message GetStaffRequest {
@@ -1562,6 +1577,8 @@ message User {
   optional string demo_preview_dismissed_at = 22;
   /** True after the current phone number passed SMS OTP. */
   optional bool phone_verified = 23;
+  /** ISO timestamp when the user finished onboarding. Empty while in preview or mid-onboarding. */
+  optional string onboarding_completed_at = 24;
 }
 
 // message BasicUser {
