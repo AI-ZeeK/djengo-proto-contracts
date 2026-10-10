@@ -1538,6 +1538,8 @@ message GetOrganizationsRequest {
   optional string sort_order = 5;
   optional string start_date = 6;
   optional string end_date = 7;
+  // live (real tenants) | demo (the shared demo tenant) | all/empty (both)
+  optional string data_scope = 8;
 }
 
 message OrganizationAddress {
@@ -1623,6 +1625,8 @@ message GetCompaniesRequest {
   optional int32 page_size = 3;
   optional string sort_by = 4;
   optional string sort_order = 5;
+  // live (real tenants) | demo (the shared demo tenant) | all/empty (both)
+  optional string data_scope = 6;
 }
 
 message GetCompaniesResponse {

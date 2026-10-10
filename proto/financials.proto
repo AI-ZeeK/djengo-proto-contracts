@@ -2061,6 +2061,8 @@ message ListAdminPlatformTransactionsRequest {
   optional string transaction_type_name = 12;
   // Exclude rows of this type name (e.g. WALLET_FUNDING on company activity ledger).
   optional string exclude_transaction_type_name = 13;
+  // live (real tenants) | demo (the shared demo tenant) | all/empty (both)
+  optional string data_scope = 14;
 }
 
 message ListAdminPlatformTransactionsResponse {
@@ -2135,6 +2137,8 @@ message ListAdminPlatformPayrollsRequest {
   string sort_order        = 10;
   string sort_by           = 11;
   string timeline          = 12; // optional: 1m|3m|6m|1y|all
+  // live (real tenants) | demo (the shared demo tenant) | all/empty (both)
+  optional string data_scope = 13;
 }
 
 message ListAdminPlatformPayrollsResponse {
