@@ -92,6 +92,8 @@ service ProfileService {
   rpc GetManyStaffDetails(ManyStaffDetailsRequest) returns (ManyStaffDetailsResponse);
   rpc GetCompanyStaffs(PaginatedCompanyRequest) returns (ManyStaffDetailsResponse);
   rpc ListCompanyStaffPicker(ListCompanyStaffPickerRequest) returns (ManyStaffDetailsResponse);
+  // One directory of everyone tied to a company: staff, partners, business users, guests.
+  rpc ListCompanyPeople(ListCompanyPeopleRequest) returns (ListCompanyPeopleResponse);
   rpc GetCompanyStaff(GetCompanyStaffRequest) returns (GetCompanyStaffResponse);
   rpc ResolveCompanyUsersByIds(ResolveCompanyUsersByIdsRequest) returns (ResolveCompanyUsersByIdsResponse);
 
@@ -919,6 +921,8 @@ message StaffInvitationItem {
   optional string department_id = 6;
   InvitationType type = 7;
   optional InviteContractPackage contract = 8;
+  // Business-user invites: access every company in the organization (else this company only).
+  optional bool all_companies = 9;
 }
 
 message SendStaffInvitationsRequest {
@@ -975,6 +979,7 @@ enum InvitationType {
   STAFF_INVITATION = 0;
   PARTNER_INVITATION = 1;
   GUEST_INVITATION = 2;
+  BUSINESS_USER_INVITATION = 3;
 }
 
 message OrganizationRole {
@@ -2616,3 +2621,49 @@ message CompanyPhoneOtpResult {
   optional string message = 2;
 }
 
+// ── Company people directory ─────────────────────────────────────────────────
+
+message ListCompanyPeopleRequest {
+  string organization_id = 1;
+  string company_id = 2;
+  // all | staff | partner | business_user | guest
+  string type = 3;
+  optional string search = 4;
+  int32 page = 5;
+  int32 page_size = 6;
+  // Set by the gateway from the caller's permissions.
+  bool include_partners = 7;
+  bool include_guests = 8;
+}
+
+message CompanyPerson {
+  // staff_id / partner_id / business_user_id / guest_id, per person_type.
+  string person_id = 1;
+  // staff | partner | business_user | guest
+  string person_type = 2;
+  optional string user_id = 3;
+  string first_name = 4;
+  string last_name = 5;
+  optional string email = 6;
+  optional string phone_number = 7;
+  bool is_active = 8;
+  string created_at = 9;
+  // Job title, partner roles, or guest kind — shown under the name.
+  optional string subtitle = 10;
+}
+
+message CompanyPeopleCounts {
+  int32 all = 1;
+  int32 staff = 2;
+  int32 partner = 3;
+  int32 business_user = 4;
+  int32 guest = 5;
+}
+
+message ListCompanyPeopleResponse {
+  bool success = 1;
+  optional string error = 2;
+  repeated CompanyPerson people = 3;
+  CompanyPeopleCounts counts = 4;
+  TableMeta meta = 5;
+}
