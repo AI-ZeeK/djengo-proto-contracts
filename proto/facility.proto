@@ -1540,6 +1540,10 @@ message GetPublicBookingContextRequest {
   // so without this the hotel listing lists dining tables among its rooms.
   // STAY (rooms/units/beds/houses) | DINING (tables/chairs). Unset = legacy mixed.
   optional string booking_domain = 12;
+  // Optional time window (ISO 8601). When set, nodes booked inside it are kept
+  // and carry booked_slots instead of being dropped; bookings outside it are ignored.
+  optional string available_from = 13;
+  optional string available_to = 14;
 }
 
 message PublicBookableListingImageMessage {
@@ -1582,6 +1586,14 @@ message PublicBookableNodeMessage {
   optional string table_shape = 26;
   optional double table_length_m = 27;
   optional double table_width_m = 28;
+  // Confirmed bookings overlapping the requested window (only when one is given).
+  repeated PublicBookedSlotMessage booked_slots = 29;
+}
+
+message PublicBookedSlotMessage {
+  string start_at = 1;
+  // Unset = open-ended (seated / no scheduled end).
+  optional string end_at = 2;
 }
 
 message PublicBookingSectionMessage {
