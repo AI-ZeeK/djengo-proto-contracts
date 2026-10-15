@@ -2583,3 +2583,120 @@ service ReportScheduleService {
   rpc CreateReportSchedule         (CreateReportScheduleRequest)        returns (ReportScheduleMsg);
   rpc UpdateReportScheduleEnabled  (UpdateReportScheduleEnabledRequest) returns (ReportScheduleMsg);
 }
+
+// ── Staff reminders ─────────────────────────────────────────────────────────
+// Personal / team reminders (one-off or repeating) delivered in-app and,
+// optionally, by SMS. "Upcoming dates" lists HR dates staff can turn into
+// reminders: work anniversaries, contract ends, probation ends.
+
+message StaffReminderMsg {
+  string reminder_id                 = 1;
+  string company_id                  = 2;
+  string organization_id             = 3;
+  optional string branch_id          = 4;
+  string created_by_user_id          = 5;
+  string title                       = 6;
+  optional string note               = 7;
+  // CUSTOM | BIRTHDAY | WORK_ANNIVERSARY | CONTRACT_END | PROBATION_END | CUSTOMER_FOLLOW_UP
+  string kind                        = 8;
+  optional string subject_staff_id   = 9;
+  optional string subject_label      = 10;
+  // ISO-8601 UTC of the first occurrence.
+  string remind_at                   = 11;
+  // NONE | DAILY | WEEKLY | MONTHLY | YEARLY
+  string repeat                      = 12;
+  bool notify_sms                    = 13;
+  repeated string recipient_user_ids = 14;
+  // ACTIVE | DONE | CANCELLED
+  string status                      = 15;
+  optional string next_run_at        = 16;
+  optional string last_sent_at       = 17;
+  int32 send_count                   = 18;
+  string created_at                  = 19;
+  string updated_at                  = 20;
+  repeated string recipient_staff_ids = 21;
+  bool include_self                  = 22;
+}
+
+message ListStaffRemindersRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  // Caller: sees reminders they created or receive.
+  string user_id         = 3;
+  optional string status = 4;
+  optional string search = 5;
+  int32 page             = 6;
+  int32 page_size        = 7;
+}
+
+message ListStaffRemindersResponse {
+  repeated StaffReminderMsg reminders = 1;
+  int32 total       = 2;
+  int32 page        = 3;
+  int32 page_size   = 4;
+  int32 total_pages = 5;
+  // Counts across the caller's reminders (not just this page).
+  int32 active_count  = 6;
+  int32 due_today     = 7;
+  int32 done_count    = 8;
+}
+
+message UpsertStaffReminderRequest {
+  string company_id                  = 1;
+  string organization_id             = 2;
+  optional string branch_id          = 3;
+  // Caller; becomes created_by on create. Only the creator may edit.
+  string user_id                     = 4;
+  optional string reminder_id        = 5;
+  string title                       = 6;
+  optional string note               = 7;
+  string kind                        = 8;
+  optional string subject_staff_id   = 9;
+  optional string subject_label      = 10;
+  string remind_at                   = 11;
+  string repeat                      = 12;
+  bool notify_sms                    = 13;
+  // Colleagues to remind (resolved to users within the company).
+  repeated string recipient_staff_ids = 14;
+  // Also remind the caller. Forced on when no colleagues are picked.
+  bool include_self                  = 15;
+}
+
+message SetStaffReminderStatusRequest {
+  string company_id  = 1;
+  string user_id     = 2;
+  string reminder_id = 3;
+  // ACTIVE | DONE | CANCELLED
+  string status      = 4;
+}
+
+message ListUpcomingStaffDatesRequest {
+  string company_id      = 1;
+  string organization_id = 2;
+  // Look-ahead window, 1–366 (default 30).
+  int32 days             = 3;
+}
+
+message UpcomingStaffDateMsg {
+  // WORK_ANNIVERSARY | CONTRACT_END | PROBATION_END
+  string kind        = 1;
+  // yyyy-MM-dd of the next occurrence.
+  string date        = 2;
+  optional string staff_id = 3;
+  string label       = 4;
+  // Completed years on that date (anniversaries); 0 otherwise.
+  int32 years        = 5;
+  int32 days_until   = 6;
+  string source_id   = 7;
+}
+
+message ListUpcomingStaffDatesResponse {
+  repeated UpcomingStaffDateMsg dates = 1;
+}
+
+service StaffReminderService {
+  rpc ListStaffReminders     (ListStaffRemindersRequest)     returns (ListStaffRemindersResponse);
+  rpc UpsertStaffReminder    (UpsertStaffReminderRequest)    returns (StaffReminderMsg);
+  rpc SetStaffReminderStatus (SetStaffReminderStatusRequest) returns (StaffReminderMsg);
+  rpc ListUpcomingStaffDates (ListUpcomingStaffDatesRequest) returns (ListUpcomingStaffDatesResponse);
+}

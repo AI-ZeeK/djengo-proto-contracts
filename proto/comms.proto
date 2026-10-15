@@ -177,6 +177,9 @@ message PushSubscriptionRequest {
   string body = 2;
   NotificationData data = 3;
   string recipient_user_id = 4;
+  // Also text the recipient (e.g. a reminder set to SMS). Sent unless the
+  // recipient has explicitly turned SMS off in their notification preferences.
+  optional bool request_sms = 5;
 }
 
 message OpsAlertDetail {
