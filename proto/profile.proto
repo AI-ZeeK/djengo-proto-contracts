@@ -434,11 +434,16 @@ message ListCompanyProbationsRequest {
   string company_id = 1;
   // Only periods that haven't ended yet.
   bool active_only = 2;
+  // 1-based; page_size 0 = default (20), max 100.
+  int32 page = 3;
+  int32 page_size = 4;
 }
 
 message StaffProbationHistoryResponse {
   repeated ProbationPeriod history = 1;
   optional string error = 2;
+  // Company-wide listing only: rows matching before paging.
+  optional int32 total = 3;
 }
 
 message LoginHistoryResponse {
