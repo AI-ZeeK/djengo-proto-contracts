@@ -122,6 +122,8 @@ service ProfileService {
   rpc CompleteStaffSelfProfile(CompleteStaffSelfProfileRequest) returns (CompleteStaffSelfProfileResponse);
   rpc AddStaffPaymentAdjustment(AddStaffPaymentAdjustmentRequest) returns (AddStaffPaymentAdjustmentResponse);
   rpc StaffProbationHistory(StaffProbationHistoryRequest) returns (StaffProbationHistoryResponse);
+  // Probation periods across the company (newest first), for the probation overview.
+  rpc ListCompanyProbations(ListCompanyProbationsRequest) returns (StaffProbationHistoryResponse);
   // ── HR: Termination ───────────────────────────────────────────────────────
   rpc TerminateStaff(TerminateStaffRequest) returns (TerminateStaffResponse);
   rpc FinalizeStaffTermination(FinalizeStaffTerminationRequest) returns (TerminateStaffResponse);
@@ -423,6 +425,15 @@ message ProbationPeriod {
   optional string reason = 3;
   // JSON: salary_kind, salary_percent, salary_amount_minor, restriction flags, notes
   optional string terms_json = 4;
+  // Set on company-wide listings so each period can be tied to its staff member.
+  optional string staff_id = 5;
+  optional string probation_history_id = 6;
+}
+
+message ListCompanyProbationsRequest {
+  string company_id = 1;
+  // Only periods that haven't ended yet.
+  bool active_only = 2;
 }
 
 message StaffProbationHistoryResponse {
