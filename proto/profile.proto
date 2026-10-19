@@ -75,6 +75,9 @@ service ProfileService {
   rpc DismissDemoPreview(GetUserRequest) returns (UserResponse);
   /// Finish onboarding: the account leaves the onboarding flow and uses live data.
   rpc CompleteOnboarding(GetUserRequest) returns (UserResponse);
+  /// Guided tours: remember which ones the user has finished, on any device.
+  rpc MarkToursSeen(MarkToursSeenRequest) returns (UserResponse);
+  rpc ResetTours(GetUserRequest) returns (UserResponse);
   rpc FindOrCreateCreatorAccount(FindOrCreateCreatorAccountRequest) returns (UserResponse);
   rpc SyncOrganizationCreator(SyncOrganizationCreatorRequest) returns (BusinessUserResponse);
   rpc GetUserCountForOrganization(GetUserCountForOrganizationRequest) returns (GetUserCountForOrganizationResponse);
@@ -1395,6 +1398,11 @@ message GetUserRequest {
   string user_id = 1;
 }
 
+message MarkToursSeenRequest {
+  string user_id = 1;
+  repeated string tour_ids = 2;
+}
+
 message GetUserByEmailRequest {
   string email = 1;
 }
@@ -1600,6 +1608,8 @@ message User {
   optional bool phone_verified = 23;
   /** ISO timestamp when the user finished onboarding. Empty while in preview or mid-onboarding. */
   optional string onboarding_completed_at = 24;
+  /** Guided tours the user has finished or skipped (e.g. "shell", "page:/overview/staff"). */
+  repeated string seen_tours = 25;
 }
 
 // message BasicUser {

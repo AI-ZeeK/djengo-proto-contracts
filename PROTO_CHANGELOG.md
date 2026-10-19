@@ -1,3 +1,9 @@
+## Unreleased — Guided tours saved on the profile
+
+### `profile.proto`
+- `User.seen_tours` (25) — guided tours the user has finished or skipped, so they don't replay in another browser
+- `ProfileService.rpc MarkToursSeen` (`MarkToursSeenRequest`) and `rpc ResetTours`
+
 ## Unreleased — Business onboarding flow and admin onboarding reset
 
 ### `profile.proto`
