@@ -37,6 +37,8 @@ service ApprovalService {
   rpc GetApproval         (GetApprovalRequest)           returns (Approval);
   rpc ListApprovals       (ListApprovalsRequest)         returns (ListApprovalsResponse);
   rpc CloseApproval       (CloseApprovalRequest)        returns (CloseApprovalResponse);
+  // Push a finished approval's outcome to its owning service again now.
+  rpc RetryApprovalOutcome (RetryApprovalOutcomeRequest) returns (RetryApprovalOutcomeResponse);
 
   // Step decisions
   rpc ApproveStep         (ApproveApprovalStepRequest)  returns (ApproveApprovalStepResponse);
@@ -1767,6 +1769,12 @@ message Approval {
   string                 closed_by_user_id  = 15;
   string                 closed_comment     = 16;
   repeated ApprovalStep   steps              = 17;
+  // Hand-off of the final decision to the service that owns the entity.
+  // SYNCED | PENDING (retrying) | FAILED (gave up, retry by hand) | "" (still running)
+  string                 outcome_sync_status = 18;
+  string                 outcome_sync_error  = 19;
+  string                 outcome_synced_at   = 20;
+  int32                  outcome_sync_attempts = 21;
 }
 
 /// Live step — tracks an actual approve/reject decision.
@@ -1836,6 +1844,17 @@ message CloseApprovalRequest {
 }
 
 message CloseApprovalResponse {
+  bool     success  = 1;
+  string   message  = 2;
+  Approval approval = 3;
+}
+
+message RetryApprovalOutcomeRequest {
+  string approval_id = 1;
+  string company_id  = 2;
+}
+
+message RetryApprovalOutcomeResponse {
   bool     success  = 1;
   string   message  = 2;
   Approval approval = 3;

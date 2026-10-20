@@ -294,6 +294,10 @@ service FinancialsService {
   rpc UpsertStaffDeductionConfig (UpsertStaffDeductionConfigRequest) returns (StaffDeductionConfigProto);
   rpc DeactivateStaffDeductionConfig (DeactivateStaffDeductionConfigRequest) returns (StaffDeductionConfigProto);
   rpc SyncAssetDisposalApproval (SyncAssetDisposalApprovalRequest) returns (FacilityAssetRecord);
+  // Events pushes a finished approval chain here for entity types without a
+  // dedicated sync RPC (vendor, purchase request/order, wallet withdrawal).
+  // Idempotent: an entity already past its pending state is left alone.
+  rpc SyncApprovalOutcome (SyncApprovalOutcomeRequest) returns (SyncApprovalOutcomeResponse);
 
   // Events calls these when an approval chain is first set up / updated so pre-existing
   // budgets and salary advances without an instance get wired into the new chain.
@@ -2851,6 +2855,51 @@ message ListGoodsReceiptNotesResponse {
 
 // ── Guest Billing (CRM) ────────────────────────────────────────────────────
 
+message RefundGuestInvoiceRequest {
+  // Either invoice_id, or order_id (the invoice raised for that order).
+  string invoice_id = 1;
+  string order_id = 2;
+  string company_id = 3;
+  // 0 = everything still refundable on the invoice.
+  int64 amount_minor = 4;
+  // Idempotency key, e.g. the order refund request id. Same key → same refunds.
+  string refund_key = 5;
+  string reason = 6;
+  string requested_by = 7;
+  // Refund into this user's Djengo wallet (instant) instead of the original
+  // method, e.g. a cancelled booking's deposit. Money still comes out of the
+  // branch wallet that received the payment.
+  string to_wallet_user_id = 8;
+}
+
+message GuestRefundProto {
+  string refund_id = 1;
+  string invoice_id = 2;
+  string payment_id = 3;
+  int64 amount_minor = 4;
+  string currency_code = 5;
+  // WALLET | CARD | CASH
+  string destination = 6;
+  // COMPLETED | PENDING (card refund with the gateway) | FAILED
+  string status = 7;
+  string reference = 8;
+  string created_at = 9;
+  string message = 10;
+}
+
+message RefundGuestInvoiceResponse {
+  bool success = 1;
+  string message = 2;
+  int64 refunded_minor = 3;
+  repeated GuestRefundProto refunds = 4;
+}
+
+message PayGuestInvoiceFromWalletRequest {
+  string invoice_id = 1;
+  string payer_user_id = 2;
+  string client_operation_id = 3;
+}
+
 service GuestBillingService {
   rpc CreateGuestInvoice  (CreateGuestInvoiceRequest)  returns (GuestInvoiceProto);
   rpc GetGuestInvoice     (GetGuestInvoiceRequest)     returns (GuestInvoiceProto);
@@ -2860,6 +2909,13 @@ service GuestBillingService {
   rpc RecordGuestPayment  (RecordGuestPaymentRequest)  returns (GuestPaymentProto);
   rpc DisputeGuestPayment (DisputeGuestPaymentRequest) returns (GuestPaymentProto);
   rpc ListGuestPayments   (ListGuestPaymentsRequest)   returns (ListGuestPaymentsResponse);
+  // Refund paid money back the way it came: wallet payment → payer's wallet,
+  // Paystack card payment → the card (Paystack refund), desk cash → cash. Company-
+  // authorised (no platform review); never more than was paid; one refund per refund_key.
+  rpc RefundGuestInvoice  (RefundGuestInvoiceRequest)  returns (RefundGuestInvoiceResponse);
+  // Pay an invoice balance from the payer's Djengo wallet as one atomic move into
+  // the company's policy branch wallet (and record the payment in the same step).
+  rpc PayGuestInvoiceFromWallet (PayGuestInvoiceFromWalletRequest) returns (GuestPaymentProto);
   // Issue (if draft), email guest, notify Djengo user, write activity log.
   rpc SendGuestInvoice    (SendGuestInvoiceRequest)    returns (SendGuestInvoiceResponse);
   // Online payment (Paystack / Stripe): hosted checkout for the invoice balance,
@@ -4143,6 +4199,28 @@ message DisburseSalaryAdvanceRequest {
 message SyncAssetDisposalApprovalRequest {
   string company_id = 1;
   string asset_id = 2;
+}
+
+message SyncApprovalOutcomeRequest {
+  string company_id = 1;
+  string organization_id = 2;
+  // Chain slug: vendor | purchase_request | purchase_order | wallet_withdrawal
+  string entity_type = 3;
+  string entity_id = 4;
+  // APPROVED | REJECTED | CLOSED
+  string outcome = 5;
+  string actor_user_id = 6;
+  string comment = 7;
+  string approval_id = 8;
+}
+
+message SyncApprovalOutcomeResponse {
+  bool success = 1;
+  // True when this call changed the entity; false when it was already in sync.
+  bool applied = 2;
+  string message = 3;
+  // Entity status after the sync.
+  string entity_status = 4;
 }
 
 message ListApprovalBackfillCandidatesRequest {
