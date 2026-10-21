@@ -1034,6 +1034,8 @@ message Invitation {
   string status = 16;
   optional Company company = 17;
   InvitationType type = 18;
+  // Why a RESTRICTED invitation can't be accepted (e.g. email tied to another staff profile).
+  optional string status_reason = 19;
 }
 
 message GetInvitationByCodeResponse {
