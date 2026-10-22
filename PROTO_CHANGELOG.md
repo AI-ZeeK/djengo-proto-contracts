@@ -1,3 +1,12 @@
+## Unreleased — Magic link sign-in
+
+### `profile.proto`
+- `ProfileService.rpc RequestMagicLink` (`RequestMagicLinkRequest` / `RequestMagicLinkResponse`) — email a single-use sign-in link; always answers generically so it can't be used to probe for accounts
+- `ProfileService.rpc VerifyMagicLink` (`VerifyMagicLinkRequest` / `VerifyMagicLinkResponse`) — exchange the link's token for a session; `totp_required` means call again with the same token plus `totp_code`
+
+### `communication.proto`
+- `CommunicationService.rpc SendMagicLinkMail` (`SendMagicLinkMailRequest` / `SendMagicLinkMailResponse`) — `magic_link_url` is a live credential until it expires, so never log it
+
 ## Unreleased — Guided tours saved on the profile
 
 ### `profile.proto`

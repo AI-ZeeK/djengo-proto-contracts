@@ -37,6 +37,9 @@ service ProfileService {
   /// One-time code so a signed-in user can open the staff or guest app without re-entering credentials.
   rpc CreateAppHandoff(CreateAppHandoffRequest) returns (CreateAppHandoffResponse);
   rpc ConsumeAppHandoff(ConsumeAppHandoffRequest) returns (VerifyOtpResponse);
+  /// Passwordless sign-in: email a single-use link, then exchange its token for a session.
+  rpc RequestMagicLink(RequestMagicLinkRequest) returns (RequestMagicLinkResponse);
+  rpc VerifyMagicLink(VerifyMagicLinkRequest) returns (VerifyMagicLinkResponse);
   rpc SocialLogin(SocialLoginRequest) returns (SocialLoginResponse);
   rpc ListSocialIdentities(ListSocialIdentitiesRequest) returns (ListSocialIdentitiesResponse);
   rpc LinkSocialIdentity(LinkSocialIdentityRequest) returns (LinkSocialIdentityResponse);
@@ -1288,6 +1291,42 @@ message ConsumeAppHandoffRequest {
   string code = 1;
   optional string device_info = 2;
   optional SessionSource source = 3;
+}
+
+message RequestMagicLinkRequest {
+  string email = 1;
+  optional string ip = 2;
+}
+
+message RequestMagicLinkResponse {
+  bool success = 1;
+  optional string error = 2;
+  /// Always generic, whether or not the email has an account.
+  optional string message = 3;
+  int32 expires_in = 4;
+  /// Set only in development (never staging or production) so local clients can open the link directly.
+  optional string dev_magic_link = 5;
+}
+
+message VerifyMagicLinkRequest {
+  string token = 1;
+  optional string device_info = 2;
+  optional SessionSource source = 3;
+  optional string ip = 4;
+  /// Required when the account has TOTP enabled (see totp_required).
+  optional string totp_code = 5;
+}
+
+message VerifyMagicLinkResponse {
+  bool success = 1;
+  optional string error = 2;
+  optional string message = 3;
+  optional string access_token = 4;
+  optional string refresh_token = 5;
+  optional User user = 6;
+  /// The link is valid but the account needs an authenticator code. The link
+  /// stays usable: call again with the same token plus totp_code.
+  optional bool totp_required = 7;
 }
 
 

@@ -31,6 +31,7 @@ service CommunicationService {
   
   // Mail Management
   rpc SendOtpMail(SendOtpMailRequest) returns (SendOtpMailResponse);
+  rpc SendMagicLinkMail(SendMagicLinkMailRequest) returns (SendMagicLinkMailResponse);
   rpc SendStaffInvitationMail(SendStaffInvitationMailRequest) returns (SendStaffInvitationMailResponse);
   rpc SendBookingMail(SendBookingMailRequest) returns (SendBookingMailResponse);
   rpc SendOpsAlertMail(SendOpsAlertMailRequest) returns (SendOpsAlertMailResponse);
@@ -78,6 +79,20 @@ message SendOtpMailRequest {
   string name = 2;
   string otp = 3;
   SendOtpType type = 4;
+}
+
+// Passwordless sign-in link. magic_link_url is a bearer credential until it
+// expires: never log it.
+message SendMagicLinkMailRequest {
+  string email = 1;
+  string name = 2;
+  string magic_link_url = 3;
+  int32 expires_in_minutes = 4;
+}
+
+message SendMagicLinkMailResponse {
+  bool success = 1;
+  optional string error = 2;
 }
 
 enum SendOtpType {
