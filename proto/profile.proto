@@ -40,6 +40,8 @@ service ProfileService {
   /// Passwordless sign-in: email a single-use link, then exchange its token for a session.
   rpc RequestMagicLink(RequestMagicLinkRequest) returns (RequestMagicLinkResponse);
   rpc VerifyMagicLink(VerifyMagicLinkRequest) returns (VerifyMagicLinkResponse);
+  /// Identifier-first sign-in: which methods the sign-in page offers for an email.
+  rpc GetSignInOptions(GetSignInOptionsRequest) returns (GetSignInOptionsResponse);
   rpc SocialLogin(SocialLoginRequest) returns (SocialLoginResponse);
   rpc ListSocialIdentities(ListSocialIdentitiesRequest) returns (ListSocialIdentitiesResponse);
   rpc LinkSocialIdentity(LinkSocialIdentityRequest) returns (LinkSocialIdentityResponse);
@@ -1327,6 +1329,18 @@ message VerifyMagicLinkResponse {
   /// The link is valid but the account needs an authenticator code. The link
   /// stays usable: call again with the same token plus totp_code.
   optional bool totp_required = 7;
+}
+
+message GetSignInOptionsRequest {
+  string email = 1;
+}
+
+message GetSignInOptionsResponse {
+  /// Show the password field. Also true for unknown emails, so only
+  /// accounts without a password answer differently.
+  bool password = 1;
+  /// Offer an emailed sign-in link. Always true today.
+  bool magic_link = 2;
 }
 
 
