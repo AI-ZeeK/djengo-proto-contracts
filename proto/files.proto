@@ -393,3 +393,274 @@ enum FileVisibility {
 }
 
 
+
+// ── Document signing ─────────────────────────────────────────────────────
+// Place fields on a document, collect signatures in order, export a sealed PDF.
+// Field positions are PDF points on the page as displayed (top-left origin,
+// page rotation applied), the same space as a pdf.js viewport at scale 1.
+
+service SigningService {
+  /// Creates a DRAFT envelope; the file is converted to a signable PDF and stored.
+  rpc CreateEnvelope(CreateEnvelopeRequest) returns (EnvelopeResponse);
+  /// Edits a DRAFT envelope (title, order, recipients, fields).
+  rpc UpdateEnvelope(UpdateEnvelopeRequest) returns (EnvelopeResponse);
+  rpc SendEnvelope(EnvelopeActionRequest) returns (EnvelopeResponse);
+  rpc VoidEnvelope(EnvelopeActionRequest) returns (EnvelopeResponse);
+  rpc GetEnvelope(GetEnvelopeRequest) returns (EnvelopeResponse);
+  /// Latest envelope that isn't voided for a contract, booking document…
+  rpc GetEnvelopeBySource(GetEnvelopeBySourceRequest) returns (EnvelopeResponse);
+  rpc RecordEnvelopeView(SignerActionRequest) returns (EnvelopeResponse);
+  /// One recipient signs. When the last one signs, the sealed PDF is produced.
+  rpc SignEnvelope(SignEnvelopeRequest) returns (EnvelopeResponse);
+  rpc DeclineEnvelope(SignerActionRequest) returns (EnvelopeResponse);
+  /// Reusable layouts for documents sent many times (e.g. a booking agreement).
+  rpc PrepareSigningTemplate(PrepareSigningTemplateRequest) returns (SigningTemplateResponse);
+  rpc SaveSigningTemplate(SaveSigningTemplateRequest) returns (SigningTemplateResponse);
+  rpc GetSigningTemplate(GetSigningTemplateRequest) returns (SigningTemplateResponse);
+}
+
+message SigningRecipientInput {
+  /// EMPLOYEE, EMPLOYER, GUEST, COMPANY…; unique per envelope.
+  string role = 1;
+  /// USER (only user_id signs) or COMPANY (any authorized member of the company).
+  string signer_kind = 2;
+  optional string user_id = 3;
+  string name = 4;
+  optional string email = 5;
+  int32 routing_order = 6;
+}
+
+message SigningFieldInput {
+  string role = 1;
+  /// SIGNATURE | INITIALS | DATE_SIGNED | FULL_NAME | TEXT | CHECKBOX
+  string type = 2;
+  /// 1-based.
+  int32 page = 3;
+  double x = 4;
+  double y = 5;
+  double width = 6;
+  double height = 7;
+  bool required = 8;
+  optional string label = 9;
+}
+
+message CreateEnvelopeRequest {
+  string company_id = 1;
+  optional string organization_id = 2;
+  /// employment_contract | engagement_document
+  string source_type = 3;
+  string source_id = 4;
+  string title = 5;
+  /// A file stored by this service (temp or permanent upload).
+  string file_url = 6;
+  string created_by = 7;
+  optional string created_by_name = 8;
+  bool sequential = 9;
+  repeated SigningRecipientInput recipients = 10;
+  repeated SigningFieldInput fields = 11;
+  /// Copy fields from this template when it was laid out on the same file.
+  optional string template_source_type = 12;
+  optional string template_source_id = 13;
+  /// Void an open envelope for the same source instead of refusing.
+  bool replace_existing = 14;
+  optional string company_name = 15;
+}
+
+message UpdateEnvelopeRequest {
+  string envelope_id = 1;
+  string company_id = 2;
+  string actor_user_id = 3;
+  optional string actor_name = 4;
+  optional string title = 5;
+  optional bool sequential = 6;
+  /// The lists below replace what's stored only when their flag is set.
+  bool replace_recipients = 7;
+  repeated SigningRecipientInput recipients = 8;
+  bool replace_fields = 9;
+  repeated SigningFieldInput fields = 10;
+}
+
+message EnvelopeActionRequest {
+  string envelope_id = 1;
+  string company_id = 2;
+  string actor_user_id = 3;
+  optional string actor_name = 4;
+  optional string reason = 5;
+  optional string ip = 6;
+  optional string user_agent = 7;
+}
+
+message GetEnvelopeRequest {
+  string envelope_id = 1;
+}
+
+message GetEnvelopeBySourceRequest {
+  string source_type = 1;
+  string source_id = 2;
+}
+
+message SignerActionRequest {
+  string envelope_id = 1;
+  string role = 2;
+  string user_id = 3;
+  optional string actor_name = 4;
+  optional string reason = 5;
+  optional string ip = 6;
+  optional string user_agent = 7;
+}
+
+message SigningFieldValue {
+  string field_id = 1;
+  /// TEXT input, or "true"/"false" for CHECKBOX.
+  string value = 2;
+}
+
+message SignEnvelopeRequest {
+  string envelope_id = 1;
+  string role = 2;
+  string user_id = 3;
+  string signed_name = 4;
+  /// DRAW (signature_image) | TYPE (signature_text)
+  string signature_method = 5;
+  optional bytes signature_image = 6;
+  optional string signature_text = 7;
+  optional bytes initials_image = 8;
+  optional string initials_text = 9;
+  repeated SigningFieldValue values = 10;
+  /// The signer agreed to sign electronically.
+  bool consent = 11;
+  optional string ip = 12;
+  optional string user_agent = 13;
+}
+
+message SigningPageSize {
+  double width = 1;
+  double height = 2;
+}
+
+message SigningRecipient {
+  string recipient_id = 1;
+  string role = 2;
+  string signer_kind = 3;
+  optional string user_id = 4;
+  string name = 5;
+  optional string email = 6;
+  int32 routing_order = 7;
+  /// PENDING | SIGNED | DECLINED
+  string status = 8;
+  optional string viewed_at = 9;
+  optional string signed_at = 10;
+  optional string signed_name = 11;
+  optional string signature_method = 12;
+  optional string signature_image_url = 13;
+  optional string signature_text = 14;
+  optional string declined_at = 15;
+  optional string decline_reason = 16;
+  /// Pending, the envelope is out, and (in order) everyone before has signed.
+  bool can_sign_now = 17;
+}
+
+message SigningField {
+  string field_id = 1;
+  string role = 2;
+  string type = 3;
+  int32 page = 4;
+  double x = 5;
+  double y = 6;
+  double width = 7;
+  double height = 8;
+  bool required = 9;
+  optional string label = 10;
+  optional string value = 11;
+  optional string filled_at = 12;
+}
+
+message SigningEvent {
+  string event_id = 1;
+  string action = 2;
+  optional string role = 3;
+  optional string actor_name = 4;
+  optional string ip = 5;
+  string created_at = 6;
+}
+
+message SigningEnvelope {
+  string envelope_id = 1;
+  string company_id = 2;
+  optional string organization_id = 3;
+  string source_type = 4;
+  string source_id = 5;
+  string title = 6;
+  /// DRAFT | SENT | COMPLETED | DECLINED | VOIDED
+  string status = 7;
+  bool sequential = 8;
+  /// The signable PDF (images are converted when the envelope is created).
+  string original_file_url = 9;
+  string original_sha256 = 10;
+  repeated SigningPageSize page_sizes = 11;
+  /// The stamped, certified and sealed PDF once everyone has signed.
+  optional string completed_file_url = 12;
+  optional string completed_sha256 = 13;
+  string created_by = 14;
+  string created_at = 15;
+  optional string sent_at = 16;
+  optional string completed_at = 17;
+  optional string voided_at = 18;
+  optional string void_reason = 19;
+  repeated SigningRecipient recipients = 20;
+  repeated SigningField fields = 21;
+  repeated SigningEvent events = 22;
+  optional string company_name = 23;
+}
+
+message EnvelopeResponse {
+  bool success = 1;
+  optional string message = 2;
+  optional SigningEnvelope envelope = 3;
+}
+
+message PrepareSigningTemplateRequest {
+  string company_id = 1;
+  /// engagement_requirement | contract_template
+  string source_type = 2;
+  string source_id = 3;
+  string file_url = 4;
+  string updated_by = 5;
+}
+
+message SaveSigningTemplateRequest {
+  string company_id = 1;
+  string source_type = 2;
+  string source_id = 3;
+  string updated_by = 4;
+  bool sequential = 5;
+  repeated SigningRecipientInput roles = 6;
+  repeated SigningFieldInput fields = 7;
+}
+
+message GetSigningTemplateRequest {
+  string source_type = 1;
+  string source_id = 2;
+}
+
+message SigningTemplate {
+  string template_id = 1;
+  string company_id = 2;
+  string source_type = 3;
+  string source_id = 4;
+  /// The signable PDF the layout sits on.
+  string file_url = 5;
+  /// SHA-256 of the uploaded source file the layout belongs to.
+  string file_sha256 = 6;
+  repeated SigningPageSize page_sizes = 7;
+  repeated SigningRecipientInput roles = 8;
+  repeated SigningFieldInput fields = 9;
+  bool sequential = 10;
+  string updated_at = 11;
+}
+
+message SigningTemplateResponse {
+  bool success = 1;
+  optional string message = 2;
+  optional SigningTemplate template = 3;
+}

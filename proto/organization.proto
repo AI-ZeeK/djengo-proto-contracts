@@ -5,6 +5,8 @@ package organization;
 /// Core lifecycle: organizations, companies, partners, listings, employee numbers.
 service OrganizationService {
   rpc CreateOrganization(CreateOrganizationRequest) returns (OrganizationResponse);
+  /// Owner edits the organization's own details (settings page). Partial: unset fields are left as they are.
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (OrganizationResponse);
 
   rpc ValidateCompanyReference(ValidateCompanyReferenceRequest) returns (ValidateCompanyReferenceResponse);
 
@@ -995,6 +997,18 @@ message CreateOrganizationRequest {
   string email = 4;
   string registration_number = 5;
   string registration_date = 6;
+}
+
+message UpdateOrganizationRequest {
+  string organization_id = 1;
+  optional string name = 2;
+  optional string email = 3;
+  optional string phone_number = 4;
+  optional string registration_number = 5;
+  /// ISO date; empty clears it.
+  optional string registration_date = 6;
+  /// Can be turned on, never back off; an organization with several companies cannot go back to one.
+  optional bool is_multi_company = 7;
 }
 
 message TransferOrganizationCreatorRequest {
