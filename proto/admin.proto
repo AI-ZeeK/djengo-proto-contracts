@@ -642,3 +642,280 @@ message DatabaseBackupChunk {
   string file_name = 2;  // set on the first chunk
   string size_bytes = 3; // set on the first chunk
 }
+
+// ── Outreach ─────────────────────────────────────────────────────────────
+// Find hospitality businesses, review them, push approved ones to a cold-email
+// tool (Instantly) and give campaign signups a longer trial via a code.
+
+service OutreachService {
+  /// Google Places search for one city and business type; new leads only.
+  rpc DiscoverLeads(DiscoverLeadsRequest) returns (DiscoverLeadsResponse);
+  /// Look for a contact email on each lead's own website.
+  rpc FindLeadEmails(LeadIdsRequest) returns (OutreachLeadsResponse);
+  rpc ListLeads(ListOutreachLeadsRequest) returns (OutreachLeadsResponse);
+  rpc CreateLead(CreateOutreachLeadRequest) returns (OutreachLeadResponse);
+  rpc UpdateLead(UpdateOutreachLeadRequest) returns (OutreachLeadResponse);
+  /// Approve or reject leads before they can be emailed.
+  rpc ReviewLeads(ReviewOutreachLeadsRequest) returns (OutreachLeadsResponse);
+
+  rpc ListCampaigns(ListOutreachCampaignsRequest) returns (OutreachCampaignsResponse);
+  rpc CreateCampaign(UpsertOutreachCampaignRequest) returns (OutreachCampaignResponse);
+  rpc UpdateCampaign(UpsertOutreachCampaignRequest) returns (OutreachCampaignResponse);
+  /// Send approved leads to the campaign in the cold-email tool.
+  rpc PushCampaignLeads(PushCampaignLeadsRequest) returns (PushCampaignLeadsResponse);
+  /// Webhook from the cold-email tool (opens, replies, unsubscribes, bounces…).
+  rpc RecordProviderEvent(ProviderEventRequest) returns (ProviderEventResponse);
+
+  /// Public: what a campaign code offers (landing page).
+  rpc CheckTrialCode(TrialCodeRequest) returns (TrialCodeResponse);
+  /// A new organization claims a campaign code; one code per organization.
+  rpc RedeemTrialCode(RedeemTrialCodeRequest) returns (TrialCodeResponse);
+
+  rpc ListSuppressions(ListSuppressionsRequest) returns (SuppressionsResponse);
+  rpc AddSuppression(AddSuppressionRequest) returns (SuppressionsResponse);
+  rpc RemoveSuppression(RemoveSuppressionRequest) returns (SuppressionsResponse);
+}
+
+message OutreachLead {
+  string lead_id = 1;
+  /// GOOGLE_PLACES | OPENSTREETMAP | MANUAL
+  string source = 2;
+  optional string place_id = 3;
+  string name = 4;
+  /// HOTEL | SHORT_LET | RESTAURANT | HOSPITAL | ESTATE
+  string category = 5;
+  /// NG | GH | RW
+  string country = 6;
+  string city = 7;
+  optional string address = 8;
+  optional string phone = 9;
+  optional string website = 10;
+  optional string email = 11;
+  /// WEBSITE | MAP (listed on OpenStreetMap) | MANUAL
+  optional string email_source = 12;
+  repeated string email_candidates = 13;
+  optional double rating = 14;
+  optional int32 review_count = 15;
+  /// NEW | APPROVED | REJECTED | QUEUED | CONTACTED | REPLIED | INTERESTED | SIGNED_UP | UNSUBSCRIBED | BOUNCED
+  string status = 16;
+  optional string reject_reason = 17;
+  optional string notes = 18;
+  optional string campaign_id = 19;
+  optional string contacted_at = 20;
+  optional string opened_at = 21;
+  optional string clicked_at = 22;
+  optional string replied_at = 23;
+  optional string reviewed_at = 24;
+  optional string enriched_at = 25;
+  optional string converted_org_id = 26;
+  string created_at = 27;
+  /// On the do-not-contact list.
+  bool suppressed = 28;
+}
+
+message DiscoverLeadsRequest {
+  string country = 1;
+  string city = 2;
+  string category = 3;
+  /// Optional extra words, e.g. "boutique" or "Wuse 2".
+  optional string query = 4;
+  /// Up to 60 per search (Google's limit).
+  int32 max_results = 5;
+  string requested_by = 6;
+  /// OPENSTREETMAP (free, no key) | GOOGLE_PLACES (needs GOOGLE_PLACES_API_KEY).
+  optional string source = 7;
+}
+
+message DiscoverLeadsResponse {
+  int32 found = 1;
+  int32 created = 2;
+  int32 already_known = 3;
+  repeated OutreachLead leads = 4;
+}
+
+message LeadIdsRequest {
+  repeated string lead_ids = 1;
+}
+
+message ListOutreachLeadsRequest {
+  optional string status = 1;
+  optional string country = 2;
+  optional string city = 3;
+  optional string category = 4;
+  optional string search = 5;
+  optional string campaign_id = 6;
+  /// Only leads with / without an email.
+  optional bool has_email = 7;
+  int32 page = 8;
+  int32 page_size = 9;
+}
+
+message OutreachLeadsResponse {
+  repeated OutreachLead leads = 1;
+  int32 total = 2;
+}
+
+message OutreachLeadResponse {
+  OutreachLead lead = 1;
+}
+
+message CreateOutreachLeadRequest {
+  string name = 1;
+  string category = 2;
+  string country = 3;
+  string city = 4;
+  optional string address = 5;
+  optional string phone = 6;
+  optional string website = 7;
+  optional string email = 8;
+  optional string notes = 9;
+  string created_by = 10;
+}
+
+message UpdateOutreachLeadRequest {
+  string lead_id = 1;
+  optional string name = 2;
+  optional string email = 3;
+  optional string phone = 4;
+  optional string website = 5;
+  optional string notes = 6;
+  optional string category = 7;
+}
+
+message ReviewOutreachLeadsRequest {
+  repeated string lead_ids = 1;
+  /// APPROVE | REJECT | RESET (back to NEW)
+  string decision = 2;
+  optional string reason = 3;
+  string reviewer_id = 4;
+}
+
+message OutreachCampaign {
+  string campaign_id = 1;
+  string name = 2;
+  string code = 3;
+  string country = 4;
+  string city = 5;
+  string category = 6;
+  int32 trial_days = 7;
+  /// DRAFT | ACTIVE | PAUSED | ENDED
+  string status = 8;
+  string provider = 9;
+  optional string provider_campaign_id = 10;
+  optional string expires_at = 11;
+  string signup_url = 12;
+  string created_at = 13;
+  int32 leads = 14;
+  int32 contacted = 15;
+  int32 opened = 16;
+  int32 clicked = 17;
+  int32 replied = 18;
+  int32 signed_up = 19;
+  int32 unsubscribed = 20;
+  int32 bounced = 21;
+  int32 redemptions = 22;
+}
+
+message ListOutreachCampaignsRequest {
+  optional string status = 1;
+}
+
+message OutreachCampaignsResponse {
+  repeated OutreachCampaign campaigns = 1;
+}
+
+message OutreachCampaignResponse {
+  OutreachCampaign campaign = 1;
+}
+
+message UpsertOutreachCampaignRequest {
+  /// Set on update.
+  optional string campaign_id = 1;
+  optional string name = 2;
+  optional string country = 3;
+  optional string city = 4;
+  optional string category = 5;
+  optional int32 trial_days = 6;
+  optional string status = 7;
+  /// The campaign's ID in Instantly (create the sequence there, paste the ID here).
+  optional string provider_campaign_id = 8;
+  optional string expires_at = 9;
+  string actor_id = 10;
+}
+
+message PushCampaignLeadsRequest {
+  string campaign_id = 1;
+  /// Empty = every approved lead with an email matching the campaign's city and type.
+  repeated string lead_ids = 2;
+}
+
+message PushCampaignLeadsResponse {
+  int32 sent = 1;
+  int32 uploaded = 2;
+  int32 skipped_suppressed = 3;
+  int32 skipped_no_email = 4;
+  int32 skipped_by_provider = 5;
+  optional string message = 6;
+}
+
+message ProviderEventRequest {
+  /// INSTANTLY
+  string provider = 1;
+  /// The raw webhook body.
+  string payload_json = 2;
+}
+
+message ProviderEventResponse {
+  bool matched = 1;
+  optional string lead_id = 2;
+}
+
+message TrialCodeRequest {
+  string code = 1;
+}
+
+message RedeemTrialCodeRequest {
+  string code = 1;
+  string organization_id = 2;
+  string redeemed_by = 3;
+}
+
+message TrialCodeResponse {
+  bool valid = 1;
+  int32 trial_days = 2;
+  optional string campaign_id = 3;
+  optional string city = 4;
+  optional string country = 5;
+  optional string category = 6;
+  optional string expires_at = 7;
+  /// Why it can't be used (expired, ended, already used…).
+  optional string reason = 8;
+}
+
+message OutreachSuppression {
+  string suppression_id = 1;
+  /// An email address, or "@domain.com" for a whole domain.
+  string value = 2;
+  /// UNSUBSCRIBED | BOUNCED | REQUESTED | MANUAL
+  string reason = 3;
+  optional string note = 4;
+  string created_at = 5;
+}
+
+message ListSuppressionsRequest {
+  optional string search = 1;
+}
+
+message AddSuppressionRequest {
+  string value = 1;
+  string reason = 2;
+  optional string note = 3;
+}
+
+message RemoveSuppressionRequest {
+  string suppression_id = 1;
+}
+
+message SuppressionsResponse {
+  repeated OutreachSuppression suppressions = 1;
+}

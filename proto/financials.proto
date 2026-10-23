@@ -270,6 +270,8 @@ service FinancialsService {
   rpc GetSaasSubscriptionAnalytics (GetSaasSubscriptionAnalyticsRequest) returns (SaasSubscriptionAnalyticsResponse);
   rpc GetOrganizationSubscription (GetOrganizationSubscriptionRequest) returns (OrganizationSubscriptionResponse);
   rpc AttachOrganizationTrial (AttachOrganizationTrialRequest) returns (OrganizationSubscriptionResponse);
+  /// Lengthen a new organization's trial (e.g. an outreach offer code). Never shortens; trialing only.
+  rpc ExtendOrganizationTrial (ExtendOrganizationTrialRequest) returns (OrganizationSubscriptionResponse);
   rpc CheckStaffSeatAvailability (CheckStaffSeatAvailabilityRequest) returns (CheckStaffSeatAvailabilityResponse);
 
   // ── Revenue streams (hospitality taxonomy) — FinancialsService only ───────
@@ -3936,6 +3938,14 @@ message GetOrganizationSubscriptionRequest {
 
 message AttachOrganizationTrialRequest {
   string organization_id = 1;
+}
+
+message ExtendOrganizationTrialRequest {
+  string organization_id = 1;
+  /// Trial length counted from the trial's start.
+  int32 trial_days = 2;
+  /// Shown in logs, e.g. "outreach code HTL-ABJ-7Q2K".
+  optional string reason = 3;
 }
 
 message CheckStaffSeatAvailabilityRequest {
