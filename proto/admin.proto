@@ -674,6 +674,11 @@ service OutreachService {
   rpc ListSuppressions(ListSuppressionsRequest) returns (SuppressionsResponse);
   rpc AddSuppression(AddSuppressionRequest) returns (SuppressionsResponse);
   rpc RemoveSuppression(RemoveSuppressionRequest) returns (SuppressionsResponse);
+
+  /// Cities outreach can search in; any city can be added (geocoded with OpenStreetMap).
+  rpc ListCities(ListOutreachCitiesRequest) returns (OutreachCitiesResponse);
+  rpc AddCity(AddOutreachCityRequest) returns (OutreachCitiesResponse);
+  rpc UpdateCity(UpdateOutreachCityRequest) returns (OutreachCitiesResponse);
 }
 
 message OutreachLead {
@@ -684,7 +689,7 @@ message OutreachLead {
   string name = 4;
   /// HOTEL | SHORT_LET | RESTAURANT | HOSPITAL | ESTATE
   string category = 5;
-  /// NG | GH | RW
+  /// ISO country code of one of the target cities
   string country = 6;
   string city = 7;
   optional string address = 8;
@@ -918,4 +923,367 @@ message RemoveSuppressionRequest {
 
 message SuppressionsResponse {
   repeated OutreachSuppression suppressions = 1;
+}
+
+message OutreachCity {
+  string city_id = 1;
+  string name = 2;
+  /// ISO 3166-1 alpha-2
+  string country = 3;
+  string country_name = 4;
+  /// Three letters used in campaign codes
+  string short = 5;
+  double lat = 6;
+  double lng = 7;
+  int32 radius_meters = 8;
+  bool active = 9;
+  int32 leads = 10;
+}
+
+message ListOutreachCitiesRequest {
+  /// Include switched-off cities
+  bool include_inactive = 1;
+}
+
+message AddOutreachCityRequest {
+  string name = 1;
+  /// Country name or ISO code, e.g. "Portugal" or "PT"
+  string country = 2;
+  optional string short = 3;
+  optional int32 radius_meters = 4;
+  string created_by = 5;
+}
+
+message UpdateOutreachCityRequest {
+  string city_id = 1;
+  optional bool active = 2;
+  optional int32 radius_meters = 3;
+}
+
+message OutreachCitiesResponse {
+  repeated OutreachCity cities = 1;
+  /// The city just added or changed
+  optional OutreachCity city = 2;
+}
+
+// ============================================================================
+// CAREERS — the signed-in admin's own job search
+// ============================================================================
+
+service CareersService {
+  /// Whether Claude and the mailbox are set up, and today's send count.
+  rpc GetStatus(CareerAdminRequest) returns (CareersStatusResponse);
+
+  rpc GetProfile(CareerAdminRequest) returns (CareerProfileResponse);
+  rpc SaveProfile(SaveCareerProfileRequest) returns (CareerProfileResponse);
+  /// Read an uploaded resume (PDF, DOCX text or plain text) into the profile.
+  rpc ImportResume(ImportResumeRequest) returns (CareerProfileResponse);
+
+  /// Pull new software roles from the job boards and watched company pages.
+  rpc SyncJobs(SyncJobsRequest) returns (SyncJobsResponse);
+  rpc ListJobs(ListCareerJobsRequest) returns (CareerJobsResponse);
+  rpc GetJob(CareerJobRequest) returns (CareerJobResponse);
+  /// Save, dismiss or reset jobs.
+  rpc SetJobStatus(SetCareerJobStatusRequest) returns (CareerJobsResponse);
+  /// Claude reads each job against the resume: score, strengths, gaps.
+  rpc AnalyzeFit(AnalyzeFitRequest) returns (CareerJobsResponse);
+  /// Companies with open software roles, grouped from the jobs.
+  rpc ListCompanies(ListHiringCompaniesRequest) returns (HiringCompaniesResponse);
+
+  /// Tailored resume, cover letter and email for one job; saved as a draft.
+  rpc DraftApplication(DraftApplicationRequest) returns (CareerApplicationResponse);
+  rpc ListApplications(ListCareerApplicationsRequest) returns (CareerApplicationsResponse);
+  rpc UpdateApplication(UpdateCareerApplicationRequest) returns (CareerApplicationResponse);
+  /// Email a reviewed draft from the admin's mailbox, resume attached as PDF.
+  rpc SendApplication(CareerApplicationRequest) returns (CareerApplicationResponse);
+  /// The master resume (no application id) or a tailored one as a PDF.
+  rpc RenderResumePdf(RenderResumeRequest) returns (ResumePdfResponse);
+
+  rpc ListBoards(CareerAdminRequest) returns (CareerBoardsResponse);
+  rpc AddBoard(AddCareerBoardRequest) returns (CareerBoardsResponse);
+  rpc RemoveBoard(RemoveCareerBoardRequest) returns (CareerBoardsResponse);
+}
+
+message CareerAdminRequest {
+  string admin_id = 1;
+}
+
+message CareersStatusResponse {
+  bool claude_configured = 1;
+  bool mail_configured = 2;
+  optional string mail_from = 3;
+  int32 sent_today = 4;
+  int32 daily_send_limit = 5;
+  optional string last_synced_at = 6;
+  int32 jobs = 7;
+}
+
+message CareerProfile {
+  string full_name = 1;
+  string email = 2;
+  optional string phone = 3;
+  optional string location = 4;
+  repeated string links = 5;
+  optional string headline = 6;
+  string resume_markdown = 7;
+  repeated string target_roles = 8;
+  repeated string skills = 9;
+  repeated string preferred_locations = 10;
+  bool remote_only = 11;
+  optional int32 min_salary_usd = 12;
+  optional string signature = 13;
+  optional string updated_at = 14;
+}
+
+message CareerProfileResponse {
+  CareerProfile profile = 1;
+}
+
+message SaveCareerProfileRequest {
+  string admin_id = 1;
+  optional string full_name = 2;
+  optional string email = 3;
+  optional string phone = 4;
+  optional string location = 5;
+  repeated string links = 6;
+  optional string headline = 7;
+  optional string resume_markdown = 8;
+  repeated string target_roles = 9;
+  repeated string skills = 10;
+  repeated string preferred_locations = 11;
+  optional bool remote_only = 12;
+  optional int32 min_salary_usd = 13;
+  optional string signature = 14;
+  /// Repeated fields can't say "not sent"; these say which lists to replace.
+  bool set_links = 15;
+  bool set_target_roles = 16;
+  bool set_skills = 17;
+  bool set_preferred_locations = 18;
+}
+
+message ImportResumeRequest {
+  string admin_id = 1;
+  bytes content = 2;
+  string mime_type = 3;
+  string file_name = 4;
+}
+
+message SyncJobsRequest {
+  string admin_id = 1;
+  /// Empty = every source
+  repeated string sources = 2;
+}
+
+message SyncSourceResult {
+  string source = 1;
+  int32 fetched = 2;
+  /// Software roles among them
+  int32 kept = 3;
+  int32 created = 4;
+  optional string error = 5;
+}
+
+message SyncJobsResponse {
+  repeated SyncSourceResult results = 1;
+  int32 created = 2;
+  int32 total = 3;
+}
+
+message CareerJob {
+  string job_id = 1;
+  string source = 2;
+  string title = 3;
+  string company = 4;
+  optional string company_url = 5;
+  optional string location = 6;
+  bool remote = 7;
+  optional string employment_type = 8;
+  optional string salary = 9;
+  string url = 10;
+  optional string apply_url = 11;
+  optional string apply_email = 12;
+  /// A short excerpt in lists; the whole text from GetJob
+  string description = 13;
+  repeated string tags = 14;
+  optional string posted_at = 15;
+  string first_seen_at = 16;
+  int32 keyword_score = 17;
+  optional int32 fit_score = 18;
+  /// STRONG | GOOD | STRETCH | POOR
+  optional string fit_verdict = 19;
+  optional string fit_summary = 20;
+  repeated string strengths = 21;
+  repeated string gaps = 22;
+  /// NEW | SAVED | DISMISSED | APPLIED
+  string status = 23;
+  optional string analyzed_at = 24;
+  optional string application_id = 25;
+  optional string application_status = 26;
+}
+
+message ListCareerJobsRequest {
+  string admin_id = 1;
+  optional string search = 2;
+  optional string source = 3;
+  /// NEW | SAVED | DISMISSED | APPLIED; empty = everything but dismissed
+  optional string status = 4;
+  optional bool remote_only = 5;
+  optional int32 min_score = 6;
+  optional int32 posted_within_days = 7;
+  optional bool analyzed_only = 8;
+  optional string company = 9;
+  /// SCORE (default) | FIT | NEWEST
+  optional string sort = 10;
+  int32 page = 11;
+  int32 page_size = 12;
+}
+
+message CareerJobsResponse {
+  repeated CareerJob jobs = 1;
+  int32 total = 2;
+}
+
+message CareerJobRequest {
+  string admin_id = 1;
+  string job_id = 2;
+}
+
+message CareerJobResponse {
+  CareerJob job = 1;
+}
+
+message SetCareerJobStatusRequest {
+  string admin_id = 1;
+  repeated string job_ids = 2;
+  string status = 3;
+}
+
+message AnalyzeFitRequest {
+  string admin_id = 1;
+  repeated string job_ids = 2;
+}
+
+message ListHiringCompaniesRequest {
+  string admin_id = 1;
+  optional string search = 2;
+  optional int32 posted_within_days = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+}
+
+message HiringCompany {
+  string company = 1;
+  optional string company_url = 2;
+  int32 open_roles = 3;
+  int32 remote_roles = 4;
+  int32 best_score = 5;
+  optional int32 best_fit = 6;
+  optional string latest_posted_at = 7;
+  repeated string sources = 8;
+  repeated string titles = 9;
+  /// Any address a posting gave to apply to
+  optional string apply_email = 10;
+}
+
+message HiringCompaniesResponse {
+  repeated HiringCompany companies = 1;
+  int32 total = 2;
+}
+
+message CareerApplication {
+  string application_id = 1;
+  string job_id = 2;
+  optional string to_email = 3;
+  string subject = 4;
+  string body = 5;
+  string cover_letter = 6;
+  string resume_markdown = 7;
+  /// DRAFT | SENT | FAILED | APPLIED_EXTERNALLY | INTERVIEW | OFFER | REJECTED | NO_REPLY
+  string status = 8;
+  optional string error = 9;
+  optional string notes = 10;
+  optional string sent_at = 11;
+  string created_at = 12;
+  string updated_at = 13;
+  CareerJob job = 14;
+}
+
+message DraftApplicationRequest {
+  string admin_id = 1;
+  string job_id = 2;
+  optional string to_email = 3;
+  /// Anything to stress or mention, e.g. a referral or a project to lead with
+  optional string instructions = 4;
+}
+
+message ListCareerApplicationsRequest {
+  string admin_id = 1;
+  optional string status = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message CareerApplicationsResponse {
+  repeated CareerApplication applications = 1;
+  int32 total = 2;
+}
+
+message UpdateCareerApplicationRequest {
+  string admin_id = 1;
+  string application_id = 2;
+  optional string to_email = 3;
+  optional string subject = 4;
+  optional string body = 5;
+  optional string cover_letter = 6;
+  optional string resume_markdown = 7;
+  optional string status = 8;
+  optional string notes = 9;
+}
+
+message CareerApplicationRequest {
+  string admin_id = 1;
+  string application_id = 2;
+}
+
+message CareerApplicationResponse {
+  CareerApplication application = 1;
+}
+
+message RenderResumeRequest {
+  string admin_id = 1;
+  optional string application_id = 2;
+}
+
+message ResumePdfResponse {
+  string file_name = 1;
+  bytes content = 2;
+}
+
+message CareerBoard {
+  string board_id = 1;
+  /// GREENHOUSE | LEVER | ASHBY
+  string ats = 2;
+  string slug = 3;
+  string name = 4;
+  bool active = 5;
+  optional string last_synced_at = 6;
+  optional string last_error = 7;
+  int32 open_roles = 8;
+}
+
+message AddCareerBoardRequest {
+  string admin_id = 1;
+  string ats = 2;
+  /// The board name, or a careers-page URL to read it from
+  string slug = 3;
+  optional string name = 4;
+}
+
+message RemoveCareerBoardRequest {
+  string admin_id = 1;
+  string board_id = 2;
+}
+
+message CareerBoardsResponse {
+  repeated CareerBoard boards = 1;
 }
