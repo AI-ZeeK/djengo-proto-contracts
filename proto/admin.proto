@@ -665,6 +665,12 @@ service OutreachService {
   rpc PushCampaignLeads(PushCampaignLeadsRequest) returns (PushCampaignLeadsResponse);
   /// Webhook from the cold-email tool (opens, replies, unsubscribes, bounces…).
   rpc RecordProviderEvent(ProviderEventRequest) returns (ProviderEventResponse);
+  /// Campaigns sent from the business mailbox: is it set up, how much went out today.
+  rpc GetMailboxStatus(MailboxStatusRequest) returns (MailboxStatusResponse);
+  /// Render a campaign's email for one lead, and optionally send it as a test.
+  rpc PreviewCampaignEmail(PreviewCampaignEmailRequest) returns (PreviewCampaignEmailResponse);
+  /// Public: the unsubscribe link in mailbox campaign emails.
+  rpc Unsubscribe(OutreachUnsubscribeRequest) returns (OutreachUnsubscribeResponse);
 
   /// Public: what a campaign code offers (landing page).
   rpc CheckTrialCode(TrialCodeRequest) returns (TrialCodeResponse);
@@ -819,6 +825,14 @@ message OutreachCampaign {
   int32 unsubscribed = 20;
   int32 bounced = 21;
   int32 redemptions = 22;
+  /// MAILBOX campaigns: the emails, with {{merge_tags}}.
+  optional string subject = 23;
+  optional string body = 24;
+  /// Sent once, follow_up_days after the first email, unless they replied. Empty = no follow-up.
+  optional string follow_up_body = 25;
+  int32 follow_up_days = 26;
+  /// Waiting to be sent from the mailbox.
+  int32 queued = 27;
 }
 
 message ListOutreachCampaignsRequest {
@@ -846,6 +860,56 @@ message UpsertOutreachCampaignRequest {
   optional string provider_campaign_id = 8;
   optional string expires_at = 9;
   string actor_id = 10;
+  /// MAILBOX (the business mailbox, default) | INSTANTLY
+  optional string provider = 11;
+  optional string subject = 12;
+  optional string body = 13;
+  optional string follow_up_body = 14;
+  optional int32 follow_up_days = 15;
+}
+
+message MailboxStatusRequest {}
+
+message MailboxStatusResponse {
+  bool configured = 1;
+  optional string from = 2;
+  /// Settings still to set on admin-service.
+  repeated string missing = 3;
+  int32 sent_today = 4;
+  int32 daily_limit = 5;
+  /// Replies, bounces and unsubscribe replies are read from the inbox (IMAP).
+  bool replies_tracked = 6;
+  /// Local hours in each lead's city, e.g. "8-17".
+  string send_hours = 7;
+  int32 queued = 8;
+  optional string last_error = 9;
+  optional string last_inbox_check_at = 10;
+}
+
+message PreviewCampaignEmailRequest {
+  string campaign_id = 1;
+  /// Defaults to a sample business.
+  optional string lead_id = 2;
+  /// 1 = first email (default), 2 = follow-up.
+  optional int32 step = 3;
+  /// Send it to this address as a test (not counted, not tracked).
+  optional string send_test_to = 4;
+}
+
+message PreviewCampaignEmailResponse {
+  string to = 1;
+  string subject = 2;
+  string text = 3;
+  optional string sent_to = 4;
+}
+
+message OutreachUnsubscribeRequest {
+  string token = 1;
+}
+
+message OutreachUnsubscribeResponse {
+  bool ok = 1;
+  optional string email = 2;
 }
 
 message PushCampaignLeadsRequest {
