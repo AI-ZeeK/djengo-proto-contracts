@@ -661,6 +661,8 @@ service OutreachService {
   rpc ListCampaigns(ListOutreachCampaignsRequest) returns (OutreachCampaignsResponse);
   rpc CreateCampaign(UpsertOutreachCampaignRequest) returns (OutreachCampaignResponse);
   rpc UpdateCampaign(UpsertOutreachCampaignRequest) returns (OutreachCampaignResponse);
+  /// Delete a campaign that hasn't emailed anyone yet (tests, mistakes).
+  rpc DeleteCampaign(DeleteOutreachCampaignRequest) returns (DeleteOutreachCampaignResponse);
   /// Send approved leads to the campaign in the cold-email tool.
   rpc PushCampaignLeads(PushCampaignLeadsRequest) returns (PushCampaignLeadsResponse);
   /// Webhook from the cold-email tool (opens, replies, unsubscribes, bounces…).
@@ -912,6 +914,16 @@ message OutreachUnsubscribeRequest {
 message OutreachUnsubscribeResponse {
   bool ok = 1;
   optional string email = 2;
+}
+
+message DeleteOutreachCampaignRequest {
+  string campaign_id = 1;
+}
+
+message DeleteOutreachCampaignResponse {
+  bool ok = 1;
+  /// Leads that were waiting to be sent, now back to approved.
+  int32 released = 2;
 }
 
 message PushCampaignLeadsRequest {
