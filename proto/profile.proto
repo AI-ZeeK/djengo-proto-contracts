@@ -37,6 +37,11 @@ service ProfileService {
   /// One-time code so a signed-in user can open the staff or guest app without re-entering credentials.
   rpc CreateAppHandoff(CreateAppHandoffRequest) returns (CreateAppHandoffResponse);
   rpc ConsumeAppHandoff(ConsumeAppHandoffRequest) returns (VerifyOtpResponse);
+  /// Shared sign-in across the djengo.app apps: a browser-wide token (kept in a
+  /// .djengo.app cookie by the gateway) that each app trades for its own session.
+  rpc StartSso(StartSsoRequest) returns (StartSsoResponse);
+  rpc ExchangeSso(ExchangeSsoRequest) returns (VerifyOtpResponse);
+  rpc EndSso(EndSsoRequest) returns (EndSsoResponse);
   /// Passwordless sign-in: email a single-use link, then exchange its token for a session.
   rpc RequestMagicLink(RequestMagicLinkRequest) returns (RequestMagicLinkResponse);
   rpc VerifyMagicLink(VerifyMagicLinkRequest) returns (VerifyMagicLinkResponse);
@@ -1287,6 +1292,33 @@ message CreateAppHandoffResponse {
   optional string error = 2;
   string code = 3;
   int32 expires_in = 4;
+}
+
+message StartSsoRequest {
+  string user_id = 1;
+  /// The browser's current token, kept (and extended) when it is this user's.
+  optional string token = 2;
+}
+
+message StartSsoResponse {
+  string token = 1;
+  int32 expires_in = 2;
+}
+
+message ExchangeSsoRequest {
+  string token = 1;
+  /// "staff" (workspace) or "guest" (bookings).
+  string target = 2;
+  optional string device_info = 3;
+  optional SessionSource source = 4;
+}
+
+message EndSsoRequest {
+  string token = 1;
+}
+
+message EndSsoResponse {
+  bool ok = 1;
 }
 
 message ConsumeAppHandoffRequest {

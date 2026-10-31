@@ -35,6 +35,8 @@ service CommunicationService {
   rpc SendStaffInvitationMail(SendStaffInvitationMailRequest) returns (SendStaffInvitationMailResponse);
   rpc SendBookingMail(SendBookingMailRequest) returns (SendBookingMailResponse);
   rpc SendOpsAlertMail(SendOpsAlertMailRequest) returns (SendOpsAlertMailResponse);
+  /// Website contact form: notifies the team (reply-to the sender) and confirms receipt to the sender.
+  rpc SendContactMail(SendContactMailRequest) returns (SendContactMailResponse);
   rpc SendUserPush(SendUserPushRequest) returns (SendUserPushResponse);
   rpc SendPayrollApprovedMail(SendPayrollApprovedMailRequest) returns (SendPayrollApprovedMailResponse);
 
@@ -174,6 +176,23 @@ message SendOpsAlertMailRequest {
 }
 
 message SendOpsAlertMailResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
+message SendContactMailRequest {
+  string name = 1;
+  string email = 2;
+  optional string organization = 3;
+  /// onboarding | demo | support | partnership | other
+  string intent = 4;
+  string message = 5;
+  /// Page the form was sent from, for the team's context.
+  optional string page_url = 6;
+  optional string ip = 7;
+}
+
+message SendContactMailResponse {
   bool success = 1;
   optional string error = 2;
 }
