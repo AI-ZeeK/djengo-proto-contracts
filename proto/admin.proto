@@ -901,6 +901,8 @@ message PreviewCampaignEmailResponse {
   string subject = 2;
   string text = 3;
   optional string sent_to = 4;
+  // The designed version; the text is sent alongside it.
+  string html = 5;
 }
 
 message OutreachUnsubscribeRequest {
